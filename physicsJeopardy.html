@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Exam Showdown - Jeopardy</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX for beautiful math typesetting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <style>
+        .katex { font-size: 1.1em; }
+        /* Custom scrollbar styling for a high-tech premium feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #312e81;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338ca;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white font-sans min-h-screen flex flex-col justify-between overflow-x-hidden pb-12">
+
+    <!-- Header Bar -->
+    <header class="bg-slate-900 border-b border-indigo-500/30 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-indigo-500 to-purple-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight">
+                    PHYSICS EXAM SHOWDOWN
+                </h1>
+                <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Semester Exam Review Game (25-26)</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button
+                onclick="toggleEquationSheet(true)"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-indigo-500/50 transition-all font-bold text-sm text-indigo-300"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Formula Sheet
+            </button>
+            <div class="text-xs font-semibold px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-slate-300">
+                Topic: Forces & Conservation
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Board View -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- Jeopardy Board (3/4 Width) -->
+        <div class="lg:col-span-3 space-y-4">
+            <div id="jeopardy-board" class="grid grid-cols-6 gap-2 md:gap-3">
+                <!-- Javascript will render categories and questions here dynamically -->
+            </div>
+        </div>
+
+        <!-- Scoreboard Panel (1/4 Width) -->
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between gap-6 shadow-xl backdrop-blur-md h-fit">
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-md font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                        Scoreboard
+                    </h2>
+                    <button
+                        onclick="addTeam()"
+                        id="btn-add-team"
+                        class="text-xs bg-indigo-500 hover:bg-indigo-600 disabled:bg-slate-800 text-white font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all"
+                    >
+                        + Add Team
+                    </button>
+                </div>
+
+                <!-- Teams Container -->
+                <div id="teams-container" class="space-y-3">
+                    <!-- Dynamic Team lists rendered here -->
+                </div>
+            </div>
+
+            <div class="bg-slate-950 p-4 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest">Active Selector</h4>
+                <p class="text-xs text-slate-300">
+                    Points validated in question view will credit/debit: <strong id="active-team-indicator" class="text-indigo-400">Team Alpha</strong>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Slide-out Formula Sheet Reference -->
+    <div id="equation-sheet" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex justify-end transition-transform translate-x-full duration-300">
+        <div class="w-full max-w-xl bg-slate-900 h-full border-l border-slate-800 p-6 overflow-y-auto shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h2 class="text-lg font-black tracking-wider text-slate-100 uppercase">PHYSICS FORMULA SHEET</h2>
+                </div>
+                <button
+                    onclick="toggleEquationSheet(false)"
+                    class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Formulas Group -->
+            <div class="space-y-6">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h3 class="text-xs font-black uppercase text-indigo-400 tracking-wider mb-2">Unit 3 - Forces</h3>
+                    <ul class="space-y-1.5 text-sm text-slate-300">
+                        <li><strong>Newton's 2nd Law:</strong> $F_{\text{net}} = ma$</li>
+                        <li><strong>Force of Gravity:</strong> $F_g = mg \quad (g \approx 9.8 \text{ m/s}^2)$</li>
+                        <li><strong>Friction Force:</strong> $F_f \le \mu_s F_N \quad (\text{static}), \quad F_f = \mu_k F_N \quad (\text{kinetic})$</li>
+                        <li><strong>Spring Force (Hooke's Law):</strong> $F_s = -kx$</li>
+                        <li><strong>Centripetal Acceleration:</strong> $a_c = \frac{v^2}{r}$</li>
+                        <li><strong>Centripetal Force:</strong> $F_c = m a_c = m\frac{v^2}{r}$</li>
+                        <li><strong>Angled Forces on Incline:</strong> $F_{\parallel} = mg\sin\theta, \quad F_{\perp} = mg\cos\theta$</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <h3 class="text-xs font-black uppercase text-indigo-400 tracking-wider mb-2">Unit 4 - Conservation</h3>
+                    <ul class="space-y-1.5 text-sm text-slate-300">
+                        <li><strong>Kinetic Energy:</strong> $KE = \frac{1}{2}mv^2$</li>
+                        <li><strong>Gravitational Potential Energy:</strong> $GPE = mgh$</li>
+                        <li><strong>Elastic Potential Energy:</strong> $EPE = \frac{1}{2}kx^2$</li>
+                        <li><strong>Work-Energy Theorem:</strong> $W = \Delta E_k = F d \cos\theta$</li>
+                        <li><strong>Momentum:</strong> $p = mv$</li>
+                        <li><strong>Impulse-Momentum:</strong> $J = F \Delta t = \Delta p = m \Delta v$</li>
+                        <li><strong>Conservation of Momentum:</strong> $\sum p_i = \sum p_f$</li>
+                        <li><strong>Elastic Collisions:</strong> $m_1 v_{1i} + m_2 v_{2i} = m_1 v_{1f} + m_2 v_{2f}$</li>
+                        <li><strong>Inelastic Collisions:</strong> $m_1 v_{1i} + m_2 v_{2i} = (m_1 + m_2) v_f$</li>
+                    </ul>
+                </div>
+
+                <div class="bg-indigo-950/20 p-4 rounded-xl border border-indigo-500/20 text-xs text-slate-400">
+                    <p>💡 Tip: Use this formula sheet to quickly double check equations during the game. Remember to include standard units for full marks!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Question / Daily Double Modal -->
+    <div id="question-modal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-slate-900 border border-indigo-500/30 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden">
+            
+            <!-- Daily Double Container -->
+            <div id="dd-screen" class="p-8 text-center space-y-6 bg-gradient-to-b from-indigo-950 to-slate-900 hidden">
+                <div class="w-20 h-20 bg-yellow-400 text-slate-950 rounded-full flex items-center justify-center text-3xl font-black mx-auto shadow-lg animate-bounce">
+                    ⚡
+                </div>
+                <div>
+                  <h2 class="text-3xl font-black text-yellow-400 uppercase tracking-widest animate-pulse">DAILY DOUBLE!</h2>
+                  <p class="text-sm text-slate-300 mt-2">Place your bet based on your active points!</p>
+                </div>
+
+                <div class="max-w-xs mx-auto space-y-3">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span id="dd-min-wager">Minimum: 100</span>
+                      <span id="dd-max-wager">Max: 1000</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="dd-wager-input"
+                      value="100"
+                      class="w-full bg-slate-950 border border-indigo-500/50 rounded-xl px-4 py-3 text-center text-2xl font-black text-yellow-400 focus:outline-none"
+                    />
+                    <button
+                      onclick="confirmWager()"
+                      class="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider transition-all"
+                    >
+                      Confirm Wager
+                    </button>
+                </div>
+            </div>
+
+            <!-- Standard Question Layout -->
+            <div id="standard-screen" class="flex flex-col md:flex-row h-full max-h-[90vh]">
+                
+                <!-- Info & Question Text Column -->
+                <div class="flex-1 p-6 md:p-8 flex flex-col justify-between space-y-6 border-b md:border-b-0 md:border-r border-slate-800">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center gap-2">
+                            <span id="question-target" class="text-xs uppercase font-black tracking-widest bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/30">
+                                TARGET PLACEHOLDER
+                            </span>
+                            <span id="question-value-badge" class="text-sm font-bold text-yellow-400">
+                                Value: 100 pts
+                            </span>
+                        </div>
+
+                        <h3 id="question-text" class="text-lg md:text-xl font-medium text-slate-100 leading-relaxed">
+                            Question text goes here...
+                        </h3>
+
+                        <!-- Show Answer Area -->
+                        <div id="answer-box" class="bg-emerald-950/20 border border-emerald-500/30 p-4 rounded-2xl space-y-2 mt-4 hidden">
+                            <span class="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Correct Answer:</span>
+                            <p id="answer-text" class="text-sm md:text-base text-slate-200">Answer placeholder...</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="space-y-4 pt-4 border-t border-slate-800/60">
+                        <div class="flex gap-3">
+                            <button
+                                id="btn-reveal-answer"
+                                onclick="revealAnswer()"
+                                class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-sm tracking-wider transition-all"
+                            >
+                                Reveal Answer
+                            </button>
+                            <div id="grading-actions" class="flex-1 flex gap-3 hidden">
+                                <button
+                                    onclick="gradeQuestion(true)"
+                                    class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-sm text-white tracking-wider transition-all flex items-center justify-center gap-2"
+                                >
+                                    ✓ Correct
+                                </button>
+                                <button
+                                    onclick="gradeQuestion(false)"
+                                    class="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-sm text-white tracking-wider transition-all flex items-center justify-center gap-2"
+                                >
+                                    ✗ Incorrect
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-400">
+                                Grading for: <strong id="grading-team-name" class="text-indigo-400">Team Alpha</strong>
+                            </span>
+                            <button
+                                onclick="dismissQuestion()"
+                                class="text-xs text-slate-400 hover:text-white underline transition-all"
+                            >
+                                Skip & Close Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawing Whiteboard Canvas Panel -->
+                <div class="w-full md:w-96 bg-slate-950 p-6 flex flex-col justify-between gap-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-xs font-black tracking-widest text-slate-400 uppercase flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                Physics Canvas
+                            </h4>
+                            <button
+                                onclick="clearCanvas()"
+                                class="text-[10px] bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white px-2.5 py-1 rounded-md border border-slate-800"
+                            >
+                                Clear Canvas
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mb-3">Draw freebody diagrams or scratch out equations directly on screen.</p>
+
+                        <!-- Canvas Holder -->
+                        <div class="border border-slate-800 rounded-2xl overflow-hidden bg-slate-900">
+                            <canvas id="scratchpad" width="330" height="280" class="cursor-crosshair w-full"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Controls -->
+                    <div class="flex items-center justify-between gap-4 bg-slate-900 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-semibold text-slate-400">Color:</span>
+                            <div class="flex gap-1.5" id="color-palette">
+                                <!-- Colors rendered here dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-semibold text-slate-400">Brush:</span>
+                            <input
+                                type="range"
+                                id="brush-size"
+                                min="1"
+                                max="8"
+                                value="3"
+                                class="w-16 accent-indigo-500"
+                                onchange="updateBrushSettings()"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto w-full px-6 text-center text-xs text-slate-500 mt-8">
+        <p>💡 Interactive features: Use Team Selector on the right to award points. Click standard formula sheets anytime to consult equations.</p>
+        <p class="mt-1">Physics Exam Prep review materials curated from Physics I review syllabus (Units 3 & 4).</p>
+    </footer>
+
+    <!-- Logic Controller Scripts -->
+    <script>
+        // Data Structure matching the user's exam packet
+        const JEOPARDY_DATA = [
+          {
+            category: "Newton's Laws",
+            questions: [
+              {
+                value: 100,
+                question: "According to Newton's First Law (Law of Inertia), what happens to an object moving at constant velocity if the net external force acting on it is zero?",
+                answer: "It remains in motion at that same constant velocity in a straight line.",
+                target: "3.01B - Newton's First Law"
+              },
+              {
+                value: 200,
+                question: "If the net force acting on a block is doubled and its mass is also doubled, how does its acceleration change?",
+                answer: "The acceleration remains unchanged (same), since $a = F_{\\text{net}}/m$.",
+                target: "3.02A - Newton's Second Law"
+              },
+              {
+                value: 300,
+                question: "A massive truck collides head-on with a small hybrid car. According to Newton's Third Law, which vehicle experiences the greater force during the collision?",
+                answer: "They experience equal and opposite force magnitudes. Newton's 3rd Law states $F_{\\text{truck on car}} = -F_{\\text{car on truck}}$.",
+                target: "3.03B - Newton's Third Law"
+              },
+              {
+                value: 400,
+                question: "An elevator is accelerating upwards at $2 \\text{ m/s}^2$. What is the relationship between the upward normal force ($F_N$) on a $50\\text{ kg}$ passenger and their downward force of gravity ($F_g$)?",
+                answer: "The normal force is greater than gravity. $F_N = m(g + a) = 50(9.8 + 2) = 590\\text{ N}$, whereas $F_g = mg = 490\\text{ N}$.",
+                target: "3.05B - Vertical Unbalanced Forces"
+              },
+              {
+                value: 500,
+                question: "What is the true third law action-reaction pair to the downward gravitational pull of the Earth on a physics textbook resting on a table?",
+                answer: "The upward gravitational force exerted by the textbook pulling the Earth up.",
+                target: "3.03B - Newton's Third Law"
+              }
+            ]
+          },
+          {
+            category: "Force Interactions",
+            questions: [
+              {
+                value: 100,
+                question: "Distinguish between static friction and kinetic friction. Which of the two coefficients is typically larger?",
+                answer: "Static friction acts on stationary objects to prevent slipping; kinetic friction acts on sliding objects. The static friction coefficient ($\\mu_s$) is typically larger.",
+                target: "3.06B - Friction"
+              },
+              {
+                value: 200,
+                question: "A $2\\text{ kg}$ block is held stationary against a vertical brick wall by a horizontal pushing force of $50\\text{ N}$. What is the magnitude and direction of the static friction force acting on the block? (Use $g = 9.8\\text{ m/s}^2$)",
+                answer: "The static friction force is $19.6\\text{ N}$ directed upwards (balancing gravity: $F_s = F_g = mg = 2 \\times 9.8 = 19.6\\text{ N}$).",
+                target: "3.06C - Advanced Force Interactions"
+              },
+              {
+                value: 300,
+                question: "If a spring with spring constant $k = 250\\text{ N/m}$ is compressed by $0.2\\text{ m}$, what is the magnitude of the spring force it exerts?",
+                answer: "$F_s = kx = 250 \\times 0.2 = 50\\text{ N}$.",
+                target: "3.06B - Springs"
+              },
+              {
+                value: 400,
+                question: "An object is moving in a circle of radius $r$ at a constant speed $v$. What is the direction of its acceleration, and what is the formula for its centripetal acceleration?",
+                answer: "The acceleration is directed towards the center of the circle (centripetal). The magnitude is $a_c = \\frac{v^2}{r}$.",
+                target: "3.05C - Centripetal Acceleration"
+              },
+              {
+                value: 500,
+                question: "A $1000\\text{ kg}$ car travels over a circular hill crest of radius $20\\text{ m}$ at a speed of $10\\text{ m/s}$. What is the normal force exerted by the road on the car at the peak? (Use $g = 9.8\\text{ m/s}^2$)",
+                answer: "At the peak: $F_g - F_N = m\\frac{v^2}{r} \\implies F_N = mg - m\\frac{v^2}{r} = 1000(9.8) - 1000\\frac{10^2}{20} = 9800 - 5000 = 4800\\text{ N}$.",
+                target: "3.05C - Centripetal Forces"
+              }
+            ]
+          },
+          {
+            category: "Angles & Inclines",
+            questions: [
+              {
+                value: 100,
+                question: "A tow rope pulls a crate with a force of $100\\text{ N}$ at an angle of $30^\\circ$ above the horizontal. What are the horizontal and vertical components of this pulling force?",
+                answer: "$F_x = 100 \\cos(30^\\circ) \\approx 86.6\\text{ N}$; $F_y = 100 \\sin(30^\\circ) = 50\\text{ N}$.",
+                target: "3.07A - Resolving Vectors"
+              },
+              {
+                value: 200,
+                question: "For a block of mass $m$ sliding down a frictionless incline of angle $\\theta$, what expression represents the component of gravity pulling the block down along the ramp?",
+                answer: "$F_{g,\\parallel} = mg \\sin\\theta$.",
+                target: "3.07C - Inclined Planes"
+              },
+              {
+                value: 300,
+                question: "A $5\\text{ kg}$ crate rests on a ramp inclined at $30^\\circ$. What is the normal force acting on the crate? (Use $g = 9.8\\text{ m/s}^2$)",
+                answer: "$F_N = mg \\cos\\theta = 5 \\times 9.8 \\times \\cos(30^\\circ) = 49 \\times 0.866 \\approx 42.4\\text{ N}$.",
+                target: "3.07C - Normal Force on Incline"
+              },
+              {
+                value: 400,
+                question: "A crate is pulled across a rough floor with friction by a rope tilted upward at angle $\\theta$ from the floor. Explain why this angle decreases the overall force of friction compared to pulling horizontally with the same tension.",
+                answer: "The vertical component of tension ($T \\sin\\theta$) supports some of the weight, reducing the normal force ($F_N = mg - T \\sin\\theta$). Since friction depends on the normal force ($F_f = \\mu F_N$), friction is reduced.",
+                target: "3.07B - Forces at an Angle"
+              },
+              {
+                value: 500,
+                question: "A $4\\text{ kg}$ block is held at rest on a $30^\\circ$ inclined plane with friction. What is the magnitude of the static friction force keeping the block from sliding? (Use $g = 9.8\\text{ m/s}^2$)",
+                answer: "Since the block is at rest, static friction must balance the parallel component of gravity: $F_s = mg \\sin\\theta = 4 \\times 9.8 \\times \\sin(30^\\circ) = 39.2 \\times 0.5 = 19.6\\text{ N}$.",
+                target: "3.07C - Forces on Inclines"
+              }
+            ]
+          },
+          {
+            category: "Conservation of Energy",
+            questions: [
+              {
+                value: 100,
+                question: "State the mathematical equations for Kinetic Energy ($KE$) and Gravitational Potential Energy ($GPE$).",
+                answer: "$KE = \\frac{1}{2}mv^2$ and $GPE = mgh$.",
+                target: "Unit 4 - Mechanical Energy"
+              },
+              {
+                value: 200,
+                question: "In energy conservation problems, what do the bars and components of an 'LOL' diagram represent?",
+                answer: "The first 'L' shows the initial energy storage columns (e.g. $K_i, U_g, U_s$), the 'O' represents the defined system and transfers (Work in/out), and the final 'L' represents final energy storage columns ($K_f, U_g, U_s$).",
+                target: "Unit 4 - Energy System Representations"
+              },
+              {
+                value: 300,
+                question: "A $2\\text{ kg}$ cart starts from rest at the top of a frictionless $10\\text{ m}$ high hill. How fast is the cart moving when it reaches the bottom? (Use $g = 9.8\\text{ m/s}^2$)",
+                answer: "$GPE_{\\text{top}} = KE_{\\text{bottom}} \\implies mgh = \\frac{1}{2}mv^2 \\implies v = \\sqrt{2gh} = \\sqrt{2 \\times 9.8 \\times 10} = \\sqrt{196} = 14\\text{ m/s}$.",
+                target: "Unit 4 - Conservation of Energy"
+              },
+              {
+                value: 400,
+                question: "A toy spring gun contains a spring with $k = 500\\text{ N/m}$. If the spring is compressed by $0.1\\text{ m}$, how much Elastic Potential Energy ($EPE$) is stored?",
+                answer: "$EPE = \\frac{1}{2}kx^2 = \\frac{1}{2}(500)(0.1)^2 = 250 \\times 0.01 = 2.5\\text{ J}$.",
+                target: "Unit 4 - Spring Energy"
+              },
+              {
+                value: 500,
+                question: "A roller coaster car starts with $120\\text{ J}$ of gravitational potential energy at the top of a hill. At the bottom, its kinetic energy is measured to be $100\\text{ J}$. How much thermal energy was generated by friction, and how much work did friction do?",
+                answer: "$20\\text{ J}$ of thermal energy was generated. Friction did $-20\\text{ J}$ of work on the coaster.",
+                target: "Unit 4 - Work and Energy Dissipation"
+              }
+            ]
+          },
+          {
+            category: "Momentum & Collisions",
+            questions: [
+              {
+                value: 100,
+                question: "State the mathematical formulas for momentum ($p$) and impulse ($J$), and state the units of momentum.",
+                answer: "$p = mv$ and $J = F \\Delta t = \\Delta p$. The unit is $\\text{kg}\\cdot\\text{m/s}$ or $\\text{N}\\cdot\\text{s}$.",
+                target: "Unit 4 - Impulse & Momentum"
+              },
+              {
+                value: 200,
+                question: "Under what specific condition is the total momentum of a system of colliding objects guaranteed to be conserved?",
+                answer: "When there is no net external force acting on the system ($F_{\\text{net, ext}} = 0$).",
+                target: "4.8B - Conservation of Momentum"
+              },
+              {
+                value: 300,
+                question: "A $4\\text{ kg}$ physics projectile is launched at $45\\text{ m/s}$ from a $120\\text{ kg}$ launcher at rest. What is the recoil velocity of the launcher?",
+                answer: "By Conservation of Momentum ($p_i = p_f = 0$): $0 = m_1 v_1 + m_2 v_2 \\implies 0 = 4(45) + 120(v_2) \\implies v_2 = -180 / 120 = -1.5\\text{ m/s}$ (in the opposite direction).",
+                target: "4.8B - Conservation of Momentum"
+              },
+              {
+                value: 400,
+                question: "Compare elastic and inelastic collisions. What is conserved in both, and how do they differ regarding kinetic energy?",
+                answer: "Both conserve total momentum. In an elastic collision, kinetic energy is also conserved. In an inelastic collision, kinetic energy is NOT conserved (some is transformed into thermal energy, sound, or deformation).",
+                target: "Unit 4 - Collision Classification"
+              },
+              {
+                value: 500,
+                question: "A $3\\text{ kg}$ cart moving to the right at $4\\text{ m/s}$ collides with and sticks to a stationary $5\\text{ kg}$ cart. What is their combined velocity after the collision?",
+                answer: "By Conservation of Momentum: $m_1 v_1 = (m_1 + m_2)v_f \\implies 3(4) = (3 + 5)v_f \\implies 12 = 8 v_f \\implies v_f = 1.5\\text{ m/s}$ to the right.",
+                target: "4.8B - Conservation of Momentum"
+              }
+            ]
+          },
+          {
+            category: "Challenge & Combo",
+            questions: [
+              {
+                value: 100,
+                question: "Explain what mechanical energy is, and give two common examples of non-conservative forces that can change a system's mechanical energy.",
+                answer: "Mechanical energy is the sum of kinetic and potential energies ($ME = KE + PE$). Non-conservative forces include friction, air resistance, and applied tension forces.",
+                target: "Unit 4 - Conservation of Energy"
+              },
+              {
+                value: 200,
+                question: "An object of mass $m$ is hung from a vertical spring with spring constant $k$. When the mass hangs in equilibrium (rest), how far has the spring stretched?",
+                answer: "$x = \\frac{mg}{k}$, since at equilibrium, the upward spring force ($kx$) equals the downward gravitational force ($mg$).",
+                target: "3.06B - Forces and Springs"
+              },
+              {
+                value: 300,
+                question: "What is the minimum speed a roller coaster car must have at the top of a circular loop of radius $R$ to maintain contact with the track?",
+                answer: "$v_{\\text{min}} = \\sqrt{gR}$, occurs when normal force ($F_N$) drops to zero, and gravity alone provides the centripetal acceleration ($mg = m v^2 / R$).",
+                target: "3.05C - Centripetal Forces"
+              },
+              {
+                value: 400,
+                question: "A $0.02\\text{ kg}$ bullet is fired horizontally into a $0.98\\text{ kg}$ wooden block suspended as a pendulum. The block/bullet system swings up to a maximum height of $0.8\\text{ m}$. What was the initial velocity of the bullet? (Use $g = 9.8\\text{ m/s}^2$)",
+                answer: "1) Swing phase (Energy): $\\frac{1}{2}(M)v^2 = Mgh \\implies v = \\sqrt{2gh} = \\sqrt{2(9.8)(0.8)} = 3.96\\text{ m/s}$. 2) Collision phase (Momentum): $m_1 v_{1i} = (m_1+m_2)v_f \\implies 0.02 v_{1i} = (1.0)(3.96) \\implies v_{1i} = 198\\text{ m/s}$.",
+                target: "4.8C - Combo Energy and Momentum"
+              },
+              {
+                value: 500,
+                question: "Two identical $2\\text{ kg}$ carts moving toward each other at $1\\text{ m/s}$ ($v_a = 1\\text{ m/s}$, $v_b = -1\\text{ m/s}$) collide in a perfectly inelastic collision. What is the total final momentum, and how much kinetic energy is converted to thermal energy?",
+                answer: "Total initial (and final) momentum is zero ($2(1) + 2(-1) = 0$). Since they stick and $p_f = 0$, $v_f = 0$. Initial $KE = \\frac{1}{2}(2)(1)^2 + \\frac{1}{2}(2)(-1)^2 = 2\\text{ J}$. Final $KE = 0$. $2\\text{ J}$ of kinetic energy is converted to thermal energy.",
+                target: "4.8C - Combo Energy and Momentum"
+              }
+            ]
+          }
+        ];
+
+        // State variables
+        let teams = [
+            { name: "Team Alpha", score: 0 },
+            { name: "Team Beta", score: 0 }
+        ];
+        let selectedTeamIndex = 0;
+        let answeredMap = {}; // Key: "col-row", Value: true/false
+        let currentQuestion = null;
+        let showAnswer = false;
+        let dailyDouble = { col: 3, row: 3 }; // Random location
+        let wager = 100;
+        let isWagerConfirmed = false;
+
+        // Sound Synthesis controller
+        function playSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.1);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.5);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else if (type === 'daily_double') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(220, ctx.currentTime);
+                    osc.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.6);
+                }
+            } catch (e) {
+                console.log("Audio contexts blocked or not supported on device.");
+            }
+        }
+
+        // Initialize App
+        window.onload = function() {
+            // Pick a random spot for the Daily Double on boot
+            dailyDouble.col = Math.floor(Math.random() * 6);
+            dailyDouble.row = Math.floor(Math.random() * 5);
+
+            renderBoard();
+            renderScoreboard();
+            renderColors();
+            initCanvas();
+        };
+
+        // Render the Grid Board
+        function renderBoard() {
+            const board = document.getElementById('jeopardy-board');
+            board.innerHTML = '';
+
+            JEOPARDY_DATA.forEach((colData, colIdx) => {
+                // Column container
+                const colDiv = document.createElement('div');
+                colDiv.className = "flex flex-col gap-2";
+
+                // Header
+                const header = document.createElement('div');
+                header.className = "bg-slate-900 border border-slate-800 rounded-xl p-2 min-h-[70px] flex items-center justify-center text-center shadow-md";
+                header.innerHTML = `<h3 class="text-[10px] md:text-xs font-black uppercase text-indigo-400 tracking-wider leading-tight">${colData.category}</h3>`;
+                colDiv.appendChild(header);
+
+                // Row Point Cards
+                colData.questions.forEach((q, rowIdx) => {
+                    const isAnswered = answeredMap[`${colIdx}-${rowIdx}`];
+                    const cardBtn = document.createElement('button');
+                    cardBtn.className = `h-16 md:h-24 rounded-xl font-bold flex flex-col items-center justify-center transition-all relative overflow-hidden group border ${
+                        isAnswered
+                            ? 'bg-slate-950 border-slate-900 text-slate-800 cursor-not-allowed'
+                            : 'bg-gradient-to-b from-indigo-950 to-slate-900 border-indigo-900/40 text-yellow-400 hover:scale-[1.03] hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-500'
+                    }`;
+                    cardBtn.disabled = isAnswered;
+                    cardBtn.onclick = () => handleQuestionClick(colIdx, rowIdx, q);
+
+                    if (!isAnswered) {
+                        cardBtn.innerHTML = `
+                            <span class="text-xl md:text-2xl font-extrabold tracking-wider group-hover:text-yellow-300">${q.value}</span>
+                            <span class="hidden md:block text-[8px] uppercase text-slate-500 tracking-widest font-semibold mt-1">Review Target</span>
+                        `;
+                    } else {
+                        cardBtn.innerHTML = `
+                            <svg class="w-5 h-5 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                        `;
+                    }
+                    colDiv.appendChild(cardBtn);
+                });
+
+                board.appendChild(colDiv);
+            });
+        }
+
+        // Render Scoreboard
+        function renderScoreboard() {
+            const container = document.getElementById('teams-container');
+            container.innerHTML = '';
+
+            teams.forEach((team, idx) => {
+                const teamDiv = document.createElement('div');
+                teamDiv.className = `p-4 rounded-xl border transition-all cursor-pointer ${
+                    selectedTeamIndex === idx
+                        ? 'bg-indigo-950/40 border-indigo-500 shadow-md shadow-indigo-500/10'
+                        : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                }`;
+                teamDiv.onclick = () => {
+                    playSound('click');
+                    selectedTeamIndex = idx;
+                    renderScoreboard();
+                };
+
+                teamDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <input
+                            type="text"
+                            value="${team.name}"
+                            onclick="event.stopPropagation()"
+                            onchange="updateTeamName(${idx}, this.value)"
+                            class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-indigo-500 focus:outline-none font-bold text-sm text-slate-200 w-32"
+                        />
+                        ${
+                            teams.length > 1
+                                ? `<button onclick="event.stopPropagation(); removeTeam(${idx})" class="text-slate-500 hover:text-red-400 p-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                   </button>`
+                                : ''
+                        }
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-black text-yellow-400">
+                            ${team.score} <span class="text-xs text-slate-500 font-normal">pts</span>
+                        </span>
+                        <div class="flex gap-1" onclick="event.stopPropagation()">
+                            <button onclick="adjustScore(${idx}, -100)" class="w-7 h-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-md text-xs transition-all">-</button>
+                            <button onclick="adjustScore(${idx}, 100)" class="w-7 h-7 flex items-center justify-center bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 font-bold rounded-md text-xs transition-all">+</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(teamDiv);
+            });
+
+            // Update Active indicators
+            const indicator = document.getElementById('active-team-indicator');
+            if (teams[selectedTeamIndex]) {
+                indicator.textContent = teams[selectedTeamIndex].name;
+            }
+
+            // Disable/Enable Add Team button
+            const addBtn = document.getElementById('btn-add-team');
+            addBtn.disabled = teams.length >= 4;
+        }
+
+        // Teams actions
+        function addTeam() {
+            if (teams.length < 4) {
+                playSound('click');
+                teams.push({ name: `Team ${String.fromCharCode(65 + teams.length)}`, score: 0 });
+                renderScoreboard();
+            }
+        }
+
+        function removeTeam(idx) {
+            if (teams.length > 1) {
+                playSound('click');
+                teams.splice(idx, 1);
+                if (selectedTeamIndex >= teams.length) {
+                    selectedTeamIndex = teams.length - 1;
+                }
+                renderScoreboard();
+            }
+        }
+
+        function updateTeamName(idx, name) {
+            teams[idx].name = name;
+            renderScoreboard();
+        }
+
+        function adjustScore(idx, amt) {
+            playSound('click');
+            teams[idx].score += amt;
+            renderScoreboard();
+        }
+
+        // Toggle Reference Sheets
+        function toggleEquationSheet(show) {
+            playSound('click');
+            const sheet = document.getElementById('equation-sheet');
+            if (show) {
+                sheet.classList.remove('translate-x-full');
+            } else {
+                sheet.classList.add('translate-x-full');
+            }
+        }
+
+        // Question / Daily Double Handler
+        function handleQuestionClick(colIdx, rowIdx, question) {
+            playSound('click');
+            const isDD = dailyDouble.col === colIdx && dailyDouble.row === rowIdx;
+            currentQuestion = { ...question, colIdx, rowIdx, isDailyDouble: isDD };
+            showAnswer = false;
+
+            const modal = document.getElementById('question-modal');
+            modal.classList.remove('hidden');
+
+            const ddScreen = document.getElementById('dd-screen');
+            const standardScreen = document.getElementById('standard-screen');
+
+            if (isDD) {
+                // Prepare Daily Double wager configuration
+                ddScreen.classList.remove('hidden');
+                standardScreen.classList.add('hidden');
+                const maxWager = Math.max(1000, teams[selectedTeamIndex].score);
+                document.getElementById('dd-max-wager').innerText = `Max: ${maxWager}`;
+                document.getElementById('dd-wager-input').value = question.value;
+                wager = question.value;
+            } else {
+                ddScreen.classList.add('hidden');
+                standardScreen.classList.remove('hidden');
+                loadQuestionDetails();
+            }
+        }
+
+        // Validate wager & confirm
+        function confirmWager() {
+            const input = document.getElementById('dd-wager-input');
+            const maxWager = Math.max(1000, teams[selectedTeamIndex].score);
+            let val = parseInt(input.value);
+            if (isNaN(val) || val < 100) val = 100;
+            if (val > maxWager) val = maxWager;
+            wager = val;
+
+            playSound('daily_double');
+            document.getElementById('dd-screen').classList.add('hidden');
+            document.getElementById('standard-screen').classList.remove('hidden');
+            loadQuestionDetails();
+        }
+
+        // Populates standard question layout content
+        function loadQuestionDetails() {
+            document.getElementById('question-target').innerText = currentQuestion.target;
+            const pointsLabel = currentQuestion.isDailyDouble ? `${wager} pts (DD)` : `${currentQuestion.value} pts`;
+            document.getElementById('question-value-badge').innerText = `Value: ${pointsLabel}`;
+            document.getElementById('question-text').innerText = currentQuestion.question;
+            document.getElementById('answer-text').innerText = currentQuestion.answer;
+            document.getElementById('grading-team-name').innerText = teams[selectedTeamIndex].name;
+
+            // Hide answers / reset buttons
+            document.getElementById('answer-box').classList.add('hidden');
+            document.getElementById('btn-reveal-answer').classList.remove('hidden');
+            document.getElementById('grading-actions').classList.add('hidden');
+
+            // Render latex equations
+            renderMath();
+            clearCanvas();
+        }
+
+        function revealAnswer() {
+            playSound('click');
+            showAnswer = true;
+            document.getElementById('answer-box').classList.remove('hidden');
+            document.getElementById('btn-reveal-answer').classList.add('hidden');
+            document.getElementById('grading-actions').classList.remove('hidden');
+            renderMath();
+        }
+
+        function gradeQuestion(isCorrect) {
+            const points = currentQuestion.isDailyDouble ? wager : currentQuestion.value;
+            if (isCorrect) {
+                playSound('correct');
+                teams[selectedTeamIndex].score += points;
+                // Instantly dismiss if correct
+                answeredMap[`${currentQuestion.colIdx}-${currentQuestion.rowIdx}`] = true;
+                document.getElementById('question-modal').classList.add('hidden');
+                renderBoard();
+                renderScoreboard();
+            } else {
+                playSound('wrong');
+                teams[selectedTeamIndex].score -= points;
+                renderScoreboard();
+                // We keep modal open to allow other teams to steal! Update indicator
+                document.getElementById('grading-team-name').innerText = teams[selectedTeamIndex].name;
+            }
+        }
+
+        function dismissQuestion() {
+            playSound('click');
+            answeredMap[`${currentQuestion.colIdx}-${currentQuestion.rowIdx}`] = true;
+            document.getElementById('question-modal').classList.add('hidden');
+            renderBoard();
+        }
+
+        // Render mathematical structures using KaTeX auto-renderer safely
+        function renderMath() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ]
+                });
+            }
+        }
+
+        // Canvas & Whiteboard controller scripts
+        let canvas, ctx;
+        let isDrawing = false;
+        let drawingColor = '#ffffff';
+        let brushSize = 3;
+
+        const colors = ['#ffffff', '#6366f1', '#10b981', '#f59e0b', '#ef4444'];
+
+        function renderColors() {
+            const palette = document.getElementById('color-palette');
+            palette.innerHTML = '';
+            colors.forEach(col => {
+                const btn = document.createElement('button');
+                btn.className = `w-4 h-4 rounded-full transition-all border ${
+                    drawingColor === col ? 'scale-125 border-white' : 'border-transparent'
+                }`;
+                btn.style.backgroundColor = col;
+                btn.onclick = () => {
+                    drawingColor = col;
+                    renderColors();
+                    updateBrushSettings();
+                };
+                palette.appendChild(btn);
+            });
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('scratchpad');
+            ctx = canvas.getContext('2d');
+
+            // Mouse Events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            // Touch Events
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', stopDrawing);
+
+            updateBrushSettings();
+        }
+
+        function updateBrushSettings() {
+            if (!ctx) return;
+            ctx.strokeStyle = drawingColor;
+            brushSize = parseInt(document.getElementById('brush-size').value);
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        function startDrawing(e) {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+    </script>
+</body>
+</html>
