@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebra 2 Honors: Trig Functions Study Hub</title>
+    <!-- Tailwind CSS for modern responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for beautiful SVG icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for crisp math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+    <style>
+        /* Modern custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Card Flip effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        /* Print styling for clean physical exports */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .print-card {
+                border: 1px solid #cbd5e1 !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 no-print">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md shadow-indigo-100">
+                    <i class="fa-solid fa-compass-drafting text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">Trig Functions Study Hub</h1>
+                    <p class="text-xs text-indigo-600 font-semibold uppercase tracking-wider">Algebra 2 Honors • Unit 7</p>
+                </div>
+            </div>
+            
+            <nav class="flex items-center gap-2">
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700">
+                    <i class="fa-solid fa-gamepad mr-1.5"></i> Play Quiz
+                </button>
+                <button onclick="switchTab('flashcards')" id="tab-flashcards" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-layer-group mr-1.5"></i> Flashcards
+                </button>
+                <button onclick="switchTab('exporter')" id="tab-exporter" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    <i class="fa-solid fa-file-export mr-1.5"></i> Export Hub
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+        
+        <!-- ================= QUIZ TAB ================= -->
+        <section id="section-quiz" class="tab-content">
+            <!-- Game Progress Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white border border-slate-200 p-4 rounded-xl flex items-center justify-between shadow-sm">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Question</p>
+                        <h3 class="text-xl font-bold text-slate-800" id="quiz-progress-text">1 / 10</h3>
+                    </div>
+                    <div class="text-indigo-500 bg-indigo-50 p-3 rounded-lg"><i class="fa-solid fa-circle-question text-lg"></i></div>
+                </div>
+                <div class="bg-white border border-slate-200 p-4 rounded-xl flex items-center justify-between shadow-sm">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Score</p>
+                        <h3 class="text-xl font-bold text-emerald-600" id="quiz-score-text">0</h3>
+                    </div>
+                    <div class="text-emerald-500 bg-emerald-50 p-3 rounded-lg"><i class="fa-solid fa-circle-check text-lg"></i></div>
+                </div>
+                <div class="bg-white border border-slate-200 p-4 rounded-xl flex items-center justify-between shadow-sm">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Accuracy</p>
+                        <h3 class="text-xl font-bold text-slate-800" id="quiz-accuracy-text">100%</h3>
+                    </div>
+                    <div class="text-blue-500 bg-blue-50 p-3 rounded-lg"><i class="fa-solid fa-chart-simple text-lg"></i></div>
+                </div>
+                <div class="bg-white border border-slate-200 p-4 rounded-xl flex items-center justify-between shadow-sm">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Current Topic</p>
+                        <h3 class="text-sm font-semibold text-slate-800 truncate" id="quiz-topic-text" style="max-width: 150px;">Special Triangles</h3>
+                    </div>
+                    <div class="text-amber-500 bg-amber-50 p-3 rounded-lg"><i class="fa-solid fa-tags text-lg"></i></div>
+                </div>
+            </div>
+
+            <!-- Quiz Layout Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Question Card -->
+                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl shadow-sm p-6 relative overflow-hidden flex flex-col justify-between min-h-[450px]">
+                    <!-- Question Top Status -->
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                        <span class="text-xs font-semibold text-indigo-600 uppercase bg-indigo-50 px-2.5 py-1 rounded-full" id="question-badge-topic">Right Triangle Trig</span>
+                        <button onclick="toggleHint()" class="text-xs font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fa-solid fa-lightbulb"></i> View Hint
+                        </button>
+                    </div>
+
+                    <!-- Hint Box (Hidden by default) -->
+                    <div id="hint-box" class="hidden mb-4 p-4 bg-amber-50/70 border border-amber-200 rounded-xl text-sm text-amber-800 flex items-start gap-2.5 animate-fadeIn">
+                        <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5"></i>
+                        <p id="hint-text">Use the sine ratio...</p>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="my-6">
+                        <h2 class="text-lg md:text-xl font-semibold text-slate-900 leading-relaxed" id="question-text">
+                            Loading question...
+                        </h2>
+                    </div>
+
+                    <!-- Multiple Choice Options -->
+                    <div class="grid grid-cols-1 gap-3" id="options-container">
+                        <!-- Options generated dynamically -->
+                    </div>
+
+                    <!-- Explanation Panel (Hidden by default) -->
+                    <div id="explanation-container" class="hidden mt-6 p-5 border rounded-xl animate-fadeIn">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span id="explanation-icon" class="p-1 rounded-full text-white"></span>
+                            <h4 id="explanation-title" class="font-bold text-sm"></h4>
+                        </div>
+                        <p id="explanation-text" class="text-sm text-slate-600 leading-relaxed"></p>
+                    </div>
+
+                    <!-- Next Question / Action Buttons -->
+                    <div class="mt-6 flex justify-between items-center border-t border-slate-100 pt-4">
+                        <button onclick="resetQuiz()" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Restart Quiz
+                        </button>
+                        <button id="btn-next" onclick="nextQuestion()" class="hidden px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold tracking-wide transition-colors shadow-lg shadow-indigo-100 flex items-center gap-2">
+                            <span>Next Question</span> <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reference Sidepanel & Formula Help -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2 border-b border-slate-100 pb-2">
+                            <i class="fa-solid fa-book-open text-indigo-600"></i> Trig Quick Reference
+                        </h3>
+                        
+                        <!-- Mini Reference list -->
+                        <div class="space-y-4 text-xs text-slate-600">
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-1">Special Right Triangles:</h4>
+                                <ul class="list-disc list-inside space-y-0.5 text-slate-500">
+                                    <li><strong>$30^\circ-60^\circ-90^\circ$:</strong> Sides ratio is $x : x\sqrt{3} : 2x$</li>
+                                    <li><strong>$45^\circ-45^\circ-90^\circ$:</strong> Sides ratio is $x : x : x\sqrt{2}$</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-1">Unit Circle Definitions:</h4>
+                                <ul class="list-disc list-inside space-y-0.5 text-slate-500">
+                                    <li>$\sin\theta = y/r$ &nbsp; | &nbsp; $\cos\theta = x/r$</li>
+                                    <li>$\tan\theta = y/x$ &nbsp; | &nbsp; $\csc\theta = r/y$</li>
+                                    <li>$\sec\theta = r/x$ &nbsp; | &nbsp; $\cot\theta = x/y$</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 mb-1">Quadrant Signs (ASTC):</h4>
+                                <div class="grid grid-cols-2 gap-1.5 mt-1 font-mono text-[10px] text-center">
+                                    <div class="bg-slate-50 p-1.5 rounded"><strong>Quad II (S)</strong><br>Sin (+) / Cos (-)</div>
+                                    <div class="bg-slate-50 p-1.5 rounded"><strong>Quad I (A)</strong><br>All (+)</div>
+                                    <div class="bg-slate-50 p-1.5 rounded"><strong>Quad III (T)</strong><br>Tan (+) / Sin (-)</div>
+                                    <div class="bg-slate-50 p-1.5 rounded"><strong>Quad IV (C)</strong><br>Cos (+) / Sin (-)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini feedback/tip area -->
+                    <div class="mt-6 p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-indigo-600 mt-0.5 text-sm"></i>
+                            <div>
+                                <h4 class="text-xs font-bold text-indigo-900 mb-0.5">Study Tip</h4>
+                                <p class="text-[11px] text-indigo-700 leading-relaxed">Always find the positive acute <strong>Reference Angle</strong> ($\theta'$) to easily determine standard trig values.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= FLASHCARDS TAB ================= -->
+        <section id="section-flashcards" class="tab-content hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-slate-900">Trigonometry Formula Flashcards</h2>
+                    <p class="text-sm text-slate-500 mt-1">Click the card to flip and view the answer or formula.</p>
+                </div>
+
+                <!-- Flashcard Widget -->
+                <div class="perspective-1000 w-full aspect-[16/10] max-h-[350px]">
+                    <div id="flashcard" onclick="flipCard()" class="transform-style-3d relative w-full h-full duration-500 cursor-pointer shadow-lg rounded-2xl border border-slate-200">
+                        <!-- Front Face -->
+                        <div class="backface-hidden absolute inset-0 bg-white p-8 flex flex-col justify-between rounded-2xl">
+                            <span class="text-xs font-semibold text-indigo-600 tracking-wider uppercase" id="flashcard-category">Topic</span>
+                            <div class="flex-grow flex items-center justify-center text-center px-4">
+                                <h3 class="text-xl md:text-2xl font-semibold text-slate-800" id="flashcard-front-text">Front of Card</h3>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-slate-400">
+                                <span><i class="fa-solid fa-arrows-rotate mr-1"></i> Click to Flip</span>
+                                <span id="flashcard-index">1 / 5</span>
+                            </div>
+                        </div>
+
+                        <!-- Back Face -->
+                        <div class="backface-hidden rotate-y-180 absolute inset-0 bg-indigo-900 text-white p-8 flex flex-col justify-between rounded-2xl">
+                            <span class="text-xs font-semibold text-indigo-300 tracking-wider uppercase">Formula / Explanation</span>
+                            <div class="flex-grow flex items-center justify-center text-center px-4">
+                                <h3 class="text-xl md:text-2xl font-medium text-white leading-relaxed" id="flashcard-back-text">Back of Card</h3>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-indigo-300">
+                                <span><i class="fa-solid fa-arrows-rotate mr-1"></i> Click to see question</span>
+                                <span id="flashcard-index-back">1 / 5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flashcard Controls -->
+                <div class="flex justify-between items-center mt-6">
+                    <button onclick="prevFlashcard()" class="p-3 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all shadow-sm flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <i class="fa-solid fa-arrow-left"></i> Previous
+                    </button>
+                    <button onclick="flipCard()" class="px-5 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition-all font-semibold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i> Flip Card
+                    </button>
+                    <button onclick="nextFlashcard()" class="p-3 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all shadow-sm flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        Next <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= EXPORTER TAB ================= -->
+        <section id="section-exporter" class="tab-content hidden">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl font-bold text-slate-900">Study Guide Exporter Hub</h2>
+                    <p class="text-sm text-slate-500 mt-1">Export your practice problems, test reports, or custom flashcards to PDF, Print, or File formats.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Option 1: Print / Export Study Guide -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-lg mb-2">Print Study Guide</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed mb-4">Generates a beautiful offline study guide document containing all 10 practice problems with answers and explanations. Perfect for printing or saving to PDF.</p>
+                        </div>
+                        <button onclick="window.print()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-print"></i> Print / Save as PDF
+                        </button>
+                    </div>
+
+                    <!-- Option 2: Export Practice Sheet -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-4">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-lg mb-2">Download Text File</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed mb-4">Generates and downloads a `.txt` file with all curriculum quiz questions, answer choices, and rationale explanations for offline reviewing.</p>
+                        </div>
+                        <button onclick="downloadStudySheetText()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-download"></i> Download `.txt` File
+                        </button>
+                    </div>
+
+                    <!-- Option 3: Export My Score Report -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-4">
+                                <i class="fa-solid fa-square-poll-vertical"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-lg mb-2">Export Score Report</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed mb-4">Export a complete breakdown of your current quiz performance, detailing correct/incorrect questions so you can pinpoint weak spots.</p>
+                        </div>
+                        <button onclick="exportQuizScoreReport()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-chart-line"></i> Download Score Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Alert notification box inside UI -->
+                <div id="toast-notif" class="hidden mt-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                    <span id="toast-text">Success message</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= PRINT ONLY VIEW (Hidden in standard UI) ================= -->
+    <div class="hidden print-only max-w-4xl mx-auto p-8 bg-white text-black">
+        <h1 class="text-3xl font-bold border-b-2 border-indigo-600 pb-2 mb-2">Unit 7: Trigonometric Functions</h1>
+        <p class="text-sm text-gray-500 mb-8">Comprehensive Study Guide • 10 Practice Problems with Complete Step-by-Step Rationale</p>
+
+        <div id="print-questions-container" class="space-y-8">
+            <!-- Programmatically populated print cards -->
+        </div>
+    </div>
+
+    <!-- Footer Area -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 no-print">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+            <p>© 2026 Trig Functions Study App. Built for Unit 7 Practice.</p>
+            <p>Ready to offline export! Press <kbd class="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">Ctrl + P</kbd> anytime to save current views.</p>
+        </div>
+    </footer>
+
+    <!-- Script Section -->
+    <script>
+        // Core Question Database
+        const questionsDB = [
+            {
+                question: "A $12$-foot ladder leans against a wall, making a $60^{\\circ}$ angle with the ground. What is the exact height $h$ up the wall that the ladder reaches?",
+                topic: "Right Triangle Trig Applications",
+                hint: "Use the sine ratio: $\\sin(\\theta) = \\frac{\\text{opposite}}{\\text{hypotenuse}}$. Here, the ladder length is the hypotenuse.",
+                options: [
+                    { text: "$6\\sqrt{3}$ feet", correct: true, rationale: "Using $\\sin(60^{\\circ}) = \\frac{h}{12}$, we solve for $h$: $h = 12\\sin(60^{\\circ}) = 12 \\left(\\frac{\\sqrt{3}}{2}\\right) = 6\\sqrt{3}$ feet." },
+                    { text: "$6$ feet", correct: false, rationale: "Incorrect. This represents the distance along the ground from the wall to the base, which uses cosine instead." },
+                    { text: "$12\\sqrt{3}$ feet", correct: false, rationale: "Incorrect. Remember to divide by 2 when multiplying by the exact ratio $\\sin(60^\\circ) = \\frac{\\sqrt{3}}{2}$." },
+                    { text: "$4\\sqrt{3}$ feet", correct: false, rationale: "Incorrect. Check your algebraic setup." }
+                ]
+            },
+            {
+                question: "Let $(-4, 3)$ be a point on the terminal side of an angle $\\theta$ in standard position. Find the exact value of $\\sin\\theta$.",
+                topic: "Angles in Standard Position",
+                hint: "Calculate the radius $r = \\sqrt{x^2 + y^2}$ first, then evaluate using $\\sin\\theta = \\frac{y}{r}$.",
+                options: [
+                    { text: "$\\frac{3}{5}$", correct: true, rationale: "The radius is $r = \\sqrt{(-4)^2 + 3^2} = \\sqrt{16+9} = 5$. Since $\\sin\\theta = \\frac{y}{r}$, we get $\\frac{3}{5}$." },
+                    { text: "$-\\frac{4}{5}$", correct: false, rationale: "Incorrect. This represents the cosine value: $\\cos\\theta = \\frac{x}{r}$." },
+                    { text: "$-\\frac{3}{4}$", correct: false, rationale: "Incorrect. This represents the tangent value: $\\tan\\theta = \\frac{y}{x}$." },
+                    { text: "$-\\frac{4}{3}$", correct: false, rationale: "Incorrect. This represents the cotangent value." }
+                ]
+            },
+            {
+                question: "Using the same point $(-4, 3)$ on the terminal side of $\\theta$, find the exact value of $\\tan\\theta$.",
+                topic: "Angles in Standard Position",
+                hint: "Use the terminal coordinates formula: $\\tan\\theta = \\frac{y}{x}$. Keep standard quadrant signs in mind.",
+                options: [
+                    { text: "$-\\frac{3}{4}$", correct: true, rationale: "Substitute $x = -4$ and $y = 3$ into $\\tan\\theta = \\frac{y}{x}$ to get $-\\frac{3}{4}$." },
+                    { text: "$-\\frac{4}{3}$", correct: false, rationale: "Incorrect. This is the reciprocal, representing cotangent." },
+                    { text: "$\\frac{3}{5}$", correct: false, rationale: "Incorrect. This is the sine value of the angle, not the tangent." },
+                    { text: "$-\\frac{4}{5}$", correct: false, rationale: "Incorrect. This is the cosine value of the angle." }
+                ]
+            },
+            {
+                question: "In which quadrant does the terminal side of $\\theta$ lie if $\\sin\\theta < 0$ and $\\cos\\theta > 0$?",
+                topic: "Determining Signs & Quadrants",
+                hint: "Determine which coordinate values (x, y) must be positive or negative based on the inequalities, or use ASTC.",
+                options: [
+                    { text: "Quadrant IV", correct: true, rationale: "In Quadrant IV, x-coordinates are positive (so $\\cos\\theta > 0$) and y-coordinates are negative (so $\\sin\\theta < 0$)." },
+                    { text: "Quadrant I", correct: false, rationale: "Incorrect. All trigonometric ratios are positive in Quadrant I." },
+                    { text: "Quadrant II", correct: false, rationale: "Incorrect. In Quadrant II, sine is positive and cosine is negative." },
+                    { text: "Quadrant III", correct: false, rationale: "Incorrect. Both sine and cosine are negative in Quadrant III." }
+                ]
+            },
+            {
+                question: "What is the reference angle $\\theta'$ for an angle of $\\theta = 220^{\\circ}$?",
+                topic: "Reference Angles",
+                hint: "An angle of $220^{\\circ}$ lies in Quadrant III. Calculate how far it is from the standard horizontal x-axis line ($180^{\\circ}$).",
+                options: [
+                    { text: "$40^{\\circ}$", correct: true, rationale: "In Quadrant III, reference angles are calculated as $\\theta' = \\theta - 180^{\\circ}$. Thus, $220^{\\circ} - 180^{\\circ} = 40^{\\circ}$." },
+                    { text: "$50^{\\circ}$", correct: false, rationale: "Incorrect. This measures the distance to the vertical y-axis, but reference angles must always be relative to the horizontal x-axis." },
+                    { text: "$140^{\\circ}$", correct: false, rationale: "Incorrect. A reference angle must always be acute (less than $90^{\\circ}$)." },
+                    { text: "$60^{\\circ}$", correct: false, rationale: "Incorrect. $220^{\\circ}$ is not $60^{\\circ}$ away from the horizontal axis." }
+                ]
+            },
+            {
+                question: "Evaluate the exact value of $\\cos(330^{\\circ})$.",
+                topic: "Exact Value Trig Problems",
+                hint: "Find the reference angle in Quadrant IV, and verify whether cosine is positive or negative in that quadrant.",
+                options: [
+                    { text: "$\\frac{\\sqrt{3}}{2}$", correct: true, rationale: "The reference angle is $360^{\\circ} - 330^{\\circ} = 30^{\\circ}$. Cosine is positive in Quadrant IV, so $\\cos(330^{\\circ}) = \\cos(30^{\\circ}) = \\frac{\\sqrt{3}}{2}$." },
+                    { text: "$-\\frac{\\sqrt{3}}{2}$", correct: false, rationale: "Incorrect. Although the magnitude is correct, cosine is positive in the fourth quadrant." },
+                    { text: "$\\frac{1}{2}$", correct: false, rationale: "Incorrect. This represents $\\cos(60^{\\circ})$ or $\\sin(30^{\\circ})$." },
+                    { text: "$-\\frac{1}{2}$", correct: false, rationale: "Incorrect. This represents the sine of $330^{\\circ}$." }
+                ]
+            },
+            {
+                question: "Evaluate the exact value of $\\sin(210^{\\circ})$.",
+                topic: "Exact Value Trig Problems",
+                hint: "Find the reference angle in Quadrant III, and verify whether sine is positive or negative there.",
+                options: [
+                    { text: "$-\\frac{1}{2}$", correct: true, rationale: "The reference angle is $210^{\\circ} - 180^{\\circ} = 30^{\\circ}$. Since sine is negative in Quadrant III, $\\sin(210^{\\circ}) = -\\sin(30^{\\circ}) = -\\frac{1}{2}$." },
+                    { text: "$\\frac{1}{2}$", correct: false, rationale: "Incorrect. Keep in mind that y-values (and sine values) are negative below the horizontal x-axis." },
+                    { text: "$-\\frac{\\sqrt{3}}{2}$", correct: false, rationale: "Incorrect. This is the value of $\\cos(210^{\\circ})$." },
+                    { text: "$\\frac{\\sqrt{3}}{2}$", correct: false, rationale: "Incorrect. This is the positive cosine value for a $30^{\\circ}$ angle." }
+                ]
+            },
+            {
+                question: "Evaluate the exact value of $\\tan(135^{\\circ})$.",
+                topic: "Exact Value Trig Problems",
+                hint: "Find the reference angle in Quadrant II, and remember that tangent is negative there because x and y coordinates have opposite signs.",
+                options: [
+                    { text: "$-1$", correct: true, rationale: "The reference angle is $180^{\\circ} - 135^{\\circ} = 45^{\\circ}$. Since tangent is negative in Quadrant II, $\\tan(135^{\\circ}) = -\\tan(45^{\\circ}) = -1$." },
+                    { text: "$1$", correct: false, rationale: "Incorrect. Tangent is only positive in Quadrants I and III." },
+                    { text: "$-\\sqrt{3}$", correct: false, rationale: "Incorrect. This is the tangent value of a $120^{\\circ}$ angle." },
+                    { text: "$-\\frac{\\sqrt{3}}{3}$", correct: false, rationale: "Incorrect. This is the tangent value of a $150^{\\circ}$ angle." }
+                ]
+            },
+            {
+                question: "In a $30^{\\circ}-60^{\\circ}-90^{\\circ}$ triangle, if the shorter leg is $4$ units long, what is the length of the hypotenuse?",
+                topic: "Special Right Triangles",
+                hint: "Use the standard ratio for $30^{\\circ}-60^{\\circ}-90^{\\circ}$ triangles: the hypotenuse is exactly double the shorter leg ($2x$).",
+                options: [
+                    { text: "$8$ units", correct: true, rationale: "In a $30^{\\circ}-60^{\\circ}-90^{\\circ}$ triangle, the hypotenuse ($2x$) is twice the length of the shorter leg ($x$). So, $2(4) = 8$." },
+                    { text: "$4\\sqrt{3}$ units", correct: false, rationale: "Incorrect. This represents the longer leg ($x\\sqrt{3}$) opposite the $60^{\\circ}$ angle." },
+                    { text: "$4\\sqrt{2}$ units", correct: false, rationale: "Incorrect. This represents the hypotenuse of an isosceles right ($45^{\\circ}-45^{\\circ}-90^{\\circ}$) triangle." },
+                    { text: "$16$ units", correct: false, rationale: "Incorrect. The hypotenuse is double the short leg, not squared." }
+                ]
+            },
+            {
+                question: "Given that $\\sec\\theta = -\\frac{13}{12}$ and $\\theta$ is in Quadrant II, what is the exact value of $\\tan\\theta$?",
+                topic: "Rigorous Identity & Coordinates Check",
+                hint: "Use the relationship $\\cos\\theta = -\\frac{12}{13}$ ($x=-12$, $r=13$). Find the missing y-coordinate using $x^2 + y^2 = r^2$.",
+                options: [
+                    { text: "$-\\frac{5}{12}$", correct: true, rationale: "Since $\\sec\\theta = -\\frac{13}{12}$, we have $\\cos\\theta = -\\frac{12}{13}$. Thus $x = -12, r = 13$. Solving $x^2 + y^2 = r^2$ gives $y = 5$ (positive because it is in Quadrant II). Tangent is $\\frac{y}{x} = -\\frac{5}{12}$." },
+                    { text: "$\\frac{5}{12}$", correct: false, rationale: "Incorrect. Tangent must be negative in the second quadrant." },
+                    { text: "$-\\frac{12}{5}$", correct: false, rationale: "Incorrect. This represents the value of $\\cot\\theta$." },
+                    { text: "$-\\frac{5}{13}$", correct: false, rationale: "Incorrect. This represents the value of $\\sin\\theta$ with an incorrect sign." }
+                ]
+            }
+        ];
+
+        // Flashcards Database
+        const flashcardsDB = [
+            { front: "Sine Ratio Definition ($\u03b8$ in standard position)", back: "$\\sin\\theta = \\frac{y}{r}$", category: "Unit Circle" },
+            { front: "Cosine Ratio Definition ($\u03b8$ in standard position)", back: "$\\cos\\theta = \\frac{x}{r}$", category: "Unit Circle" },
+            { front: "Tangent Ratio Definition ($\u03b8$ in standard position)", back: "$\\tan\\theta = \\frac{y}{x}$ where $x \\neq 0$", category: "Unit Circle" },
+            { front: "$30^{\\circ}-60^{\\circ}-90^{\\circ}$ Side Ratio Model", back: "Short Leg: $x$<br>Long Leg: $x\\sqrt{3}$<br>Hypotenuse: $2x$", category: "Special Triangles" },
+            { front: "$45^{\\circ}-45^{\\circ}-90^{\\circ}$ Side Ratio Model", back: "Legs: $x$, $x$<br>Hypotenuse: $x\\sqrt{2}$", category: "Special Triangles" },
+            { front: "Quadrant II Angle Sign Pattern", back: "Sine is Positive (+)<br>Cosine and Tangent are Negative (-)", category: "ASTC Signs" },
+            { front: "Quadrant III Angle Sign Pattern", back: "Tangent is Positive (+)<br>Sine and Cosine are Negative (-)", category: "ASTC Signs" },
+            { front: "Reference Angle ($\\theta'$) Formula for Quadrant II", back: "$\\theta' = 180^{\\circ} - \\theta$", category: "Reference Angles" },
+            { front: "Reference Angle ($\\theta'$) Formula for Quadrant III", back: "$\\theta' = \\theta - 180^{\\circ}$", category: "Reference Angles" },
+            { front: "Reference Angle ($\\theta'$) Formula for Quadrant IV", back: "$\\theta' = 360^{\\circ} - \\theta$", category: "Reference Angles" }
+        ];
+
+        // Global Game State
+        let currentQuizIndex = 0;
+        let score = 0;
+        let answeredQuestions = 0;
+        let userResponses = []; // Keeps track of progress to export later
+        let currentFlashcardIndex = 0;
+
+        // Init App on load
+        window.onload = function() {
+            initQuiz();
+            initFlashcards();
+            buildPrintSheets();
+            renderMath();
+        };
+
+        // Navigation Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(element => {
+                element.classList.add('hidden');
+            });
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            
+            // Switch navigation highlight style
+            const tabs = ['quiz', 'flashcards', 'exporter'];
+            tabs.forEach(tab => {
+                const btn = document.getElementById(`tab-${tab}`);
+                if (tab === tabId) {
+                    btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-50 text-indigo-700";
+                } else {
+                    btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100";
+                }
+            });
+            
+            // Make sure math renders when showing hidden containers
+            setTimeout(renderMath, 50);
+        }
+
+        // Render mathematical markup inside DOM
+        function renderMath() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError : false
+                });
+            }
+        }
+
+        // ================= QUIZ LOGIC =================
+        function initQuiz() {
+            currentQuizIndex = 0;
+            score = 0;
+            answeredQuestions = 0;
+            userResponses = [];
+            loadQuestion();
+        }
+
+        function resetQuiz() {
+            initQuiz();
+            showToast("Quiz has been reset! Good luck!", "emerald");
+        }
+
+        function loadQuestion() {
+            // Hide previous results UI
+            document.getElementById('explanation-container').classList.add('hidden');
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('btn-next').classList.add('hidden');
+
+            const current = questionsDB[currentQuizIndex];
+            
+            // Populate Question Details
+            document.getElementById('quiz-progress-text').innerText = `${currentQuizIndex + 1} / ${questionsDB.length}`;
+            document.getElementById('quiz-topic-text').innerText = current.topic;
+            document.getElementById('question-badge-topic').innerText = current.topic;
+            document.getElementById('question-text').innerHTML = current.question;
+            document.getElementById('hint-text').innerHTML = current.hint;
+
+            // Generate options HTML
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            current.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 font-medium transition-all duration-150 flex items-center justify-between text-slate-700 group option-btn";
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-indigo-100 group-hover:text-indigo-600 flex items-center justify-center text-xs font-bold transition-colors">
+                            ${String.fromCharCode(65 + index)}
+                        </span>
+                        <span class="option-text">${opt.text}</span>
+                    </span>
+                    <i class="fa-regular fa-circle text-slate-300 text-lg"></i>
+                `;
+                btn.onclick = () => submitAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Re-render math expressions
+            renderMath();
+        }
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-box');
+            hintBox.classList.toggle('hidden');
+        }
+
+        function submitAnswer(selectedIndex) {
+            // Stop allowing double-clicks
+            const optionButtons = document.querySelectorAll('.option-btn');
+            optionButtons.forEach(btn => btn.onclick = null);
+
+            const current = questionsDB[currentQuizIndex];
+            const selectedOpt = current.options[selectedIndex];
+            answeredQuestions++;
+
+            // Track for exporter
+            userResponses.push({
+                question: current.question,
+                selected: selectedOpt.text,
+                correct: selectedOpt.correct,
+                correctAnswer: current.options.find(o => o.correct).text
+            });
+
+            const explanationContainer = document.getElementById('explanation-container');
+            const explanationIcon = document.getElementById('explanation-icon');
+            const explanationTitle = document.getElementById('explanation-title');
+            const explanationText = document.getElementById('explanation-text');
+
+            if (selectedOpt.correct) {
+                score++;
+                explanationContainer.className = "mt-6 p-5 border border-emerald-200 bg-emerald-50 rounded-xl animate-fadeIn";
+                explanationIcon.className = "p-1.5 rounded-full text-white bg-emerald-500 fa-solid fa-circle-check";
+                explanationTitle.className = "font-bold text-sm text-emerald-800";
+                explanationTitle.innerText = "Excellent! That is correct.";
+                
+                // Highlight button
+                optionButtons[selectedIndex].className = "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 font-semibold transition-all flex items-center justify-between text-emerald-900";
+                optionButtons[selectedIndex].querySelector('i').className = "fa-solid fa-circle-check text-emerald-600 text-lg animate-bounce";
+            } else {
+                explanationContainer.className = "mt-6 p-5 border border-rose-200 bg-rose-50 rounded-xl animate-fadeIn";
+                explanationIcon.className = "p-1.5 rounded-full text-white bg-rose-500 fa-solid fa-circle-xmark";
+                explanationTitle.className = "font-bold text-sm text-rose-800";
+                explanationTitle.innerText = "Incorrect Option selected.";
+
+                // Highlight correct and incorrect
+                optionButtons[selectedIndex].className = "w-full text-left p-4 rounded-xl border-2 border-rose-400 bg-rose-50 font-medium transition-all flex items-center justify-between text-rose-900";
+                optionButtons[selectedIndex].querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500 text-lg";
+
+                // Show the right answer
+                const correctIdx = current.options.findIndex(o => o.correct);
+                optionButtons[correctIdx].className = "w-full text-left p-4 rounded-xl border border-emerald-500 bg-emerald-50/60 font-semibold transition-all flex items-center justify-between text-emerald-800";
+            }
+
+            // Fill explanation description
+            explanationText.innerHTML = selectedOpt.rationale;
+            explanationContainer.classList.remove('hidden');
+
+            // Update dashboards
+            document.getElementById('quiz-score-text').innerText = score;
+            const accuracy = Math.round((score / answeredQuestions) * 100);
+            document.getElementById('quiz-accuracy-text').innerText = `${accuracy}%`;
+
+            // Display Next Trigger
+            document.getElementById('btn-next').classList.remove('hidden');
+            renderMath();
+        }
+
+        function nextQuestion() {
+            if (currentQuizIndex < questionsDB.length - 1) {
+                currentQuizIndex++;
+                loadQuestion();
+            } else {
+                // Completed State
+                const accuracy = Math.round((score / questionsDB.length) * 100);
+                showToast(`🎉 You finished! Final Score: ${score}/${questionsDB.length} (${accuracy}%)`, 'indigo');
+                
+                // Automatically route to Exporter tab to download score report
+                switchTab('exporter');
+            }
+        }
+
+
+        // ================= FLASHCARD LOGIC =================
+        function initFlashcards() {
+            currentFlashcardIndex = 0;
+            updateFlashcard();
+        }
+
+        function updateFlashcard() {
+            // Unflip first
+            document.getElementById('flashcard').classList.remove('rotate-y-180');
+            
+            setTimeout(() => {
+                const card = flashcardsDB[currentFlashcardIndex];
+                document.getElementById('flashcard-category').innerText = card.category;
+                document.getElementById('flashcard-front-text').innerHTML = card.front;
+                document.getElementById('flashcard-back-text').innerHTML = card.back;
+                document.getElementById('flashcard-index').innerText = `${currentFlashcardIndex + 1} / ${flashcardsDB.length}`;
+                document.getElementById('flashcard-index-back').innerText = `${currentFlashcardIndex + 1} / ${flashcardsDB.length}`;
+                
+                renderMath();
+            }, 100);
+        }
+
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('rotate-y-180');
+        }
+
+        function prevFlashcard() {
+            if (currentFlashcardIndex > 0) {
+                currentFlashcardIndex--;
+            } else {
+                currentFlashcardIndex = flashcardsDB.length - 1;
+            }
+            updateFlashcard();
+        }
+
+        function nextFlashcard() {
+            if (currentFlashcardIndex < flashcardsDB.length - 1) {
+                currentFlashcardIndex++;
+            } else {
+                currentFlashcardIndex = 0;
+            }
+            updateFlashcard();
+        }
+
+
+        // ================= EXPORT & PRINT LOGIC =================
+
+        // Helper: Standard Toast Notifications
+        function showToast(message, color = "emerald") {
+            const toast = document.getElementById('toast-notif');
+            const toastText = document.getElementById('toast-text');
+            
+            toastText.innerText = message;
+            
+            // Set dynamic background colors
+            if (color === "indigo") {
+                toast.className = "mt-6 p-4 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-800 text-sm flex items-center gap-2";
+            } else if (color === "amber") {
+                toast.className = "mt-6 p-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-sm flex items-center gap-2";
+            } else {
+                toast.className = "mt-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-sm flex items-center gap-2";
+            }
+            
+            toast.classList.remove('hidden');
+            
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        }
+
+        // Build a beautiful printable question sheet on startup
+        function buildPrintSheets() {
+            const container = document.getElementById('print-questions-container');
+            container.innerHTML = '';
+
+            questionsDB.forEach((q, i) => {
+                const card = document.createElement('div');
+                card.className = "p-6 border border-gray-200 rounded-xl print-card space-y-3";
+                
+                let optionsList = q.options.map((o, idx) => {
+                    return `<div><strong>${String.fromCharCode(65 + idx)}:</strong> ${o.text} ${o.correct ? '<span style="color:#059669; font-weight:bold;">[CORRECT]</span>' : ''}</div>`;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center text-xs text-gray-400 font-bold border-b border-gray-100 pb-2">
+                        <span>QUESTION ${i + 1}</span>
+                        <span>${q.topic}</span>
+                    </div>
+                    <p class="font-semibold text-lg text-black mt-2">${q.question}</p>
+                    <div class="grid grid-cols-2 gap-2 text-sm mt-3">${optionsList}</div>
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg text-xs border border-gray-100">
+                        <strong class="text-indigo-600 block mb-1">Step-by-Step Explanation:</strong>
+                        <p>${q.options.find(o => o.correct).rationale}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Export Option 2: Generate downloadable TEXT study guide
+        function downloadStudySheetText() {
+            let outputText = "ALGEBRA 2 HONORS - UNIT 7: TRIGONOMETRIC FUNCTIONS\n";
+            outputText += "========================================================\n\n";
+
+            questionsDB.forEach((q, idx) => {
+                outputText += `Question ${idx + 1}: ${cleanMathText(q.question)}\n`;
+                outputText += `Category: ${q.topic}\n`;
+                outputText += `--------------------------------------------------------\n`;
+                q.options.forEach((opt, oIdx) => {
+                    outputText += `  [${String.fromCharCode(65 + oIdx)}] ${cleanMathText(opt.text)} ${opt.correct ? '(Correct)' : ''}\n`;
+                });
+                outputText += `\nExplanation:\n  ${cleanMathText(q.options.find(o => o.correct).rationale)}\n\n`;
+                outputText += `========================================================\n\n`;
+            });
+
+            const blob = new Blob([outputText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Trig_Functions_Unit_7_Study_Guide.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("Successfully downloaded Trig_Functions_Unit_7_Study_Guide.txt!", "emerald");
+        }
+
+        // Export Option 3: Score Report
+        function exportQuizScoreReport() {
+            if (userResponses.length === 0) {
+                showToast("Please answer at least one question in the Quiz tab first to export your custom results!", "amber");
+                return;
+            }
+
+            const accuracy = Math.round((score / userResponses.length) * 100);
+            let outputText = "ALGEBRA 2 HONORS: TRIGONOMETRY PERFORMANCE REPORT\n";
+            outputText += "========================================================\n";
+            outputText += `Total Answered: ${userResponses.length} / ${questionsDB.length}\n`;
+            outputText += `Correct Answers: ${score}\n`;
+            outputText += `Final Performance Score: ${accuracy}%\n`;
+            outputText += "========================================================\n\n";
+            outputText += "DETAILED QUESTION SUMMARY:\n\n";
+
+            userResponses.forEach((res, idx) => {
+                outputText += `Question ${idx + 1}: ${cleanMathText(res.question)}\n`;
+                outputText += `  - Your Answer: ${cleanMathText(res.selected)}\n`;
+                outputText += `  - Correct Answer: ${cleanMathText(res.correctAnswer)}\n`;
+                outputText += `  - Status: ${res.correct ? 'CORRECT' : 'INCORRECT'}\n\n`;
+            });
+
+            const blob = new Blob([outputText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Trig_Quiz_Score_Report.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("Successfully downloaded your Trig_Quiz_Score_Report.txt!", "emerald");
+        }
+
+        // Helper to format math syntax nicely for pure text files
+        function cleanMathText(str) {
+            return str
+                .replace(/\$/g, '')
+                .replace(/\\sin/g, 'sin')
+                .replace(/\\cos/g, 'cos')
+                .replace(/\\tan/g, 'tan')
+                .replace(/\\sec/g, 'sec')
+                .replace(/\\csc/g, 'csc')
+                .replace(/\\cot/g, 'cot')
+                .replace(/\\theta/g, 'theta')
+                .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)')
+                .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1/$2)')
+                .replace(/\\circ/g, ' degrees');
+        }
+    </script>
+</body>
+</html>
+
