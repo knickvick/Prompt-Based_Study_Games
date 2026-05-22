@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limit Kickoff: Precalc Shootout</title>
+    <!-- Tailwind CSS for sleek UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX for gorgeous mathematical notation -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0b132b;
+            color: #f4f4f9;
+        }
+        .grass-gradient {
+            background: linear-gradient(180deg, #137547 0%, #054a29 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-2 sm:p-4 overflow-x-hidden">
+
+    <!-- Header & Scoreboard -->
+    <header class="w-full max-w-5xl bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl p-4 mb-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xl">
+        <div class="flex items-center gap-3">
+            <div class="bg-emerald-500 text-slate-950 p-2.5 rounded-xl font-bold text-xl shadow-lg shadow-emerald-500/20 animate-pulse">
+                ⚽
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
+                    LIMIT KICKOFF
+                </h1>
+                <p class="text-xs text-slate-400 font-medium">Precalculus Honors Shootout</p>
+            </div>
+        </div>
+
+        <!-- Live Game Stats -->
+        <div class="flex items-center gap-4 bg-slate-950/60 px-4 py-2.5 rounded-xl border border-slate-800 w-full md:w-auto justify-around">
+            <div class="text-center">
+                <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">YOUR SCORE</span>
+                <span id="player-score" class="text-2xl font-black text-emerald-400">0</span>
+            </div>
+            <div class="h-8 w-px bg-slate-800"></div>
+            <div class="text-center">
+                <span id="round-label" class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">ROUND</span>
+                <span id="round-val" class="text-lg font-extrabold text-teal-300">1 / 5</span>
+            </div>
+            <div class="h-8 w-px bg-slate-800"></div>
+            <div class="text-center">
+                <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">CPU SCORE</span>
+                <span id="cpu-score" class="text-2xl font-black text-rose-400">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Arena -->
+    <main class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+        
+        <!-- Interactive Pitch Area (Left 7 Columns) -->
+        <section class="lg:col-span-7 flex flex-col bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative min-h-[360px] md:min-h-[480px]">
+            <!-- Status overlay -->
+            <div id="canvas-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center transition-all duration-300">
+                <div id="overlay-emoji" class="text-6xl mb-4 animate-bounce">📋</div>
+                <h3 id="overlay-title" class="text-2xl font-bold text-white mb-2">Answer to Shoot!</h3>
+                <p id="overlay-desc" class="text-slate-300 text-sm max-w-sm mb-6">Solve the limits question on the right side to power up your shot. Get it right to attack, get it wrong and you must defend!</p>
+                <button id="overlay-btn" onclick="startGame()" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all">
+                    START MATCH
+                </button>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="relative w-full flex-grow grass-gradient overflow-hidden flex items-center justify-center">
+                <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+
+                <!-- Kick Position Selector Buttons (Overlaid on Canvas during Action Phase) -->
+                <div id="kick-controls" class="absolute inset-0 grid grid-cols-2 grid-rows-2 p-12 gap-8 pointer-events-none opacity-0 transition-opacity duration-300">
+                    <button onclick="executeAction('TL')" class="target-btn pointer-events-auto border-2 border-dashed border-white/30 hover:border-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all flex items-center justify-center text-white/50 hover:text-white font-bold text-sm bg-slate-950/20 backdrop-blur-xs">
+                        🎯 TOP LEFT
+                    </button>
+                    <button onclick="executeAction('TR')" class="target-btn pointer-events-auto border-2 border-dashed border-white/30 hover:border-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all flex items-center justify-center text-white/50 hover:text-white font-bold text-sm bg-slate-950/20 backdrop-blur-xs">
+                        🎯 TOP RIGHT
+                    </button>
+                    <button onclick="executeAction('BL')" class="target-btn pointer-events-auto border-2 border-dashed border-white/30 hover:border-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all flex items-center justify-center text-white/50 hover:text-white font-bold text-sm bg-slate-950/20 backdrop-blur-xs">
+                        🎯 BOTTOM LEFT
+                    </button>
+                    <button onclick="executeAction('BR')" class="target-btn pointer-events-auto border-2 border-dashed border-white/30 hover:border-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all flex items-center justify-center text-white/50 hover:text-white font-bold text-sm bg-slate-950/20 backdrop-blur-xs">
+                        🎯 BOTTOM RIGHT
+                    </button>
+                </div>
+
+                <!-- Live Notification banner inside stadium -->
+                <div id="stadium-announcer" class="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-950/80 px-4 py-1.5 rounded-full border border-slate-700 text-xs text-yellow-400 font-semibold tracking-wider uppercase animate-pulse shadow-md z-5">
+                    STADIUM READY
+                </div>
+            </div>
+        </section>
+
+        <!-- Precalc Limits Panel (Right 5 Columns) -->
+        <section class="lg:col-span-5 flex flex-col gap-4">
+            <!-- Question Box -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl flex-grow flex flex-col justify-between relative overflow-hidden">
+                <!-- Background pattern -->
+                <div class="absolute -right-20 -top-20 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span id="question-tag" class="text-xs font-bold tracking-widest text-emerald-400 uppercase bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-800/50">
+                            LIMIT QUESTION
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span class="text-xs text-slate-400" id="question-progress">Ready</span>
+                        </div>
+                    </div>
+
+                    <!-- Question formulation -->
+                    <div class="py-4 flex flex-col items-center justify-center min-h-[120px] bg-slate-950/40 rounded-2xl border border-slate-800 px-4 mb-4">
+                        <div id="math-question" class="text-xl sm:text-2xl text-center text-white overflow-x-auto max-w-full py-2">
+                            <!-- Math formula loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Answer options -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2" id="answer-grid">
+                    <!-- Options buttons template -->
+                </div>
+
+                <!-- Action Button for Skip / Continue (hidden during active questions) -->
+                <button id="next-question-btn" class="hidden w-full py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold rounded-xl transition-all mt-4">
+                    Next Action →
+                </button>
+            </div>
+
+            <!-- Detailed Explanation Log -->
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl h-44 flex flex-col justify-between">
+                <span class="text-xs font-bold tracking-widest text-slate-400 uppercase block mb-1">
+                    📖 COACH'S WHITEBOARD
+                </span>
+                <div id="explanation-box" class="text-xs text-slate-300 leading-relaxed overflow-y-auto custom-scrollbar flex-grow pr-1">
+                    Welcome to the precalculus shootout. Solve the math problem to earn a golden opportunity on the goal. Tap "Start Match" to begin.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Help Modal & Bottom Control Bar -->
+    <footer class="w-full max-w-5xl mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <p>&copy; 2026 Limit Kickoff. Engineered for Honors Precalc study.</p>
+        <div class="flex gap-4">
+            <button onclick="showRules()" class="hover:text-white transition-all underline">Game Rules</button>
+            <button onclick="toggleSound()" id="sound-toggle" class="hover:text-white transition-all flex items-center gap-1">
+                <span>🔊</span> Sound On
+            </button>
+            <button onclick="resetGame()" class="text-rose-400 hover:text-rose-300 font-bold transition-all">Reset All</button>
+        </div>
+    </footer>
+
+    <!-- Rules Modal Container -->
+    <div id="rules-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative animate-scale-in">
+            <button onclick="closeRules()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+            <h3 class="text-xl font-extrabold text-emerald-400 mb-4 flex items-center gap-2">
+                ⚽ RULES OF THE PITCH
+            </h3>
+            <div class="space-y-3 text-slate-300 text-sm">
+                <p>Prepare for your Honors Precalc limits test through competitive football action! Here's how to play:</p>
+                <ul class="list-decimal list-inside space-y-2 text-slate-300">
+                    <li>Analyze the **Limits Limit Question** shown on the right-hand panel.</li>
+                    <li>Select one of the four options. Think carefully!</li>
+                    <li>If you are <strong class="text-emerald-400">CORRECT</strong>: You get a <strong class="text-emerald-400">PENALTY SHOT</strong>. Choose a quadrant to aim. Keep it away from the diving goalie!</li>
+                    <li>If you are <strong class="text-rose-400">INCORRECT</strong>: You must play as the goalkeeper to <strong class="text-rose-400">DEFEND A SHOT</strong>. Anticipate which corner the AI striker will strike and dive!</li>
+                    <li>A standard shootout runs for **5 Rounds**. If tied, it moves into sudden death!</li>
+                </ul>
+                <div class="bg-emerald-950/40 p-3 rounded-xl border border-emerald-800/50 mt-4 text-xs">
+                    💡 <strong>Pro-Tip:</strong> Pay special attention to limits with asymptotes, conjugates, trig identities like $\lim_{x \to 0}\frac{\sin x}{x}=1$, and one-sided limits!
+                </div>
+            </div>
+            <button onclick="closeRules()" class="w-full mt-6 py-2.5 bg-emerald-500 text-slate-950 font-bold rounded-xl hover:bg-emerald-400 transition-all">
+                Let's Play!
+            </button>
+        </div>
+    </div>
+
+    <!-- Sound & Game Logic Script -->
+    <script>
+        // --- Web Audio Synthesizer ---
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            try {
+                const now = audioCtx.currentTime;
+                if (type === 'kick') {
+                    // Quick low frequency impact + white noise burst
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.15);
+                    gain.gain.setValueAtTime(1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'goal') {
+                    // Roaring crowd noise approximation
+                    let bufferSize = audioCtx.sampleRate * 1.5;
+                    let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    let data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    let whiteNoise = audioCtx.createBufferSource();
+                    whiteNoise.buffer = buffer;
+
+                    let filter = audioCtx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 400;
+
+                    let gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 1.4);
+
+                    whiteNoise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    whiteNoise.start(now);
+                } else if (type === 'save') {
+                    // High pitch whistle
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1000, now + 0.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'correct') {
+                    // Success chime
+                    let osc1 = audioCtx.createOscillator();
+                    let osc2 = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc1.frequency.setValueAtTime(523.25, now); // C5
+                    osc2.frequency.setValueAtTime(659.25, now); // E5
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + 0.3);
+                    osc2.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    // Buzzer sound
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                }
+            } catch (e) {
+                console.warn("Audio Context block or error:", e);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('sound-toggle');
+            btn.innerHTML = soundEnabled ? '<span>🔊</span> Sound On' : '<span>🔇</span> Sound Off';
+        }
+
+        // --- Question Database (Honors Precalculus Limits) ---
+        const QUESTIONS = [
+            {
+                latex: "\\lim_{x \\to 3} \\frac{x^2 - 9}{x - 3}",
+                options: ["0", "6", "3", "DNE"],
+                answer: "6",
+                ex: "Factor the numerator: \\(x^2 - 9 = (x-3)(x+3)\\). Cancel out the zero-producing factor \\((x-3)\\) to yield \\(\\lim_{x \\to 3} (x + 3) = 6\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 0} \\frac{\\sin(4x)}{x}",
+                options: ["1", "0", "4", "DNE"],
+                answer: "4",
+                ex: "Apply the special trigonometric limit \\(\\lim_{\\theta \\to 0} \\frac{\\sin \\theta}{\\theta} = 1\\). Multiply numerator and denominator by 4 to get \\(\\lim_{x \\to 0} 4 \\cdot \\frac{\\sin(4x)}{4x} = 4 \\cdot 1 = 4\\)."
+            },
+            {
+                latex: "\\lim_{x \\to \\infty} \\frac{3x^3 - 5x + 2}{2x^3 + x^2 - 7}",
+                options: ["0", "\\frac{3}{2}", "\\infty", "DNE"],
+                answer: "\\frac{3}{2}",
+                ex: "For limits at infinity of rational functions with identical leading powers, compare the leading coefficients: \\(\\frac{3}{2}\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 4} \\frac{\\sqrt{x} - 2}{x - 4}",
+                options: ["\\frac{1}{4}", "\\frac{1}{2}", "0", "DNE"],
+                answer: "\\frac{1}{4}",
+                ex: "Multiply numerator and denominator by the conjugate of the numerator: \\(\\sqrt{x} + 2\\). This simplifies to \\(\\frac{x-4}{(x-4)(\\sqrt{x}+2)} = \\frac{1}{\\sqrt{x}+2}\\). Evaluating at \\(x=4\\) yields \\(\\frac{1}{4}\\)."
+            },
+            {
+                latex: "\\text{If } f(x) = \\begin{cases} x^2+1 & x < 2 \\\\ 3x-1 & x \\ge 2 \\end{cases},\\; \\lim_{x \\to 2} f(x)",
+                options: ["5", "3", "Does Not Exist", "1"],
+                answer: "5",
+                ex: "Verify both one-sided limits: Left-hand limit: \\(\\lim_{x \\to 2^-} (x^2+1) = 5\\). Right-hand limit: \\(\\lim_{x \\to 2^+} (3x-1) = 5\\). Since both match, the overall limit is 5."
+            },
+            {
+                latex: "\\lim_{x \\to -\\infty} \\frac{\\sqrt{9x^2 + 1}}{4x}",
+                options: ["\\frac{3}{4}", "-\\frac{3}{4}", "\\frac{9}{4}", "-\\frac{9}{4}"],
+                answer: "-\\frac{3}{4}",
+                ex: "Dividing numerator and denominator by \\(x\\). For \\(x < 0\\), we write \\(x = -\\sqrt{x^2}\\). Thus, the numerator becomes \\(-\\sqrt{9 + 1/x^2}\\) which goes to \\(-3\\), yielding \\(-\\frac{3}{4}\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 1} \\frac{x^3 - 1}{x - 1}",
+                options: ["1", "3", "0", "DNE"],
+                answer: "3",
+                ex: "Factor the numerator as a difference of cubes: \\(x^3 - 1 = (x-1)(x^2 + x + 1)\\). Cancel \\(x-1\\) to get \\(\\lim_{x \\to 1} (x^2+x+1) = 1+1+1 = 3\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 0} \\frac{1 - \\cos(x)}{x}",
+                options: ["0", "1", "DNE", "\\infty"],
+                answer: "0",
+                ex: "This is a classic special trigonometric limit rule: \\(\\lim_{x \\to 0} \\frac{1-\\cos x}{x} = 0\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 2^+} \\frac{3}{x - 2}",
+                options: ["0", "3", "\\infty", "-\\infty"],
+                answer: "\\infty",
+                ex: "As \\(x\\) approaches 2 from the right, the denominator \\(x-2\\) is a tiny positive number. Thus, \\(\\frac{3}{\\text{tiny positive}} \\to \\infty\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 3} \\frac{|x - 3|}{x - 3}",
+                options: ["1", "-1", "0", "DNE"],
+                answer: "DNE",
+                ex: "Check left/right: Left-hand limit approaches \\(-1\\) because \\(x-3 < 0\\). Right-hand limit approaches \\(1\\) because \\(x-3 > 0\\). Since left \\(\\neq\\) right, the limit Does Not Exist (DNE)."
+            },
+            {
+                latex: "\\lim_{x \\to 0} \\frac{\\tan(5x)}{3x}",
+                options: ["\\frac{5}{3}", "\\frac{3}{5}", "0", "DNE"],
+                answer: "\\frac{5}{3}",
+                ex: "Write \\(\\tan(5x)\\) as \\(\\frac{\\sin(5x)}{\\cos(5x)}\\). The limit becomes \\(\\lim_{x \\to 0} \\frac{\\sin(5x)}{5x} \\cdot \\frac{5}{3} \\cdot \\frac{1}{\\cos(5x)} = 1 \\cdot \\frac{5}{3} \\cdot 1 = \\frac{5}{3}\\)."
+            },
+            {
+                latex: "\\lim_{x \\to \\infty} \\frac{\\ln(x)}{x}",
+                options: ["\\infty", "1", "0", "DNE"],
+                answer: "0",
+                ex: "In Honors Precalculus, we analyze relative growth rates. Linear functions grow vastly faster than logarithmic functions. Thus, as \\(x \\to \\infty\\), \\(\\frac{\\ln x}{x} \\to 0\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 2} \\frac{\\frac{1}{x} - \\frac{1}{2}}{x - 2}",
+                options: ["\\frac{1}{4}", "-\\frac{1}{4}", "0", "DNE"],
+                answer: "-\\frac{1}{4}",
+                ex: "Simplify the complex fraction: \\(\\frac{1}{x} - \\frac{1}{2} = \\frac{2 - x}{2x} = \\frac{-(x - 2)}{2x}\\). Divide this by \\((x-2)\\) to cancel the zero-producing term, leaving \\(\\lim_{x \\to 2} \\frac{-1}{2x} = -\\frac{1}{4}\\)."
+            },
+            {
+                latex: "\\lim_{x \\to 0} x^2 \\sin\\left(\\frac{1}{x}\\right)",
+                options: ["1", "0", "DNE", "1/2"],
+                answer: "0",
+                ex: "Use the Squeeze Theorem: since \\(-1 \\le \\sin(1/x) \\le 1\\), multiplying by \\(x^2\\) gives \\(-x^2 \\le x^2 \\sin(1/x) \\le x^2\\). Since both \\(-x^2\\) and \\(x^2\\) approach 0, the target limit must be 0."
+            }
+        ];
+
+        // --- Game State Vars ---
+        let gameActive = false;
+        let currentRound = 1;
+        let playerScore = 0;
+        let cpuScore = 0;
+        let currentQuestion = null;
+        let usedQuestionIndices = [];
+        let playerTurnToShoot = true; // Correct answer = player shoots; incorrect = cpu shoots (player saves)
+        let isShootMode = true; // Current interactive phase type
+
+        // Canvas Setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Physics / Animation State
+        let ball = { x: 0, y: 0, targetX: 0, targetY: 0, radius: 10, speed: 0.08, t: 1, active: false };
+        let goalie = { x: 0, y: 0, targetX: 0, targetY: 0, width: 32, height: 60, active: false };
+        let shotStatusText = "";
+        let animationFrameId = null;
+
+        // --- Canvas Drawing Routines ---
+        function initCanvasSize() {
+            const rect = canvas.parentNode.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            resetEntities();
+        }
+
+        window.addEventListener('resize', initCanvasSize);
+
+        function resetEntities() {
+            // Put ball at penalty spot (bottom center)
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height * 0.85;
+            ball.active = false;
+            ball.t = 1;
+
+            // Put goalie at center of goal (top center)
+            goalie.x = canvas.width / 2;
+            goalie.y = canvas.height * 0.35;
+            goalie.targetX = canvas.width / 2;
+            goalie.targetY = canvas.height * 0.35;
+        }
+
+        function drawPitch() {
+            // Draw background pitch lines
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Field line green contrast lines (grass alternating bands)
+            const numBands = 8;
+            const bandHeight = canvas.height / numBands;
+            for (let i = 0; i < numBands; i++) {
+                ctx.fillStyle = i % 2 === 0 ? '#10633c' : '#0e5231';
+                ctx.fillRect(0, i * bandHeight, canvas.width, bandHeight);
+            }
+
+            // White soccer line markings
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 3;
+
+            // Goal area line
+            ctx.strokeRect(canvas.width * 0.15, canvas.height * 0.25, canvas.width * 0.7, canvas.height * 0.4);
+            // Penalty box semi-circle
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height * 0.65, canvas.width * 0.15, 0, Math.PI);
+            ctx.stroke();
+
+            // Penalty spot
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height * 0.85, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Goalposts (top end)
+            const goalLeft = canvas.width * 0.25;
+            const goalRight = canvas.width * 0.75;
+            const goalTop = canvas.height * 0.25;
+            const goalBottom = canvas.height * 0.35;
+
+            // Net pattern
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1.5;
+            const netCols = 20;
+            const netRows = 6;
+            const cellW = (goalRight - goalLeft) / netCols;
+            const cellH = (goalBottom - goalTop) / netRows;
+
+            for (let r = 0; r <= netRows; r++) {
+                ctx.beginPath();
+                ctx.moveTo(goalLeft, goalTop + r * cellH);
+                ctx.lineTo(goalRight, goalTop + r * cellH);
+                ctx.stroke();
+            }
+            for (let c = 0; c <= netCols; c++) {
+                ctx.beginPath();
+                ctx.moveTo(goalLeft + c * cellW, goalTop);
+                ctx.lineTo(goalLeft + c * cellW, goalBottom);
+                ctx.stroke();
+            }
+
+            // Goal Posts border (White)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(goalLeft, goalBottom);
+            ctx.lineTo(goalLeft, goalTop);
+            ctx.lineTo(goalRight, goalTop);
+            ctx.lineTo(goalRight, goalBottom);
+            ctx.stroke();
+
+            // Red/Yellow decorative post flags
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(goalLeft - 3, goalBottom - 5, 6, 10);
+            ctx.fillRect(goalRight - 3, goalBottom - 5, 6, 10);
+        }
+
+        function drawGoalie() {
+            ctx.save();
+            // Draw goalie shadows
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(goalie.x, goalie.y + goalie.height/2, 16, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Goalkeeper Jersey (Bright Neon Cyan/Yellow)
+            ctx.fillStyle = playerTurnToShoot ? '#eab308' : '#06b6d4'; // CPU is yellow jersey, player goalie is Cyan
+            ctx.beginPath();
+            ctx.roundRect(goalie.x - goalie.width / 2, goalie.y - goalie.height / 2 + 15, goalie.width, goalie.height - 20, 8);
+            ctx.fill();
+
+            // Head / Skin
+            ctx.fillStyle = '#ffedd5';
+            ctx.beginPath();
+            ctx.arc(goalie.x, goalie.y - goalie.height / 2 + 10, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Goalie Gloves extended
+            ctx.fillStyle = '#ffffff';
+            // Left Glove
+            ctx.beginPath();
+            ctx.arc(goalie.x - goalie.width/2 - 4, goalie.y - goalie.height/2 + 20, 5, 0, Math.PI*2);
+            ctx.fill();
+            // Right Glove
+            ctx.beginPath();
+            ctx.arc(goalie.x + goalie.width/2 + 4, goalie.y - goalie.height/2 + 20, 5, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawBall() {
+            ctx.save();
+            // Ball shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.beginPath();
+            // Shadow stays closer to ground but shrinks as ball goes up
+            const shadowY = ball.y + (canvas.height * 0.85 - ball.y) * 0.1;
+            ctx.arc(ball.x, shadowY + 4, ball.radius * (1 - (ball.y < canvas.height*0.85 ? 0.3 : 0)), 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw Classic Soccer Ball (White sphere with black patches)
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Outer ring accent
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Small black star/pentagon designs inside
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawStatusText() {
+            if (shotStatusText) {
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+                ctx.fillRect(0, canvas.height/2 - 30, canvas.width, 60);
+
+                ctx.font = '800 24px Poppins';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = shotStatusText.includes("GOAL") ? '#34d399' : '#f87171';
+                ctx.fillText(shotStatusText, canvas.width / 2, canvas.height / 2 + 8);
+            }
+        }
+
+        // --- Core Gameloop ---
+        function updateAnimation() {
+            drawPitch();
+            drawGoalie();
+            drawBall();
+            drawStatusText();
+
+            // Animate Ball along curve
+            if (ball.active) {
+                ball.t += ball.speed;
+                if (ball.t >= 1) {
+                    ball.t = 1;
+                    ball.active = false;
+                    resolveInteractiveResult();
+                }
+                
+                // Interpolate ball coordinates
+                const startX = canvas.width / 2;
+                const startY = canvas.height * 0.85;
+                
+                // Linear route for X, quadratic arc for Y height simulation
+                ball.x = startX + (ball.targetX - startX) * ball.t;
+                ball.y = startY + (ball.targetY - startY) * ball.t;
+
+                // Make the ball slightly smaller as it goes "deep" into the field
+                ball.radius = 12 - (6 * ball.t);
+            }
+
+            // Smooth goalie dive translation
+            if (goalie.active) {
+                const dx = goalie.targetX - goalie.x;
+                const dy = goalie.targetY - goalie.y;
+                goalie.x += dx * 0.15;
+                goalie.y += dy * 0.15;
+            }
+
+            animationFrameId = requestAnimationFrame(updateAnimation);
+        }
+
+        // --- Match State Routines ---
+        function startGame() {
+            document.getElementById('canvas-overlay').classList.add('hidden');
+            initCanvasSize();
+            playerScore = 0;
+            cpuScore = 0;
+            currentRound = 1;
+            usedQuestionIndices = [];
+            
+            updateScoreboard();
+            loadNextQuestion();
+            
+            // Kickstart canvas animations
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            updateAnimation();
+        }
+
+        function loadNextQuestion() {
+            // Check for tied sudden death after 5 rounds
+            if (currentRound > 5 && playerScore !== cpuScore) {
+                endMatch();
+                return;
+            }
+
+            // Find a unique question
+            let randIndex;
+            if (usedQuestionIndices.length >= QUESTIONS.length) {
+                usedQuestionIndices = []; // Recycle if exhausted
+            }
+
+            do {
+                randIndex = Math.floor(Math.random() * QUESTIONS.length);
+            } while (usedQuestionIndices.includes(randIndex));
+
+            usedQuestionIndices.push(randIndex);
+            currentQuestion = QUESTIONS[randIndex];
+
+            // Render limit question LaTeX
+            const mathEl = document.getElementById('math-question');
+            mathEl.innerHTML = "";
+            const span = document.createElement('span');
+            span.id = "katex-render";
+            mathEl.appendChild(span);
+            katex.render(currentQuestion.latex, span, { throwOnError: false });
+
+            // Display question progress
+            document.getElementById('question-progress').innerText = `R${currentRound}`;
+
+            // Pop options
+            const grid = document.getElementById('answer-grid');
+            grid.innerHTML = "";
+            currentQuestion.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "p-4 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 hover:border-emerald-500 rounded-2xl font-semibold text-sm transition-all text-center focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-100 flex items-center justify-center min-h-[56px]";
+                btn.onclick = () => selectAnswer(opt, btn);
+                btn.innerText = opt;
+                grid.appendChild(btn);
+            });
+
+            // Default coach whiteboard back to neutral
+            document.getElementById('explanation-box').innerHTML = `<p class="text-slate-300">Prepare for the round! Analyze the limit. If you have indeterminate forms like \\(\\frac{0}{0}\\), use factoring, conjugates, or trig identity rules to simplify.</p>`;
+            document.getElementById('stadium-announcer').innerText = `STADIUM: ROUND ${currentRound}`;
+            document.getElementById('next-question-btn').classList.add('hidden');
+            
+            resetEntities();
+            shotStatusText = "";
+        }
+
+        function selectAnswer(selectedVal, btnElement) {
+            const allBtns = document.querySelectorAll('#answer-grid button');
+            allBtns.forEach(btn => btn.disabled = true);
+
+            // Render detailed math formula in explanation
+            const explBox = document.getElementById('explanation-box');
+            explBox.innerHTML = `
+                <div class="font-bold text-yellow-400 mb-1">COACH'S BREAKDOWN:</div>
+                <div id="latex-explanation" class="text-xs text-slate-200"></div>
+            `;
+            const katexExplSpan = document.getElementById('latex-explanation');
+            katex.render(currentQuestion.ex, katexExplSpan, { throwOnError: false });
+
+            if (selectedVal === currentQuestion.answer) {
+                btnElement.classList.add('bg-emerald-600', 'border-emerald-400', 'text-white');
+                playerTurnToShoot = true;
+                playSound('correct');
+                document.getElementById('stadium-announcer').innerText = "LIMIT CRACKED! PREPARE TO SHOOT!";
+                setupInteractivePhase("ATTACK");
+            } else {
+                btnElement.classList.add('bg-rose-600', 'border-rose-400', 'text-white');
+                // Find correct and highlight it green
+                allBtns.forEach(btn => {
+                    if (btn.innerText === currentQuestion.answer) {
+                        btn.classList.add('bg-emerald-950/60', 'border-emerald-600/50', 'text-emerald-400');
+                    }
+                });
+                playerTurnToShoot = false;
+                playSound('wrong');
+                document.getElementById('stadium-announcer').innerText = "LIMIT MISS! DEFEND THE POSTS!";
+                setupInteractivePhase("DEFEND");
+            }
+        }
+
+        // Prep the interactive Canvas shootout buttons
+        function setupInteractivePhase(mode) {
+            isShootMode = (mode === "ATTACK");
+            const controls = document.getElementById('kick-controls');
+            controls.style.opacity = "1";
+            controls.style.pointerEvents = "auto";
+
+            // Rename UI overlay target indicators based on role
+            const buttons = document.querySelectorAll('.target-btn');
+            buttons.forEach(btn => {
+                if (isShootMode) {
+                    btn.innerText = "🎯 SHOOT " + btn.innerText.replace("🎯 SHOOT ", "").replace("🛡️ DIV ", "");
+                } else {
+                    btn.innerText = "🛡️ DIV " + btn.innerText.replace("🎯 SHOOT ", "").replace("🛡️ DIV ", "");
+                }
+            });
+        }
+
+        // Execute the user's aim choice
+        function executeAction(quadrant) {
+            // Disable overlays so they can't multi-click
+            const controls = document.getElementById('kick-controls');
+            controls.style.opacity = "0";
+            controls.style.pointerEvents = "none";
+
+            // Coordinate targets inside goals
+            const targets = {
+                'TL': { x: canvas.width * 0.32, y: canvas.height * 0.28 },
+                'TR': { x: canvas.width * 0.68, y: canvas.height * 0.28 },
+                'BL': { x: canvas.width * 0.32, y: canvas.height * 0.34 },
+                'BR': { x: canvas.width * 0.68, y: canvas.height * 0.34 }
+            };
+
+            const selectedTarget = targets[quadrant];
+            playSound('kick');
+
+            if (isShootMode) {
+                // Player shooting: select a target, CPU goalie chooses a random dive direction
+                const cpuDives = ['TL', 'TR', 'BL', 'BR'];
+                const cpuChoice = cpuDives[Math.floor(Math.random() * cpuDives.length)];
+                const cpuTarget = targets[cpuChoice];
+
+                // Trigger animations
+                goalie.active = true;
+                goalie.targetX = cpuTarget.x;
+                goalie.targetY = cpuTarget.y;
+
+                ball.active = true;
+                ball.t = 0;
+                ball.targetX = selectedTarget.x;
+                ball.targetY = selectedTarget.y;
+
+                // Game outcome judgment
+                ball.saved = (quadrant === cpuChoice);
+            } else {
+                // Player Defending: CPU chooses random goal target to shoot. Player's goalie dives to quadrant
+                const cpuShots = ['TL', 'TR', 'BL', 'BR'];
+                const cpuChoice = cpuShots[Math.floor(Math.random() * cpuShots.length)];
+                const cpuTarget = targets[cpuChoice];
+
+                // Trigger animations
+                goalie.active = true;
+                goalie.targetX = selectedTarget.x;
+                goalie.targetY = selectedTarget.y;
+
+                ball.active = true;
+                ball.t = 0;
+                ball.targetX = cpuTarget.x;
+                ball.targetY = cpuTarget.y;
+
+                // Game outcome judgment
+                ball.saved = (quadrant === cpuChoice);
+            }
+        }
+
+        function resolveInteractiveResult() {
+            if (isShootMode) {
+                if (ball.saved) {
+                    shotStatusText = "BLOCKED BY CPU!";
+                    playSound('save');
+                    document.getElementById('stadium-announcer').innerText = "SPECTACULAR DOUBLE HANDED SAVE!";
+                } else {
+                    shotStatusText = "⚽ GOOOAAAL!!!";
+                    playerScore++;
+                    playSound('goal');
+                    document.getElementById('stadium-announcer').innerText = "GOAL! CRACKED INTO THE UPPER NET!";
+                }
+            } else {
+                if (ball.saved) {
+                    shotStatusText = "🛡️ AMAZING SAVE!";
+                    playSound('save');
+                    document.getElementById('stadium-announcer').innerText = "DENIED! CLEAN SHEET DEFENDING!";
+                } else {
+                    shotStatusText = "❌ CPU SCORES!";
+                    cpuScore++;
+                    playSound('goal');
+                    document.getElementById('stadium-announcer').innerText = "CPU POWERED SHOT PAST THE POST!";
+                }
+            }
+
+            updateScoreboard();
+
+            // Display "Next Action" button on bottom right container
+            const nextBtn = document.getElementById('next-question-btn');
+            nextBtn.classList.remove('hidden');
+            nextBtn.onclick = () => {
+                currentRound++;
+                loadNextQuestion();
+            };
+        }
+
+        function updateScoreboard() {
+            document.getElementById('player-score').innerText = playerScore;
+            document.getElementById('cpu-score').innerText = cpuScore;
+            
+            if (currentRound > 5) {
+                document.getElementById('round-label').innerText = "SUDDEN DEATH";
+                document.getElementById('round-val').innerText = `Round ${currentRound}`;
+            } else {
+                document.getElementById('round-label').innerText = "ROUND";
+                document.getElementById('round-val').innerText = `${currentRound} / 5`;
+            }
+        }
+
+        function endMatch() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            const overlay = document.getElementById('canvas-overlay');
+            const emoji = document.getElementById('overlay-emoji');
+            const title = document.getElementById('overlay-title');
+            const desc = document.getElementById('overlay-desc');
+            const btn = document.getElementById('overlay-btn');
+
+            overlay.classList.remove('hidden');
+
+            if (playerScore > cpuScore) {
+                emoji.innerText = "🏆";
+                title.innerText = "CHAMPIONS!";
+                desc.innerText = `Sensational play! You conquered the limits exam shootout with a stellar final score of ${playerScore} - ${cpuScore}. Your honors precalculus teacher is proud!`;
+            } else {
+                emoji.innerText = "🥈";
+                title.innerText = "RUNNERS UP!";
+                desc.innerText = `A close contest! You fell short ${playerScore} - ${cpuScore}. Perfect practice makes permanent! Refresh and kick off again to master your limits.`;
+            }
+
+            btn.innerText = "KICK OFF NEW MATCH";
+        }
+
+        function resetGame() {
+            // Re-lock stadium block
+            const overlay = document.getElementById('canvas-overlay');
+            overlay.classList.remove('hidden');
+            document.getElementById('overlay-emoji').innerText = "📋";
+            document.getElementById('overlay-title').innerText = "Limit Shootout Arena";
+            document.getElementById('overlay-desc').innerText = "Unlock the goalkeeper simulator and target practice. Solve advanced precalc limit equations on the whiteboard to earn your shot!";
+            document.getElementById('overlay-btn').innerText = "START MATCH";
+
+            playerScore = 0;
+            cpuScore = 0;
+            currentRound = 1;
+            updateScoreboard();
+
+            // Clear questions and math visuals
+            document.getElementById('math-question').innerText = "Ready to Play";
+            document.getElementById('answer-grid').innerHTML = "";
+            document.getElementById('explanation-box').innerText = "Tap Start Match to launch the database.";
+            document.getElementById('stadium-announcer').innerText = "STADIUM STANDBY";
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            initCanvasSize();
+            drawPitch();
+        }
+
+        // Rules Modals
+        function showRules() {
+            document.getElementById('rules-modal').classList.remove('hidden');
+            document.getElementById('rules-modal').classList.add('flex');
+        }
+
+        function closeRules() {
+            document.getElementById('rules-modal').classList.add('hidden');
+            document.getElementById('rules-modal').classList.remove('flex');
+        }
+
+        // Initialize Canvas layout on startup
+        window.onload = () => {
+            initCanvasSize();
+            drawPitch();
+        };
+    </script>
+</body>
+</html>
+

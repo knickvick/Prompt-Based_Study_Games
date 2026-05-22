@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebraic Arena: Clash of Functions</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for beautiful math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: radial-gradient(circle at center, #0f172a, #020617);
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        .heading-font {
+            font-family: 'Cinzel', serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            55% { transform: translate(-1px, 2px) rotate(-1deg); }
+            70% { transform: translate(-3px, 1px) rotate(0deg); }
+            85% { transform: translate(2px, 1px) rotate(-1deg); }
+            100% { transform: translate(1px, -2px) rotate(0deg); }
+        }
+        .flash-red {
+            animation: flashRed 0.5s ease-out;
+        }
+        @keyframes flashRed {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(239, 68, 68, 0.4); }
+        }
+        .flash-green {
+            animation: flashGreen 0.5s ease-out;
+        }
+        @keyframes flashGreen {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(34, 197, 94, 0.4); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Splash Screen / Menu -->
+    <div id="start-screen" class="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-4xl mx-auto">
+        <div class="mb-8">
+            <span class="text-xs font-bold tracking-widest text-indigo-400 bg-indigo-950/50 border border-indigo-800/60 px-4 py-1.5 rounded-full uppercase">Turn-Based Educational Battle RPG</span>
+        </div>
+        <h1 class="heading-font text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-600 mb-4 tracking-wide drop-shadow-lg">
+            Algebraic Arena
+        </h1>
+        <p class="text-gray-400 text-lg md:text-xl max-w-2xl mb-12">
+            Unleash mathematical fury! Choose algebra concepts, answer randomized Algebra II questions correctly to amplify your spells, and defeat the legendary bosses of functional mathematics.
+        </p>
+
+        <!-- Feature cards grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-3xl mb-12">
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl text-left hover:border-cyan-500/40 transition-colors duration-300">
+                <div class="w-10 h-10 rounded-xl bg-cyan-950 flex items-center justify-center text-cyan-400 mb-4">
+                    <i class="fa-solid fa-square-root-variable text-lg"></i>
+                </div>
+                <h3 class="font-bold text-white mb-1">Scale Power</h3>
+                <p class="text-sm text-gray-400">Easy, Medium, and Hard equations yield corresponding attack damage multipliers. Bigger risks, ultimate power.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl text-left hover:border-indigo-500/40 transition-colors duration-300">
+                <div class="w-10 h-10 rounded-xl bg-indigo-950 flex items-center justify-center text-indigo-400 mb-4">
+                    <i class="fa-solid fa-dragon text-lg"></i>
+                </div>
+                <h3 class="font-bold text-white mb-1">Mythical Bosses</h3>
+                <p class="text-sm text-gray-400">Battle the Quadratic Hydra, Logarithmic Leviathan, Imaginary Specter, and the Polynomial Overlord.</p>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl text-left hover:border-purple-500/40 transition-colors duration-300">
+                <div class="w-10 h-10 rounded-xl bg-purple-950 flex items-center justify-center text-purple-400 mb-4">
+                    <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+                </div>
+                <h3 class="font-bold text-white mb-1">Mage Upgrades</h3>
+                <p class="text-sm text-gray-400">Gain experience, level up, boost maximum HP, and heal after hard-fought victories.</p>
+            </div>
+        </div>
+
+        <button onclick="startGame()" class="px-10 py-5 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xl rounded-2xl shadow-[0_0_25px_rgba(79,70,229,0.4)] hover:shadow-[0_0_35px_rgba(79,70,229,0.6)] transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-3">
+            <i class="fa-solid fa-gamepad"></i> Enter the Arena
+        </button>
+    </div>
+
+    <!-- Active Game Layout (Hidden initially) -->
+    <div id="game-screen" class="hidden flex-1 flex flex-col p-4 md:p-6 max-w-7xl w-full mx-auto gap-6">
+        
+        <!-- Header HUD -->
+        <header class="flex flex-wrap items-center justify-between gap-4 bg-slate-950/60 border border-slate-800/80 p-4 rounded-2xl backdrop-blur-md">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <div class="w-14 h-14 bg-gradient-to-tr from-cyan-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-black border-2 border-slate-700 shadow-lg">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <span id="player-level-badge" class="absolute -bottom-2 -right-2 bg-indigo-600 text-white text-xs font-bold px-2 py-0.5 rounded-full border border-indigo-400">LVL 1</span>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg text-white flex items-center gap-2">
+                        Alge-Mage <span class="text-xs text-gray-400">(Player)</span>
+                    </h2>
+                    <!-- XP bar -->
+                    <div class="w-36 md:w-48 bg-slate-800 rounded-full h-2 mt-1 relative overflow-hidden">
+                        <div id="xp-bar-fill" class="bg-cyan-400 h-full w-0 transition-all duration-500"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-0.5">
+                        <span id="player-xp-text">XP: 0/100</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats/Score Overview -->
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <span class="block text-xs text-gray-400 uppercase tracking-wider">High Score</span>
+                    <span id="high-score-counter" class="text-lg font-bold text-yellow-400">0</span>
+                </div>
+                <div class="text-right">
+                    <span class="block text-xs text-gray-400 uppercase tracking-wider">Current Streak</span>
+                    <span id="streak-counter" class="text-lg font-bold text-emerald-400 flex items-center gap-1.5 justify-end">
+                        <i class="fa-solid fa-fire text-amber-500"></i> <span id="streak-value">0</span>
+                    </span>
+                </div>
+                <button onclick="toggleAudio()" id="audio-toggle" class="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Arena Field (Split Player & Monster Visuals + Controls) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch flex-1">
+            
+            <!-- Left 7 columns: Combat Visuals + Spell Selection -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- Battle Stage Visualizer Canvas Card -->
+                <div class="bg-slate-950/80 border border-slate-800/80 rounded-3xl p-4 flex-1 flex flex-col relative overflow-hidden min-h-[300px] shadow-inner" id="battle-view-container">
+                    <div class="absolute top-3 left-3 bg-slate-900/90 border border-slate-800/50 px-3 py-1 rounded-full text-xs text-gray-300 font-semibold z-10 flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Battle Dimension
+                    </div>
+
+                    <!-- Quick visual overlay when hit -->
+                    <div id="battle-flash-overlay" class="absolute inset-0 pointer-events-none z-10"></div>
+                    
+                    <!-- Canvas layer for dynamic magic particle triggers and characters -->
+                    <canvas id="battle-canvas" class="w-full flex-1 rounded-2xl"></canvas>
+
+                    <!-- HP HUD overlay directly in the dimension -->
+                    <div class="absolute bottom-4 left-4 right-4 flex justify-between gap-4 pointer-events-none">
+                        <!-- Player HP -->
+                        <div class="bg-slate-950/90 border border-cyan-900/60 p-3 rounded-2xl w-5/12 pointer-events-auto shadow-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-xs text-cyan-400">Alge-Mage HP</span>
+                                <span id="player-hp-text" class="text-xs font-semibold text-white">100/100</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+                                <div id="player-hp-bar" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-full transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <!-- Enemy HP -->
+                        <div class="bg-slate-950/90 border border-rose-950 p-3 rounded-2xl w-5/12 pointer-events-auto text-right shadow-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <span id="enemy-hp-text" class="text-xs font-semibold text-white">250/250</span>
+                                <span id="enemy-name" class="font-bold text-xs text-rose-400">Quadratic Hydra</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-slate-700">
+                                <div id="enemy-hp-bar" class="bg-gradient-to-l from-rose-500 to-red-600 h-full w-full transition-all duration-300"></div>
+                            </div>
+                            <!-- Small trait badge -->
+                            <div class="mt-1 flex justify-end">
+                                <span id="enemy-trait" class="text-[9px] px-2 py-0.5 rounded bg-rose-950/80 text-rose-300 border border-rose-800/50 uppercase font-semibold">Regen Buff</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spell & Action Selection Dashboard (Only accessible during choose phase) -->
+                <div id="action-panel" class="bg-slate-950/60 border border-slate-800/80 rounded-3xl p-6 backdrop-blur-md">
+                    <h3 class="heading-font text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-book-sparkles text-cyan-400"></i> Select an Algebraic Spell
+                    </h3>
+                    
+                    <!-- Grid of spell types -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                        
+                        <!-- Spell: Quadratics -->
+                        <button onclick="selectSpell('quadratics')" class="spell-btn group p-4 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-cyan-500 rounded-2xl text-left transition-all duration-200">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 bg-cyan-950/80 text-cyan-400 rounded-xl flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors duration-200">
+                                    <i class="fa-solid fa-chart-line text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Quadratic Explosion</h4>
+                                    <span class="text-[10px] text-cyan-400 uppercase tracking-widest font-semibold">Quadratics</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400">Deals impact fire damage. Focuses on vertices, factoring, and standard roots equations.</p>
+                        </button>
+
+                        <!-- Spell: Logarithms -->
+                        <button onclick="selectSpell('logarithms')" class="spell-btn group p-4 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-indigo-500 rounded-2xl text-left transition-all duration-200">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 bg-indigo-950/80 text-indigo-400 rounded-xl flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-slate-950 transition-colors duration-200">
+                                    <i class="fa-solid fa-calculator text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Logarithmic Surge</h4>
+                                    <span class="text-[10px] text-indigo-400 uppercase tracking-widest font-semibold">Logs & Exponents</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400">Unleashes continuous energy rays. Solves powers, inverses, and change of base equations.</p>
+                        </button>
+
+                        <!-- Spell: Complex Numbers -->
+                        <button onclick="selectSpell('complex')" class="spell-btn group p-4 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-purple-500 rounded-2xl text-left transition-all duration-200">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 bg-purple-950/80 text-purple-400 rounded-xl flex items-center justify-center group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors duration-200">
+                                    <i class="fa-solid fa-clover text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Imaginary Wave</h4>
+                                    <span class="text-[10px] text-purple-400 uppercase tracking-widest font-semibold">Complex Numbers</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400">Attacks enemy mind with complex numbers. Involves evaluating powers of $i$, conjugates, and planes.</p>
+                        </button>
+
+                        <!-- Spell: Sequences -->
+                        <button onclick="selectSpell('sequences')" class="spell-btn group p-4 bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-emerald-500 rounded-2xl text-left transition-all duration-200">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-10 h-10 bg-emerald-950/80 text-emerald-400 rounded-xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors duration-200">
+                                    <i class="fa-solid fa-arrow-trend-up text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Arithmetic Cascade</h4>
+                                    <span class="text-[10px] text-emerald-400 uppercase tracking-widest font-semibold">Sequences & Series</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400">Summons cascading math crystals. Tests arithmetic/geometric progress, summation, and formulas.</p>
+                        </button>
+
+                    </div>
+
+                    <!-- Difficulty selector (Activates on selecting a spell) -->
+                    <div id="difficulty-panel" class="hidden border-t border-slate-800/60 pt-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="text-sm font-semibold text-slate-300">Select Question Difficulty (Sets Power Multiplier):</h4>
+                            <span id="selected-spell-indicator" class="text-xs bg-slate-800 px-3 py-1 rounded-full font-bold border border-slate-700 text-white">None</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setDifficulty('easy')" class="p-3 bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-800 text-emerald-300 rounded-xl font-bold transition-all text-xs flex flex-col items-center">
+                                <span>EASY</span>
+                                <span class="text-[10px] text-emerald-400 font-normal mt-0.5">1x Base Hit DMG</span>
+                            </button>
+                            <button onclick="setDifficulty('medium')" class="p-3 bg-amber-950/50 hover:bg-amber-900/60 border border-amber-800 text-amber-300 rounded-xl font-bold transition-all text-xs flex flex-col items-center">
+                                <span>MEDIUM</span>
+                                <span class="text-[10px] text-amber-400 font-normal mt-0.5">2.5x Hyper DMG</span>
+                            </button>
+                            <button onclick="setDifficulty('hard')" class="p-3 bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800 text-rose-300 rounded-xl font-bold transition-all text-xs flex flex-col items-center">
+                                <span>HARD</span>
+                                <span class="text-[10px] text-rose-400 font-normal mt-0.5">5.0x Supreme DMG</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right 5 columns: Spell Casting & Math Solve Console + Battle Log -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- Combat Console (The Question Zone) -->
+                <div class="bg-slate-950/80 border border-slate-800/80 rounded-3xl p-6 flex flex-col flex-1 shadow-lg" id="console-panel">
+                    
+                    <!-- Pre-cast screen (idle) -->
+                    <div id="console-idle" class="flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-400">
+                        <div class="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center text-slate-600 mb-4 border border-slate-800">
+                            <i class="fa-solid fa-terminal text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-white text-base mb-1">Casting Chamber Offline</h4>
+                        <p class="text-sm max-w-xs">Select a spell and choose a difficulty on the left to activate algebraic damage channeling!</p>
+                    </div>
+
+                    <!-- Active question interface -->
+                    <div id="console-active" class="hidden flex-1 flex flex-col justify-between">
+                        <div>
+                            <!-- Header status bar -->
+                            <div class="flex justify-between items-center pb-3 border-b border-slate-800/60 mb-4">
+                                <span class="text-[10px] font-bold tracking-wider uppercase text-cyan-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-bolt-lightning animate-bounce"></i> Casting: <span id="active-spell-name">Spell</span>
+                                </span>
+                                <span id="active-difficulty-badge" class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border">HARD</span>
+                            </div>
+
+                            <!-- Question Formulation -->
+                            <div class="mb-6">
+                                <h4 class="text-slate-400 text-xs uppercase font-semibold tracking-wider mb-2">Evaluate the expression:</h4>
+                                <div id="math-question-box" class="bg-slate-900/70 border border-slate-800/80 rounded-2xl p-5 min-h-[100px] flex items-center justify-center text-center text-xl font-bold text-slate-100 overflow-x-auto shadow-inner">
+                                    <!-- LaTeX elements go here dynamically -->
+                                    $$x^2 + 5x + 6 = 0$$
+                                </div>
+                            </div>
+
+                            <!-- Answer Options Grid -->
+                            <div class="mb-6">
+                                <h4 class="text-slate-400 text-xs uppercase font-semibold tracking-wider mb-2">Choose the correct roots/solution:</h4>
+                                <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <!-- Dynamic answer buttons -->
+                                    <button class="option-btn text-left p-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-sm transition-colors text-slate-300">Option 1</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Utility hints -->
+                        <div class="bg-indigo-950/30 border border-indigo-900/40 p-3 rounded-xl text-xs text-indigo-300 flex items-start gap-2.5">
+                            <i class="fa-solid fa-circle-info text-sm mt-0.5"></i>
+                            <div>
+                                <strong class="font-bold text-indigo-200">Tip:</strong> Focus carefully. Selecting a wrong answer will cost you HP, and fail to charge your spell! You have all the time you need.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Solution / Answer Outcome View -->
+                    <div id="console-result" class="hidden flex-1 flex flex-col justify-between">
+                        <div>
+                            <!-- Outcome Heading -->
+                            <div id="result-status-header" class="p-4 rounded-2xl flex items-center gap-3 mb-4">
+                                <div id="result-status-icon" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg"></div>
+                                <div>
+                                    <h4 id="result-status-title" class="font-extrabold text-base">Perfect Answer!</h4>
+                                    <p id="result-status-subtitle" class="text-xs text-gray-300">Spell damage boosted!</p>
+                                </div>
+                            </div>
+
+                            <!-- Explanatory math steps -->
+                            <div class="mb-4">
+                                <h5 class="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Step-By-Step Mathematical Breakdown</h5>
+                                <div id="solution-explanation-box" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-xs leading-relaxed text-slate-300 max-h-[180px] overflow-y-auto">
+                                    <!-- Explanatory formulas -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advance Button -->
+                        <button onclick="advanceTurn()" class="w-full py-4 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg transition-all text-sm flex items-center justify-center gap-2">
+                            <span>Execute Actions & End Turn</span> <i class="fa-solid fa-circle-play"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Battle Logger -->
+                <div class="bg-slate-950/60 border border-slate-800/80 rounded-3xl p-5 flex flex-col h-[200px]">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-800/50 mb-3">
+                        <span class="text-xs font-bold tracking-widest text-slate-400 uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-scroll text-cyan-400"></i> Battle Chronicle
+                        </span>
+                        <button onclick="clearLogs()" class="text-[10px] text-slate-500 hover:text-slate-300 uppercase font-semibold">Clear Logs</button>
+                    </div>
+                    <div id="logs-container" class="flex-1 overflow-y-auto text-xs space-y-2 flex flex-col pr-1">
+                        <div class="text-indigo-400 italic">Welcome to the algebraic rift, Alge-Mage. The beasts await your command.</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Victory / Defeat Modal -->
+    <div id="battle-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+        <div class="bg-slate-900 border-2 border-indigo-800/80 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
+            <div id="modal-accent-circle" class="absolute -top-12 left-1/2 -translate-x-1/2 w-32 h-32 bg-indigo-500/20 blur-2xl rounded-full"></div>
+            
+            <div id="modal-icon-container" class="w-20 h-20 bg-indigo-950 text-indigo-400 border border-indigo-800 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 relative">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <h3 id="modal-title" class="heading-font text-3xl font-bold mb-2 text-white">Match Concluded!</h3>
+            <p id="modal-description" class="text-slate-400 text-sm mb-6">Excellent job defeating the math monsters and solving complex quadratic theorems.</p>
+
+            <!-- Rewards section -->
+            <div id="modal-rewards" class="bg-slate-950/60 border border-slate-800/60 rounded-2xl p-4 mb-6 text-left space-y-2">
+                <h5 class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Experience & Loot Gained</h5>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-300">Base Experience:</span>
+                    <span id="reward-xp" class="font-bold text-cyan-400">+50 XP</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-300">Current Health Restored:</span>
+                    <span id="reward-heal" class="font-bold text-emerald-400">+25 HP</span>
+                </div>
+            </div>
+
+            <button onclick="closeModalAndProceed()" id="modal-btn" class="w-full py-4 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                <span>Advance to Next Boss</span> <i class="fa-solid fa-circle-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Screen Footer info -->
+    <footer class="bg-slate-950 border-t border-slate-900/60 py-3 text-center text-xs text-slate-600 mt-auto">
+        &copy; 2026 Algebraic Arena RPG. Built with Tailwind CSS, KaTeX, and HTML5 Canvas. Empowering minds.
+    </footer>
+
+    <!-- Audio synthesizing mechanics (We use Web Audio API to generate arcade math sounds natively without external assets!) -->
+    <script>
+        let audioEnabled = true;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSynthSound(type) {
+            if (!audioEnabled) return;
+            
+            // Resume Context if suspended (browser rules)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            
+            switch(type) {
+                case 'click':
+                    {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
+                        gain.gain.setValueAtTime(0.05, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.12);
+                    }
+                    break;
+                case 'correct':
+                    {
+                        const osc1 = audioCtx.createOscillator();
+                        const osc2 = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        
+                        osc1.type = 'triangle';
+                        osc2.type = 'sine';
+                        
+                        osc1.frequency.setValueAtTime(523.25, now); // C5
+                        osc1.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                        osc1.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                        
+                        osc2.frequency.setValueAtTime(523.25 * 2, now + 0.1);
+                        
+                        gain.gain.setValueAtTime(0.06, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                        
+                        osc1.connect(gain);
+                        osc2.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc1.start(now);
+                        osc2.start(now + 0.08);
+                        osc1.stop(now + 0.38);
+                        osc2.stop(now + 0.38);
+                    }
+                    break;
+                case 'incorrect':
+                    {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(180, now);
+                        osc.frequency.linearRampToValueAtTime(90, now + 0.3);
+                        
+                        gain.gain.setValueAtTime(0.07, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.32);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now);
+                        osc.stop(now + 0.33);
+                    }
+                    break;
+                case 'boss_hit':
+                    {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(320, now);
+                        osc.frequency.exponentialRampToValueAtTime(80, now + 0.4);
+                        
+                        gain.gain.setValueAtTime(0.1, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.42);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now);
+                        osc.stop(now + 0.45);
+                    }
+                    break;
+                case 'player_hit':
+                    {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(260, now);
+                        osc.frequency.exponentialRampToValueAtTime(50, now + 0.35);
+                        
+                        gain.gain.setValueAtTime(0.08, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.36);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now);
+                        osc.stop(now + 0.38);
+                    }
+                    break;
+                case 'level_up':
+                    {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(261.63, now); // C4
+                        osc.frequency.setValueAtTime(329.63, now + 0.1); // E4
+                        osc.frequency.setValueAtTime(392.00, now + 0.2); // G4
+                        osc.frequency.setValueAtTime(523.25, now + 0.3); // C5
+                        osc.frequency.setValueAtTime(659.25, now + 0.4); // E5
+                        osc.frequency.setValueAtTime(1046.50, now + 0.5); // C6
+                        
+                        gain.gain.setValueAtTime(0.08, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(now);
+                        osc.stop(now + 0.82);
+                    }
+                    break;
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audio-toggle');
+            if (audioEnabled) {
+                btn.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
+                btn.classList.remove('text-slate-500');
+                btn.classList.add('text-slate-400');
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
+                btn.classList.remove('text-slate-400');
+                btn.classList.add('text-slate-500');
+            }
+        }
+    </script>
+
+    <!-- Complete game logic scope -->
+    <script>
+        // System state
+        let player = {
+            level: 1,
+            maxHp: 100,
+            hp: 100,
+            xp: 0,
+            maxXp: 100,
+            streak: 0,
+            highScore: 0
+        };
+
+        const BOSSES = [
+            {
+                name: "Quadratic Hydra",
+                maxHp: 80,
+                hp: 80,
+                trait: "Regeneration (+4 HP / turn)",
+                traitType: "regen",
+                color: "#14b8a6",
+                icon: "fa-chart-line",
+                level: 1
+            },
+            {
+                name: "Logarithmic Leviathan",
+                maxHp: 150,
+                hp: 150,
+                trait: "Critical Strike chance (1.5x damage)",
+                traitType: "crit",
+                color: "#6366f1",
+                icon: "fa-calculator",
+                level: 2
+            },
+            {
+                name: "Imaginary Specter",
+                maxHp: 220,
+                hp: 220,
+                trait: "Mind Drain (Lifesteals 5 HP)",
+                traitType: "drain",
+                color: "#a855f7",
+                icon: "fa-clover",
+                level: 3
+            },
+            {
+                name: "Polynomial Overlord",
+                maxHp: 320,
+                hp: 320,
+                trait: "True Math Chaos (Unpredictable damage)",
+                traitType: "chaos",
+                color: "#f43f5e",
+                icon: "fa-dragon",
+                level: 4
+            }
+        ];
+
+        let currentBossIndex = 0;
+        let activeBoss = null;
+
+        // Current Selected Action Parameters
+        let currentSelectedSpell = null;
+        let currentSelectedDifficulty = null;
+        let currentQuestion = null;
+        let hasAnsweredCurrentQuestion = false;
+        let playerDamageAccumulator = 0;
+        let monsterDamageAccumulator = 0;
+
+        // Canvas animation frame loop elements
+        let canvas, ctx;
+        let particles = [];
+        let playerPosition = { x: 0, y: 0 };
+        let enemyPosition = { x: 0, y: 0 };
+        let screenShakeAmount = 0;
+
+        function startGame() {
+            playSynthSound('click');
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            // Retrieve Highscore
+            const storedHighScore = localStorage.getItem('algebra_arena_highscore');
+            if (storedHighScore) {
+                player.highScore = parseInt(storedHighScore);
+                document.getElementById('high-score-counter').innerText = player.highScore;
+            }
+
+            initGame();
+        }
+
+        function initGame() {
+            currentBossIndex = 0;
+            player.level = 1;
+            player.maxHp = 100;
+            player.hp = 100;
+            player.xp = 0;
+            player.maxXp = 100;
+            player.streak = 0;
+
+            loadBoss(currentBossIndex);
+            updateHud();
+            initCanvas();
+            addLog("The game begins. Fight well, mathematical apprentice!", "text-cyan-400 font-bold");
+        }
+
+        function loadBoss(index) {
+            // If we beat all bosses, scale up current boss index logically
+            if (index >= BOSSES.length) {
+                // Generate a scaling procedurally enhanced Polynomial Overlord
+                const scalingFactor = 1 + (index - BOSSES.length + 1) * 0.4;
+                activeBoss = {
+                    name: `Arch-Polynomial Demigod (V${index - BOSSES.length + 2})`,
+                    maxHp: Math.round(320 * scalingFactor),
+                    hp: Math.round(320 * scalingFactor),
+                    trait: "Hyper True Chaos (Extremely unstable)",
+                    traitType: "chaos",
+                    color: "#e11d48",
+                    icon: "fa-crown",
+                    level: index + 1
+                };
+            } else {
+                activeBoss = { ...BOSSES[index] };
+            }
+
+            updateHud();
+            addLog(`BOSS FIGHT: ${activeBoss.name} has entered the arena! Trait: ${activeBoss.trait}`, "text-rose-400 font-extrabold");
+        }
+
+        function updateHud() {
+            document.getElementById('player-level-badge').innerText = `LVL ${player.level}`;
+            document.getElementById('player-hp-text').innerText = `${player.hp}/${player.maxHp}`;
+            document.getElementById('player-hp-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
+
+            document.getElementById('player-xp-text').innerText = `XP: ${player.xp}/${player.maxXp}`;
+            document.getElementById('xp-bar-fill').style.width = `${(player.xp / player.maxXp) * 100}%`;
+
+            document.getElementById('enemy-name').innerText = activeBoss.name;
+            document.getElementById('enemy-hp-text').innerText = `${activeBoss.hp}/${activeBoss.maxHp}`;
+            document.getElementById('enemy-hp-bar').style.width = `${(activeBoss.hp / activeBoss.maxHp) * 100}%`;
+            document.getElementById('enemy-trait').innerText = activeBoss.trait;
+
+            document.getElementById('streak-value').innerText = player.streak;
+            
+            // Check High Score
+            if (player.streak > player.highScore) {
+                player.highScore = player.streak;
+                localStorage.setItem('algebra_arena_highscore', player.highScore);
+                document.getElementById('high-score-counter').innerText = player.highScore;
+            }
+        }
+
+        // --- Question Generator for Algebra II Topics ---
+        // Generates unlimited math problems for easy, medium, and hard difficulties
+        function generateAlgebraQuestion(topic, difficulty) {
+            let questionText = "";
+            let correctAnswer = "";
+            let options = [];
+            let solutionSteps = [];
+
+            switch(topic) {
+                case 'quadratics':
+                    if (difficulty === 'easy') {
+                        // Factored form like (x - a)(x - b) = 0 => x^2 - (a+b)x + ab = 0
+                        const a = Math.floor(Math.random() * 6) + 1; // 1 to 6
+                        const b = Math.floor(Math.random() * 6) + 1; // 1 to 6
+                        const sum = a + b;
+                        const product = a * b;
+                        
+                        questionText = `Solve \\, for \\, x: \\quad x^2 - ${sum}x + ${product} = 0`;
+                        correctAnswer = `x = ${a} \\, or \\, x = ${b}`;
+                        
+                        options = [
+                            correctAnswer,
+                            `x = -${a} \\, or \\, x = -${b}`,
+                            `x = ${sum} \\, or \\, x = ${product}`,
+                            `x = ${a + 2} \\, or \\, x = ${b - 1}`
+                        ];
+                        
+                        solutionSteps = [
+                            `The quadratic equation is given by: \\quad x^2 - ${sum}x + ${product} = 0`,
+                            `We look for two numbers that multiply to \\( ${product} \\) and add up to \\( -${sum} \\).`,
+                            `Those numbers are \\( -${a} \\) and \\( -${b} \\).`,
+                            `Factor the equation: \\quad (x - ${a})(x - ${b}) = 0`,
+                            `Set each factor to zero to find the roots:`,
+                            `\\quad x - ${a} = 0 \\implies x = ${a}`,
+                            `\\quad x - ${b} = 0 \\implies x = ${b}`
+                        ];
+                    } else if (difficulty === 'medium') {
+                        // Find the vertex (h, k) of y = a(x-h)^2 + k  or y = ax^2 + bx + c
+                        const h = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1);
+                        const k = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 9) + 1);
+                        const a = (Math.random() > 0.5 ? 2 : 3);
+                        // y = a(x^2 - 2hx + h^2) + k = ax^2 - 2ahx + ah^2+k
+                        const bCoeff = -2 * a * h;
+                        const cCoeff = a * (h * h) + k;
+
+                        // Equation display:
+                        const signB = bCoeff >= 0 ? `+ ${bCoeff}` : `- ${Math.abs(bCoeff)}`;
+                        const signC = cCoeff >= 0 ? `+ ${cCoeff}` : `- ${Math.abs(cCoeff)}`;
+
+                        questionText = `Find \\, the \\, vertex \\, (h, k) \\, of: \\quad f(x) = ${a}x^2 ${signB}x ${signC}`;
+                        correctAnswer = `(${h}, ${k})`;
+
+                        options = [
+                            correctAnswer,
+                            `(${h}, ${-k})`,
+                            `(${-h}, ${k})`,
+                            `(${k}, ${h})`
+                        ];
+
+                        solutionSteps = [
+                            `Given function: \\quad f(x) = ${a}x^2 ${signB}x ${signC}`,
+                            `Use the vertex formula for \\( h \\): \\quad h = \\frac{-b}{2a}`,
+                            `\\quad h = \\frac{-(${bCoeff})}{2(${a})} = \\frac{${-bCoeff}}{${2 * a}} = ${h}`,
+                            `Find \\( k \\) by evaluating \\( f(h) \\):`,
+                            `\\quad f(${h}) = ${a}(${h})^2 + (${bCoeff})(${h}) + (${cCoeff})`,
+                            `\\quad f(${h}) = ${a * h * h} + (${bCoeff * h}) + (${cCoeff}) = ${k}`,
+                            `Therefore, the vertex coordinates \\((h, k)\\) are: \\quad (${h}, ${k})`
+                        ];
+                    } else {
+                        // Hard: Quadratic Formula with complex roots or radical solutions
+                        // x^2 + 2bx + c = 0 where b^2 - 4ac < 0, returning imaginary roots
+                        const b = Math.floor(Math.random() * 3) + 1; // 1 to 3
+                        const bSq = 4 * b * b;
+                        // Let's make c larger so b^2 - 4c is negative
+                        const c = bSq + (Math.floor(Math.random() * 3) + 1) * 4; // Ensures multiple of 4 inside root
+                        const discriminant = bSq - 4 * c; // negative number
+                        const insideRoot = Math.abs(discriminant);
+                        const rootSimp = Math.sqrt(insideRoot);
+
+                        questionText = `Find \\, the \\, complex \\, roots \\, of: \\quad x^2 - ${2*b}x + ${c} = 0`;
+                        
+                        // roots = (2b +- sqrt(4b^2 - 4c))/2 = b +- i*sqrt(insideRoot)/2
+                        const realPart = b;
+                        const imagPart = rootSimp / 2;
+                        correctAnswer = `x = ${realPart} \\pm ${imagPart}i`;
+
+                        options = [
+                            correctAnswer,
+                            `x = -${realPart} \\pm ${imagPart}i`,
+                            `x = ${realPart} \\pm ${imagPart * 2}i`,
+                            `x = ${realPart * 2} \\pm ${imagPart}i`
+                        ];
+
+                        solutionSteps = [
+                            `We solve \\( x^2 - ${2*b}x + ${c} = 0 \\) using the quadratic formula: \\quad x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}`,
+                            `Substitute the coefficients \\( a=1, \\, b=-${2*b}, \\, c=${c} \\):`,
+                            `\\quad x = \\frac{-(-${2*b}) \\pm \\sqrt{(-${2*b})^2 - 4(1)(${c})}}{2(1)}`,
+                            `\\quad x = \\frac{${2*b} \\pm \\sqrt{${4*b*b} - ${4*c}}}{2}`,
+                            `\\quad x = \\frac{${2*b} \\pm \\sqrt{${discriminant}}}{2}`,
+                            `Using imaginary unit \\( i = \\sqrt{-1} \\): \\quad \\sqrt{${discriminant}} = \\sqrt{${insideRoot}}i = ${rootSimp}i`,
+                            `\\quad x = \\frac{${2*b} \\pm ${rootSimp}i}{2}`,
+                            `Simplify the fraction: \\quad x = ${realPart} \\pm ${imagPart}i`
+                        ];
+                    }
+                    break;
+
+                case 'logarithms':
+                    if (difficulty === 'easy') {
+                        // Simple evaluation: log_b(y) = x
+                        const bases = [2, 3, 5, 10];
+                        const base = bases[Math.floor(Math.random() * bases.length)];
+                        const power = Math.floor(Math.random() * 3) + 2; // powers 2, 3, 4
+                        const value = Math.pow(base, power);
+
+                        questionText = `Evaluate \\, the \\, log \\, expression: \\quad \\log_{${base}}(${value}) = x`;
+                        correctAnswer = `x = ${power}`;
+
+                        options = [
+                            correctAnswer,
+                            `x = ${power + 1}`,
+                            `x = ${power - 1}`,
+                            `x = ${base}`
+                        ];
+
+                        solutionSteps = [
+                            `Given expression: \\quad \\log_{${base}}(${value}) = x`,
+                            `Convert the logarithmic equation to its equivalent exponential form: \\quad b^x = y`,
+                            `\\quad ${base}^x = ${value}`,
+                            `We know that: \\quad ${base}^{${power}} = ${value}`,
+                            `Therefore, by comparing exponents: \\quad x = ${power}`
+                        ];
+                    } else if (difficulty === 'medium') {
+                        // Solve 5^(2x - 1) = 125
+                        const base = [2, 3, 5][Math.floor(Math.random() * 3)];
+                        const rightPower = Math.floor(Math.random() * 3) + 2; // power of 2, 3, 4
+                        const rightSideValue = Math.pow(base, rightPower);
+                        
+                        // We set exponent of left side: ax + b = rightPower
+                        // Let's choose a=2, b=-1 or +1
+                        const offset = (Math.random() > 0.5 ? 1 : -1);
+                        // 2x + offset = rightPower => 2x = rightPower - offset
+                        // To make x pretty, ensure rightPower - offset is even
+                        let finalOffset = offset;
+                        if ((rightPower - offset) % 2 !== 0) {
+                            finalOffset = 0; // if not even, set offset to 0 (making ax = rightPower => 2x = rightPower, rightPower must be even)
+                        }
+                        
+                        // Adjusting display equation
+                        const displayOffset = finalOffset === 0 ? "" : (finalOffset > 0 ? `+ ${finalOffset}` : `- ${Math.abs(finalOffset)}`);
+                        const solvedX = (rightPower - finalOffset) / 2;
+
+                        questionText = `Solve \\, for \\, x: \\quad ${base}^{2x ${displayOffset}} = ${rightSideValue}`;
+                        correctAnswer = `x = ${solvedX}`;
+
+                        options = [
+                            correctAnswer,
+                            `x = ${solvedX + 1}`,
+                            `x = ${solvedX - 1}`,
+                            `x = ${solvedX + 2}`
+                        ];
+
+                        solutionSteps = [
+                            `Given exponential equation: \\quad ${base}^{2x ${displayOffset}} = ${rightSideValue}`,
+                            `Write the right side of the equation as a power of base \\( ${base} \\):`,
+                            `\\quad ${rightSideValue} = ${base}^{${rightPower}}`,
+                            `Now equate the exponents: \\quad 2x ${displayOffset} = ${rightPower}`,
+                            `Solve for \\( x \\):`,
+                            `\\quad 2x = ${rightPower - finalOffset}`,
+                            `\\quad x = ${solvedX}`
+                        ];
+                    } else {
+                        // Hard: Solve log equation using properties: log(x) + log(x - 3) = log(10) => x(x-3) = 10 => x^2 - 3x - 10 = 0
+                        // (x - a)(x + b) = 0 where roots are a and -b. Since log argument must be positive, only positive root a is valid!
+                        const rootPositive = Math.floor(Math.random() * 4) + 4; // 4 to 7
+                        const rootNegative = Math.floor(Math.random() * 3) + 1; // 1 to 3
+                        
+                        const sum = rootPositive - rootNegative; // positive sum
+                        const product = rootPositive * rootNegative; // negative product
+
+                        // log_2(x) + log_2(x - sum) = log_2(product)
+                        const baseVal = [2, 3, 10][Math.floor(Math.random() * 3)];
+
+                        questionText = `Solve \\, for \\, x: \\quad \\log_{${baseVal}}(x) + \\log_{${baseVal}}(x - ${sum}) = \\log_{${baseVal}}(${product})`;
+                        correctAnswer = `x = ${rootPositive}`;
+
+                        options = [
+                            correctAnswer,
+                            `x = -${rootNegative}`,
+                            `x = ${rootPositive} \\, and \\, -${rootNegative}`,
+                            `x = ${rootPositive + 2}`
+                        ];
+
+                        solutionSteps = [
+                            `Given: \\quad \\log_{${baseVal}}(x) + \\log_{${baseVal}}(x - ${sum}) = \\log_{${baseVal}}(${product})`,
+                            `Apply the product property of logarithms: \\quad \\log_b(M) + \\log_b(N) = \\log_b(M \\cdot N)`,
+                            `\\quad \\log_{${baseVal}}(x(x - ${sum})) = \\log_{${baseVal}}(${product})`,
+                            `Since the bases are the same, equate the arguments: \\quad x(x - ${sum}) = ${product}`,
+                            `\\quad x^2 - ${sum}x - ${product} = 0`,
+                            `Factor the quadratic equation: \\quad (x - ${rootPositive})(x + ${rootNegative}) = 0`,
+                            `This gives two potential roots: \\quad x = ${rootPositive} \\quad or \\quad x = -${rootNegative}`,
+                            `Check the domain of original logs! Logarithm arguments must be positive.`,
+                            `For \\( x = -${rootNegative} \\), \\( \\log(${rootNegative}) \\) is undefined.`,
+                            `Thus, the only valid solution is: \\quad x = ${rootPositive}`
+                        ];
+                    }
+                    break;
+
+                case 'complex':
+                    if (difficulty === 'easy') {
+                        // Simplify power of i: i^N
+                        const exponent = Math.floor(Math.random() * 100) + 10;
+                        const remainder = exponent % 4;
+                        let answer = "";
+                        let stepText = "";
+                        
+                        if (remainder === 0) { answer = "1"; stepText = "i^4 = 1"; }
+                        else if (remainder === 1) { answer = "i"; stepText = "i^1 = i"; }
+                        else if (remainder === 2) { answer = "-1"; stepText = "i^2 = -1"; }
+                        else if (remainder === 3) { answer = "-i"; stepText = "i^3 = -i"; }
+
+                        questionText = `Simplify \\, the \\, imaginary \\, power: \\quad i^{${exponent}}`;
+                        correctAnswer = answer;
+
+                        options = [
+                            "1",
+                            "-1",
+                            "i",
+                            "-i"
+                        ];
+
+                        solutionSteps = [
+                            `We wish to simplify \\( i^{${exponent}} \\).`,
+                            `The powers of imaginary unit \\( i \\) repeat in a cycle of length 4:`,
+                            `\\quad i^1 = i, \\quad i^2 = -1, \\quad i^3 = -i, \\quad i^4 = 1`,
+                            `Divide the exponent \\( ${exponent} \\) by 4 and determine the remainder:`,
+                            `\\quad ${exponent} = 4 \\times ${Math.floor(exponent/4)} + ${remainder}`,
+                            `Since \\( i^4 = 1 \\), we can rewrite the expression:`,
+                            `\\quad i^{${exponent}} = (i^4)^{${Math.floor(exponent/4)}} \\cdot i^{${remainder}} = 1 \\cdot i^{${remainder}}`,
+                            `Thus, \\( i^{${exponent}} = ${answer} \\)`
+                        ];
+                    } else if (difficulty === 'medium') {
+                        // Product of two complex numbers: (a + bi)(c + di)
+                        const a = Math.floor(Math.random() * 5) + 1;
+                        const b = Math.floor(Math.random() * 5) + 1;
+                        const c = Math.floor(Math.random() * 5) + 1;
+                        const d = (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 4) + 1);
+
+                        // (a + bi)(c + di) = (ac - bd) + (ad + bc)i
+                        const realPart = (a * c) - (b * d);
+                        const imagPart = (a * d) + (b * c);
+                        const signI = imagPart >= 0 ? `+ ${imagPart}` : `- ${Math.abs(imagPart)}`;
+
+                        questionText = `Multiply \\, the \\, complex \\, numbers: \\quad (${a} + ${b}i)(${c} ${d >= 0 ? '+' : ''}${d}i)`;
+                        correctAnswer = `${realPart} ${signI}i`;
+
+                        options = [
+                            correctAnswer,
+                            `${realPart} ${imagPart >= 0 ? '-' : '+'}${Math.abs(imagPart)}i`,
+                            `${(a * c) + (b * d)} ${signI}i`,
+                            `${realPart - 5} ${signI}i`
+                        ];
+
+                        solutionSteps = [
+                            `Distribute (FOIL) the two complex expressions: \\quad (${a} + ${b}i)(${c} ${d >= 0 ? '+' : ''}${d}i)`,
+                            `\\quad = (${a} \\cdot ${c}) + (${a} \\cdot ${d}i) + (${b}i \\cdot ${c}) + (${b}i \\cdot ${d}i)`,
+                            `\\quad = ${a*c} ${a*d >= 0 ? '+' : ''}${a*d}i ${b*c >= 0 ? '+' : ''}${b*c}i + ${b*d}i^2`,
+                            `Recall that \\( i^2 = -1 \\): \\quad + ${b*d}i^2 = - (${b*d})`,
+                            `Combine real and imaginary terms:`,
+                            `\\quad \\text{Real Part} = ${a*c} - (${b*d}) = ${realPart}`,
+                            `\\quad \\text{Imaginary Part} = (${a*d}) + (${b*c}) = ${imagPart}`,
+                            `Final Answer: \\quad ${realPart} ${signI}i`
+                        ];
+                    } else {
+                        // Hard: Complex division (a + bi) / (c + di)
+                        // Rationalizing using conjugate of denominator
+                        const a = 1; 
+                        const b = 5; 
+                        const c = 2; 
+                        const d = -1; // Let's keep it constant but dynamic looking to ensure integer results
+                        // Conjugate: c - di = 2 + i
+                        // Numerator: (1 + 5i)(2 + i) = (2 - 5) + (1 + 10)i = -3 + 11i
+                        // Denominator: (2 - i)(2 + i) = 4 + 1 = 5
+                        // (1 + 5i)/(2 - i) = -3/5 + 11/5 i
+
+                        questionText = `Divide \\, and \\, express \\, as \\, a + bi: \\quad \\frac{1 + 5i}{2 - i}`;
+                        correctAnswer = `-\\frac{3}{5} + \\frac{11}{5}i`;
+
+                        options = [
+                            correctAnswer,
+                            `-\\frac{3}{5} - \\frac{11}{5}i`,
+                            `\\frac{7}{5} + \\frac{9}{5}i`,
+                            `\\frac{2}{3} + 5i`
+                        ];
+
+                        solutionSteps = [
+                            `To divide complex numbers, multiply numerator and denominator by the complex conjugate of the denominator:`,
+                            `The denominator is \\( 2 - i \\). Its conjugate is \\( 2 + i \\).`,
+                            `\\quad \\frac{1 + 5i}{2 - i} \\cdot \\frac{2 + i}{2 + i}`,
+                            `Simplify the numerator (using FOIL):`,
+                            `\\quad (1 + 5i)(2 + i) = 2 + i + 10i + 5i^2 = 2 + 11i - 5 = -3 + 11i`,
+                            `Simplify the denominator:`,
+                            `\\quad (2 - i)(2 + i) = 2^2 - i^2 = 4 - (-1) = 5`,
+                            `Split into real and imaginary components:`,
+                            `\\quad \\frac{-3 + 11i}{5} = -\\frac{3}{5} + \\frac{11}{5}i`
+                        ];
+                    }
+                    break;
+
+                case 'sequences':
+                    if (difficulty === 'easy') {
+                        // Find Nth term of arithmetic sequence given a_1 and common difference d
+                        const a1 = Math.floor(Math.random() * 10) + 1;
+                        const d = Math.floor(Math.random() * 5) + 2;
+                        const n = Math.floor(Math.random() * 5) + 6; // term index 6 to 10
+                        const nthTerm = a1 + (n - 1) * d;
+
+                        questionText = `In \\, an \\, arithmetic \\, sequence \\, a_1 = ${a1} \\, and \\, d = ${d}. \\, Find \\, a_{${n}}:`;
+                        correctAnswer = `${nthTerm}`;
+
+                        options = [
+                            correctAnswer,
+                            `${nthTerm + d}`,
+                            `${nthTerm - d}`,
+                            `${nthTerm + a1}`
+                        ];
+
+                        solutionSteps = [
+                            `The explicit formula for an arithmetic sequence is: \\quad a_n = a_1 + (n - 1)d`,
+                            `We are given: \\quad a_1 = ${a1}, \\quad d = ${d}, \\quad n = ${n}`,
+                            `Substitute these values into the formula:`,
+                            `\\quad a_{${n}} = ${a1} + (${n} - 1)(${d})`,
+                            `\\quad a_{${n}} = ${a1} + (${n - 1})(${d})`,
+                            `\\quad a_{${n}} = ${a1} + ${ (n - 1) * d } = ${nthTerm}`
+                        ];
+                    } else if (difficulty === 'medium') {
+                        // Sum of finite geometric series: S_n = a1 * (1 - r^n) / (1 - r)
+                        const a1 = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
+                        const r = 2; // keep ratio simple
+                        const n = Math.floor(Math.random() * 2) + 4; // n = 4 or 5
+                        
+                        const rPower = Math.pow(r, n);
+                        const sumVal = a1 * (1 - rPower) / (1 - r);
+
+                        questionText = `Find \\, the \\, sum \\, of \\, the \\, first \\, ${n} \\, terms \\, of: \\quad a_n = ${a1} \\cdot (${r})^{n-1}`;
+                        correctAnswer = `${sumVal}`;
+
+                        options = [
+                            correctAnswer,
+                            `${sumVal + a1}`,
+                            `${sumVal * 2}`,
+                            `${sumVal - 10}`
+                        ];
+
+                        solutionSteps = [
+                            `This is a geometric series sum of \\( n = ${n} \\) terms.`,
+                            `The sum formula is: \\quad S_n = \\frac{a_1(1 - r^n)}{1 - r}`,
+                            `We have first term \\( a_1 = ${a1} \\), common ratio \\( r = ${r} \\), and \\( n = ${n} \\).`,
+                            `Substitute these parameters:`,
+                            `\\quad S_{${n}} = \\frac{${a1}(1 - ${r}^{${n}})}{1 - ${r}}`,
+                            `Calculate the power: \\quad ${r}^{${n}} = ${rPower}`,
+                            `\\quad S_{${n}} = \\frac{${a1}(1 - ${rPower})}{-1}`,
+                            `\\quad S_{${n}} = \\frac{${a1}(-${rPower - 1})}{-1} = ${a1} \\times ${rPower - 1} = ${sumVal}`
+                        ];
+                    } else {
+                        // Hard: Sum of infinite geometric series S_inf = a1 / (1 - r)
+                        // e.g., a1 = 12, r = 1/3 => S_inf = 12 / (2/3) = 18
+                        const a1 = [8, 12, 16, 20][Math.floor(Math.random() * 4)];
+                        const numer = 1;
+                        const denom = [2, 3, 4][Math.floor(Math.random() * 3)];
+                        
+                        // S_inf = a1 / (1 - 1/denom) = a1 / ((denom-1)/denom) = a1 * denom / (denom-1)
+                        // To ensure integer, we need a1 to be divisible by denom-1
+                        let finalA1 = a1;
+                        if (a1 % (denom - 1) !== 0) {
+                            finalA1 = (denom - 1) * 4; // recalculate to make it clean
+                        }
+                        
+                        const sumVal = Math.round(finalA1 * denom / (denom - 1));
+
+                        questionText = `Find \\, the \\, sum \\, of \\, the \\, infinite \\, geometric \\, series: \\quad \\sum_{n=1}^{\\infty} ${finalA1} \\left(\\frac{1}{${denom}}\\right)^{n-1}`;
+                        correctAnswer = `${sumVal}`;
+
+                        options = [
+                            correctAnswer,
+                            `\\infty \\, (Divergent)`,
+                            `${Math.round(sumVal - finalA1)}`,
+                            `${Math.round(sumVal * 1.5)}`
+                        ];
+
+                        solutionSteps = [
+                            `The sum of an infinite geometric series \\( S = \\frac{a_1}{1 - r} \\) exists because \\( |r| = \\left|\\frac{1}{${denom}}\\right| < 1 \\).`,
+                            `The first term is \\( a_1 = ${finalA1} \\) and the common ratio is \\( r = \\frac{1}{${denom}} \\).`,
+                            `Apply the infinite sum formula:`,
+                            `\\quad S = \\frac{${finalA1}}{1 - \\frac{1}{${denom}}}`,
+                            `Simplify the denominator: \\quad 1 - \\frac{1}{${denom}} = \\frac{${denom - 1}}{${denom}}`,
+                            `\\quad S = \\frac{${finalA1}}{\\frac{${denom - 1}}{${denom}}} = ${finalA1} \\times \\frac{${denom}}{${denom - 1}}`,
+                            `\\quad S = \\frac{${finalA1 * denom}}{${denom - 1}} = ${sumVal}`
+                        ];
+                    }
+                    break;
+            }
+
+            // Shuffle option choices
+            options = shuffleArray(options);
+
+            return {
+                questionText,
+                correctAnswer,
+                options,
+                solutionSteps
+            };
+        }
+
+        // Shuffle utility
+        function shuffleArray(arr) {
+            const temp = [...arr];
+            for (let i = temp.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [temp[i], temp[j]] = [temp[j], temp[i]];
+            }
+            return temp;
+        }
+
+        // --- Battle Loop Orchestrator ---
+
+        function selectSpell(spellType) {
+            playSynthSound('click');
+            currentSelectedSpell = spellType;
+            
+            // Highlight active selection
+            document.querySelectorAll('.spell-btn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-cyan-500', 'bg-slate-800');
+            });
+            event.currentTarget.classList.add('ring-4', 'ring-cyan-500', 'bg-slate-800');
+
+            // Format clean name
+            let spellLabel = "";
+            if(spellType === 'quadratics') spellLabel = "Quadratic Explosion";
+            if(spellType === 'logarithms') spellLabel = "Logarithmic Surge";
+            if(spellType === 'complex') spellLabel = "Imaginary Wave";
+            if(spellType === 'sequences') spellLabel = "Arithmetic Cascade";
+
+            document.getElementById('selected-spell-indicator').innerText = spellLabel;
+            document.getElementById('difficulty-panel').classList.remove('hidden');
+        }
+
+        function setDifficulty(difficulty) {
+            playSynthSound('click');
+            currentSelectedDifficulty = difficulty;
+            hasAnsweredCurrentQuestion = false;
+
+            // Generate customized question
+            currentQuestion = generateAlgebraQuestion(currentSelectedSpell, currentSelectedDifficulty);
+
+            // Hide Idle Panel, Show question console
+            document.getElementById('console-idle').classList.add('hidden');
+            document.getElementById('console-result').classList.add('hidden');
+            document.getElementById('console-active').classList.remove('hidden');
+
+            // Set Spell and Difficulty badges
+            let spellLabel = "";
+            if(currentSelectedSpell === 'quadratics') spellLabel = "Quadratic Explosion";
+            if(currentSelectedSpell === 'logarithms') spellLabel = "Logarithmic Surge";
+            if(currentSelectedSpell === 'complex') spellLabel = "Imaginary Wave";
+            if(currentSelectedSpell === 'sequences') spellLabel = "Arithmetic Cascade";
+
+            document.getElementById('active-spell-name').innerText = spellLabel;
+            
+            const diffBadge = document.getElementById('active-difficulty-badge');
+            diffBadge.innerText = difficulty.toUpperCase();
+            
+            if (difficulty === 'easy') {
+                diffBadge.className = "text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-500 text-emerald-400 bg-emerald-950/30";
+            } else if (difficulty === 'medium') {
+                diffBadge.className = "text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-amber-500 text-amber-400 bg-amber-950/30";
+            } else {
+                diffBadge.className = "text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border border-rose-500 text-rose-400 bg-rose-950/30";
+            }
+
+            // Populate question box & math rendering
+            const qBox = document.getElementById('math-question-box');
+            qBox.innerHTML = `$$${currentQuestion.questionText}$$`;
+
+            // Clear & Populate options buttons
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = "";
+
+            currentQuestion.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn text-left p-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-600 rounded-xl text-sm transition-all text-slate-300 flex items-center gap-3";
+                btn.innerHTML = `<span class="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-400 group-hover:bg-slate-700">${String.fromCharCode(65 + idx)}</span> <span class="math-opt">$$${opt}$$</span>`;
+                btn.onclick = () => submitAnswer(opt, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            // Trigger Katex parse
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.getElementById('console-active'), {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function submitAnswer(chosenOption, selectedButton) {
+            if (hasAnsweredCurrentQuestion) return;
+            hasAnsweredCurrentQuestion = true;
+
+            // Compute damage structures
+            let multiplier = 1.0;
+            if (currentSelectedDifficulty === 'medium') multiplier = 2.5;
+            if (currentSelectedDifficulty === 'hard') multiplier = 5.0;
+
+            const basePlayerDamage = 12;
+            const calculatedDmg = Math.round(basePlayerDamage * multiplier);
+
+            const isCorrect = (chosenOption === currentQuestion.correctAnswer);
+
+            const resultHeader = document.getElementById('result-status-header');
+            const resultIcon = document.getElementById('result-status-icon');
+            const resultTitle = document.getElementById('result-status-title');
+            const resultSubtitle = document.getElementById('result-status-subtitle');
+            
+            if (isCorrect) {
+                // Correct answer handling
+                playSynthSound('correct');
+                player.streak += 1;
+                playerDamageAccumulator = calculatedDmg;
+                monsterDamageAccumulator = 0; // Boss misses its core counterattack opportunity
+
+                selectedButton.className = "option-btn text-left p-3.5 bg-emerald-950/70 border-2 border-emerald-500 rounded-xl text-sm text-emerald-200 transition-all flex items-center gap-3";
+                
+                resultHeader.className = "p-4 bg-emerald-950/50 border border-emerald-800/80 rounded-2xl flex items-center gap-3 mb-4";
+                resultIcon.className = "w-10 h-10 rounded-xl bg-emerald-900/60 text-emerald-300 flex items-center justify-center text-lg";
+                resultIcon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+                resultTitle.className = "font-extrabold text-emerald-300 text-base";
+                resultTitle.innerText = "Solution Correct!";
+                resultSubtitle.innerText = `Amplified spell power successfully! Dealing ${calculatedDmg} pure damage.`;
+                
+                // Spawn beautiful success particles inside canvas
+                triggerSpellImpactParticles('player');
+            } else {
+                // Wrong answer handling
+                playSynthSound('incorrect');
+                player.streak = 0; // break streak
+                playerDamageAccumulator = 0; // Spell fails
+
+                // Compute monster strike damage scaling with difficulty
+                let bossDamageMult = 1.0;
+                if (currentSelectedDifficulty === 'medium') bossDamageMult = 1.3;
+                if (currentSelectedDifficulty === 'hard') bossDamageMult = 1.8;
+
+                const baseBossDamage = 8 + Math.floor(Math.random() * 6); // 8 to 13
+                monsterDamageAccumulator = Math.round(baseBossDamage * bossDamageMult);
+
+                selectedButton.className = "option-btn text-left p-3.5 bg-rose-950/70 border-2 border-rose-500 rounded-xl text-sm text-rose-200 transition-all flex items-center gap-3";
+                
+                // Highlight the correct one as well
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    if (btn.innerText.includes(currentQuestion.correctAnswer) || btn.innerHTML.includes(currentQuestion.correctAnswer)) {
+                        btn.className = "option-btn text-left p-3.5 bg-emerald-950/30 border border-emerald-800/80 rounded-xl text-sm text-emerald-300 flex items-center gap-3";
+                    }
+                });
+
+                resultHeader.className = "p-4 bg-rose-950/50 border border-rose-800/80 rounded-2xl flex items-center gap-3 mb-4";
+                resultIcon.className = "w-10 h-10 rounded-xl bg-rose-900/60 text-rose-300 flex items-center justify-center text-lg";
+                resultIcon.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+                resultTitle.className = "font-extrabold text-rose-300 text-base";
+                resultTitle.innerText = "Mathematical Error!";
+                resultSubtitle.innerText = `Mana unstable. Spell fizzled. Boss gains momentum and will hit back for ${monsterDamageAccumulator} HP.`;
+                
+                triggerSpellImpactParticles('boss');
+            }
+
+            // Construct explanation breakdown
+            const explanationBox = document.getElementById('solution-explanation-box');
+            explanationBox.innerHTML = "";
+            currentQuestion.solutionSteps.forEach((step, idx) => {
+                const stepElem = document.createElement('div');
+                stepElem.className = "mb-2 pb-2 border-b border-slate-900 last:border-0";
+                stepElem.innerHTML = `<span class="font-bold text-slate-400">Step ${idx + 1}:</span> \\[ ${step} \\]`;
+                explanationBox.appendChild(stepElem);
+            });
+
+            // Toggle screens
+            document.getElementById('console-active').classList.add('hidden');
+            document.getElementById('console-result').classList.remove('hidden');
+
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(explanationBox, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function advanceTurn() {
+            playSynthSound('click');
+            
+            // Execute Damage dealing
+            if (playerDamageAccumulator > 0) {
+                // Apply player damage to boss
+                activeBoss.hp = Math.max(0, activeBoss.hp - playerDamageAccumulator);
+                addLog(`You cast ${getSpellName()}! Answering correctly dealt ${playerDamageAccumulator} damage to ${activeBoss.name}!`, "text-cyan-400");
+                screenShake(10);
+                triggerDamagePulse('enemy');
+                playSynthSound('boss_hit');
+            } else if (monsterDamageAccumulator > 0) {
+                // Apply counter-attack damage to player
+                player.hp = Math.max(0, player.hp - monsterDamageAccumulator);
+                addLog(`Your calculations faltered! ${activeBoss.name} struck you for ${monsterDamageAccumulator} damage!`, "text-rose-400");
+                screenShake(15);
+                triggerDamagePulse('player');
+                playSynthSound('player_hit');
+            }
+
+            // Process passive Boss Traits (only if boss survives)
+            if (activeBoss.hp > 0) {
+                applyBossTrait();
+            }
+
+            // Clean phase parameters
+            playerDamageAccumulator = 0;
+            monsterDamageAccumulator = 0;
+            currentSelectedSpell = null;
+            currentSelectedDifficulty = null;
+
+            // Reset spell buttons UI state
+            document.querySelectorAll('.spell-btn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-cyan-500', 'bg-slate-800');
+            });
+            document.getElementById('difficulty-panel').classList.add('hidden');
+            document.getElementById('selected-spell-indicator').innerText = "None";
+
+            // Restore idle console
+            document.getElementById('console-result').classList.add('hidden');
+            document.getElementById('console-idle').classList.remove('hidden');
+
+            updateHud();
+
+            // Check game status thresholds
+            checkBattleConditions();
+        }
+
+        function applyBossTrait() {
+            if (activeBoss.traitType === 'regen') {
+                const regenVal = 4;
+                activeBoss.hp = Math.min(activeBoss.maxHp, activeBoss.hp + regenVal);
+                addLog(`[Trait Active] ${activeBoss.name} regenerated ${regenVal} HP.`, "text-amber-500 italic");
+            } 
+            else if (activeBoss.traitType === 'drain') {
+                const drainVal = 5;
+                player.hp = Math.max(0, player.hp - drainVal);
+                activeBoss.hp = Math.min(activeBoss.maxHp, activeBoss.hp + drainVal);
+                addLog(`[Trait Active] Imaginary Specter leeches ${drainVal} HP from you!`, "text-purple-400 italic");
+                triggerSpellImpactParticles('boss');
+                playSynthSound('player_hit');
+            }
+            else if (activeBoss.traitType === 'crit') {
+                // 30% chance to perform critical on next round (simulated via narrative)
+                if (Math.random() < 0.3) {
+                    addLog(`[Trait Alert] Logarithmic Leviathan is focusing energy! Critical strike chance elevated!`, "text-amber-500 font-bold");
+                }
+            }
+            else if (activeBoss.traitType === 'chaos') {
+                // Chaos strikes for random low block damage
+                const extraChaos = Math.floor(Math.random() * 5);
+                if (extraChaos > 0) {
+                    player.hp = Math.max(0, player.hp - extraChaos);
+                    addLog(`[Trait Active] The Overlord's polynomial field warped spacetime! You took ${extraChaos} chaotic damage.`, "text-rose-500 italic");
+                }
+            }
+        }
+
+        function getSpellName() {
+            if(currentSelectedSpell === 'quadratics') return "Quadratic Explosion";
+            if(currentSelectedSpell === 'logarithms') return "Logarithmic Surge";
+            if(currentSelectedSpell === 'complex') return "Imaginary Wave";
+            if(currentSelectedSpell === 'sequences') return "Arithmetic Cascade";
+            return "Algebra Blast";
+        }
+
+        function checkBattleConditions() {
+            // Check Defeat first
+            if (player.hp <= 0) {
+                // Player dies
+                triggerDefeatState();
+            } 
+            // Check Victory
+            else if (activeBoss.hp <= 0) {
+                triggerVictoryState();
+            }
+        }
+
+        function triggerVictoryState() {
+            // Earn XP
+            const earnedXp = 40 + (currentBossIndex * 15);
+            player.xp += earnedXp;
+
+            // Restorative heal after victory
+            const healVal = Math.round(player.maxHp * 0.35); // 35% heal
+            player.hp = Math.min(player.maxHp, player.hp + healVal);
+
+            // Populate Modal with customized reward text
+            const mTitle = document.getElementById('modal-title');
+            const mDesc = document.getElementById('modal-description');
+            const mIcon = document.getElementById('modal-icon-container');
+            const mXp = document.getElementById('reward-xp');
+            const mHeal = document.getElementById('reward-heal');
+            const mBtn = document.getElementById('modal-btn');
+
+            mTitle.innerText = "BOSS DEFEATED!";
+            mTitle.className = "heading-font text-3xl font-extrabold text-emerald-400 mb-2";
+            mDesc.innerText = `You have brilliantly dismantled the algebraic matrix of ${activeBoss.name}! Your mathematical prowess shines.`;
+            
+            mIcon.className = "w-20 h-20 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 relative animate-bounce";
+            mIcon.innerHTML = `<i class="fa-solid fa-trophy animate-spin-slow"></i>`;
+            
+            mXp.innerText = `+${earnedXp} XP`;
+            mHeal.innerText = `+${healVal} HP (Healed)`;
+            
+            mBtn.innerText = "Advance to Next Boss";
+            mBtn.className = "w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2";
+
+            // Check level up status
+            let isLevelUp = false;
+            if (player.xp >= player.maxXp) {
+                isLevelUp = true;
+                player.xp -= player.maxXp;
+                player.level += 1;
+                player.maxHp += 20;
+                player.hp = player.maxHp; // fully heal on lvl up
+                player.maxXp = Math.round(player.maxXp * 1.4);
+            }
+
+            if (isLevelUp) {
+                addLog(`★ LEVEL UP! You reached level ${player.level}! Max HP increased to ${player.maxHp}!`, "text-yellow-400 font-extrabold");
+                playSynthSound('level_up');
+                mDesc.innerText += ` Plus, you LEVELED UP to Level ${player.level}! All stats increased and fully healed!`;
+            }
+
+            // Show victory status modal
+            document.getElementById('battle-modal').classList.remove('hidden');
+        }
+
+        function triggerDefeatState() {
+            const mTitle = document.getElementById('modal-title');
+            const mDesc = document.getElementById('modal-description');
+            const mIcon = document.getElementById('modal-icon-container');
+            const mXp = document.getElementById('reward-xp');
+            const mHeal = document.getElementById('reward-heal');
+            const mBtn = document.getElementById('modal-btn');
+
+            mTitle.innerText = "ARENA DEFEAT";
+            mTitle.className = "heading-font text-3xl font-extrabold text-rose-500 mb-2";
+            mDesc.innerText = `The intense formula complexities of ${activeBoss.name} overwhelmed your defenses. Practice makes perfect, Alge-Mage!`;
+
+            mIcon.className = "w-20 h-20 bg-rose-950 text-rose-400 border border-rose-800 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6 relative";
+            mIcon.innerHTML = `<i class="fa-solid fa-skull-crossbones"></i>`;
+
+            mXp.innerText = "0 XP";
+            mHeal.innerText = "0 HP";
+
+            mBtn.innerText = "Retry Battle Arc";
+            mBtn.className = "w-full py-4 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-bold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2";
+
+            document.getElementById('battle-modal').classList.remove('hidden');
+        }
+
+        function closeModalAndProceed() {
+            playSynthSound('click');
+            document.getElementById('battle-modal').classList.add('hidden');
+
+            if (player.hp <= 0) {
+                // Defeat retry route: restart game completely
+                initGame();
+            } else {
+                // Success route: advance boss
+                currentBossIndex += 1;
+                loadBoss(currentBossIndex);
+            }
+        }
+
+
+        // --- Log Chronicle UI helpers ---
+        function addLog(text, textStyleClass = "text-slate-300") {
+            const container = document.getElementById('logs-container');
+            const line = document.createElement('div');
+            line.className = `p-1 border-l-2 border-slate-800/80 pl-2 leading-relaxed ${textStyleClass}`;
+            
+            // Format time stamp
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            
+            line.innerHTML = `<span class="text-slate-600 mr-1 text-[10px]">[${timeStr}]</span> ${text}`;
+            container.appendChild(line);
+            
+            // Auto scroll
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLogs() {
+            playSynthSound('click');
+            document.getElementById('logs-container').innerHTML = `<div class="text-slate-500 italic">Chronicle logs cleared. Battle status online.</div>`;
+        }
+
+
+        // --- Visual & Canvas Particle System Animation Code ---
+
+        function initCanvas() {
+            canvas = document.getElementById('battle-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Adjust canvas sizing resolution dynamically
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Start animation loop
+            requestAnimationFrame(animateLoop);
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const container = document.getElementById('battle-view-container');
+            if (container) {
+                canvas.width = container.clientWidth - 32;
+                canvas.height = 240; // Maintain standard visual height ratio
+
+                // Re-calculate entity spatial coordinates inside dimensions
+                playerPosition = { x: canvas.width * 0.22, y: canvas.height * 0.6 };
+                enemyPosition = { x: canvas.width * 0.78, y: canvas.height * 0.5 };
+            }
+        }
+
+        // Particle Class definition
+        class MagicalParticle {
+            constructor(x, y, targetX, targetY, color, type = 'spell') {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.color = color;
+                this.type = type; // 'spell' or 'impact' or 'buff'
+                this.size = Math.random() * 4 + 2;
+                
+                // Speed calculations towards target
+                const dx = targetX - x;
+                const dy = targetY - y;
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                this.maxFrames = 30 + Math.random() * 15;
+                this.vx = dx / this.maxFrames;
+                this.vy = dy / this.maxFrames;
+                this.frame = 0;
+                this.opacity = 1;
+                
+                // If it's impact particle, explode in random vector direction
+                if (this.type === 'impact') {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 4 + 1;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+                    this.maxFrames = 25 + Math.random() * 10;
+                }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.frame++;
+                
+                // Gradually dim
+                this.opacity = 1 - (this.frame / this.maxFrames);
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function triggerSpellImpactParticles(attacker) {
+            const startX = attacker === 'player' ? playerPosition.x : enemyPosition.x;
+            const startY = attacker === 'player' ? playerPosition.y - 40 : enemyPosition.y - 45;
+            const endX = attacker === 'player' ? enemyPosition.x : playerPosition.x;
+            const endY = attacker === 'player' ? enemyPosition.y - 45 : playerPosition.y - 40;
+            const color = attacker === 'player' ? '#22d3ee' : '#f43f5e';
+
+            // Spawn traveling projectiles
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    particles.push(new MagicalParticle(
+                        startX + (Math.random() - 0.5) * 15,
+                        startY + (Math.random() - 0.5) * 15,
+                        endX,
+                        endY,
+                        color,
+                        'spell'
+                    ));
+                }, i * 40);
+            }
+        }
+
+        function spawnImpactExplosion(x, y, color) {
+            for (let i = 0; i < 25; i++) {
+                particles.push(new MagicalParticle(x, y, 0, 0, color, 'impact'));
+            }
+        }
+
+        function screenShake(amt) {
+            screenShakeAmount = amt;
+        }
+
+        function triggerDamagePulse(entity) {
+            const container = document.getElementById('battle-flash-overlay');
+            if (entity === 'player') {
+                container.className = "absolute inset-0 pointer-events-none z-10 flash-red";
+            } else {
+                container.className = "absolute inset-0 pointer-events-none z-10 flash-green";
+            }
+            setTimeout(() => {
+                container.className = "absolute inset-0 pointer-events-none z-10";
+            }, 500);
+        }
+
+        // Main game visuals loop drawing Alge-Mage and Bosses elegantly
+        function animateLoop(timestamp) {
+            if (!ctx) return;
+
+            // Apply screenshake matrix transform offset
+            ctx.save();
+            if (screenShakeAmount > 0) {
+                const shakeX = (Math.random() - 0.5) * screenShakeAmount;
+                const shakeY = (Math.random() - 0.5) * screenShakeAmount;
+                ctx.translate(shakeX, shakeY);
+                screenShakeAmount *= 0.9; // decay shake
+                if (screenShakeAmount < 0.5) screenShakeAmount = 0;
+            }
+
+            // Clear Background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw abstract grid flooring for arena depth
+            ctx.strokeStyle = "rgba(30, 41, 59, 0.4)";
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let j = 0; j < canvas.height; j += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, j);
+                ctx.lineTo(canvas.width, j);
+                ctx.stroke();
+            }
+
+            // Draw dynamic magical ground halos
+            drawHalo(playerPosition.x, playerPosition.y, 'rgba(6, 182, 212, 0.2)');
+            drawHalo(enemyPosition.x, enemyPosition.y, 'rgba(244, 63, 94, 0.2)');
+
+            // DRAW ALGE-MAGE (PLAYER)
+            drawPlayerMage();
+
+            // DRAW ACTIVE BOSS MONSTER
+            drawActiveEnemyBoss();
+
+            // UPDATE AND DRAW PROJECTILE PARTICLES
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw(ctx);
+
+                // Detect travel spell reaching objective target
+                if (p.type === 'spell' && p.frame >= p.maxFrames) {
+                    spawnImpactExplosion(p.targetX, p.targetY, p.color);
+                    particles.splice(i, 1);
+                } else if (p.opacity <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            ctx.restore();
+            requestAnimationFrame(animateLoop);
+        }
+
+        function drawHalo(x, y, strokeColor) {
+            ctx.save();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = strokeColor;
+            
+            ctx.beginPath();
+            ctx.ellipse(x, y, 45, 12, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawPlayerMage() {
+            ctx.save();
+            // Core mage body coordinates
+            const x = playerPosition.x;
+            const y = playerPosition.y;
+
+            // Draw Cloaked wizard silhouette
+            ctx.fillStyle = "#1e293b";
+            ctx.strokeStyle = "#0891b2";
+            ctx.lineWidth = 3;
+
+            // Main Robe
+            ctx.beginPath();
+            ctx.moveTo(x, y - 55);
+            ctx.lineTo(x - 22, y);
+            ctx.lineTo(x + 22, y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Wizard Pointy Hat
+            ctx.fillStyle = "#0f172a";
+            ctx.beginPath();
+            ctx.moveTo(x, y - 90);
+            ctx.lineTo(x - 18, y - 55);
+            ctx.lineTo(x + 18, y - 55);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Glowing blue eyes under cowl
+            ctx.fillStyle = "#22d3ee";
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "#22d3ee";
+            ctx.beginPath();
+            ctx.arc(x - 5, y - 50, 2.5, 0, Math.PI * 2);
+            ctx.arc(x + 5, y - 50, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Staff
+            ctx.strokeStyle = "#854d0e"; // Brown staff
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(x - 18, y + 5);
+            ctx.lineTo(x - 18, y - 75);
+            ctx.stroke();
+
+            // Staff glowing mathematics orb
+            ctx.fillStyle = "#22d3ee";
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = "#22d3ee";
+            ctx.beginPath();
+            ctx.arc(x - 18, y - 78, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawActiveEnemyBoss() {
+            if (!activeBoss) return;
+            ctx.save();
+
+            const x = enemyPosition.x;
+            const y = enemyPosition.y;
+            const color = activeBoss.color;
+
+            // Shadow aura color config
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = color;
+            ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+
+            // Procedurally paint unique silhouettes depending on the active boss index
+            if (currentBossIndex === 0) {
+                // Hydra: Draw multiple functional polynomial nodes / heads
+                // Main body central node
+                ctx.beginPath();
+                ctx.arc(x, y - 30, 22, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Head 1 (Left branch)
+                ctx.beginPath();
+                ctx.moveTo(x, y - 30);
+                ctx.quadraticCurveTo(x - 20, y - 60, x - 30, y - 70);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(x - 30, y - 70, 11, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Head 2 (Right branch)
+                ctx.beginPath();
+                ctx.moveTo(x, y - 30);
+                ctx.quadraticCurveTo(x + 20, y - 60, x + 30, y - 70);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(x + 30, y - 70, 11, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            } 
+            else if (currentBossIndex === 1) {
+                // Leviathan: Sleek oceanic logarithmic wave curve beast
+                ctx.beginPath();
+                ctx.moveTo(x - 35, y);
+                ctx.bezierCurveTo(x - 25, y - 85, x + 25, y - 85, x + 35, y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Crown dorsal fin
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(x, y - 60);
+                ctx.lineTo(x - 12, y - 40);
+                ctx.lineTo(x + 12, y - 40);
+                ctx.closePath();
+                ctx.fill();
+            } 
+            else if (currentBossIndex === 2) {
+                // Specter: Eerie Floating Ghost / Complex Planes
+                const bounce = Math.sin(Date.now() * 0.005) * 6; // slow floating effect
+                const specY = y - 40 + bounce;
+
+                ctx.beginPath();
+                ctx.moveTo(x - 20, specY + 30);
+                ctx.lineTo(x - 20, specY - 30);
+                ctx.bezierCurveTo(x - 20, specY - 60, x + 20, specY - 60, x + 20, specY - 30);
+                ctx.lineTo(x + 20, specY + 30);
+                ctx.lineTo(x + 10, specY + 20);
+                ctx.lineTo(x, specY + 30);
+                ctx.lineTo(x - 10, specY + 20);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Glowing spooky mathematical coordinates for eyes
+                ctx.fillStyle = color;
+                ctx.font = "bold 9px monospace";
+                ctx.fillText("i", x - 8, specY - 20);
+                ctx.fillText("-i", x + 5, specY - 20);
+            } 
+            else {
+                // Polynomial Overlord: Large Dragon / Crown Demon
+                ctx.beginPath();
+                ctx.moveTo(x - 35, y);
+                ctx.lineTo(x - 25, y - 75);
+                ctx.lineTo(x, y - 95);
+                ctx.lineTo(x + 25, y - 75);
+                ctx.lineTo(x + 35, y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Demon center eye
+                ctx.fillStyle = "#ffe4e6";
+                ctx.shadowColor = "#ffffff";
+                ctx.beginPath();
+                ctx.arc(x, y - 50, 7, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y - 50, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        // Initialize empty elements and game loop when the page loads fully
+        window.onload = function() {
+            // KaTeX Autorender dynamic loading pre-flight check
+            setTimeout(() => {
+                if (typeof renderMathInElement !== 'undefined') {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        throwOnError: false
+                    });
+                }
+            }, 100);
+        };
+    </script>
+</body>
+</html>

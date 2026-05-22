@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World History: Penalty Shootout</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@300;400;600;700&display=swap">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .retro-font {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+        /* Scrollbar styling for explanations */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(34, 197, 94, 0.5);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(34, 197, 94, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-emerald-500/30 py-4 px-6 sticky top-0 z-50 shadow-lg shadow-emerald-500/5">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-emerald-500 to-teal-600 p-2.5 rounded-xl shadow-md shadow-emerald-500/20">
+                    <i class="fa-solid fa-soccer-ball text-2xl text-white animate-spin" style="animation-duration: 15s;"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight retro-font bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent">
+                        WORLD HISTORY SHOOTOUT
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium">Contemporary World History Honors Exam Prep (Kohlhagen)</p>
+                </div>
+            </div>
+
+            <!-- Stats/Bar HUD -->
+            <div class="flex items-center gap-4 retro-font text-sm">
+                <div class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-800 flex items-center gap-2">
+                    <span class="text-slate-500">GOALS:</span>
+                    <span id="score-val" class="text-emerald-400 font-bold text-lg">0</span>
+                </div>
+                <div class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-800 flex items-center gap-2">
+                    <span id="streak-label" class="text-slate-500">STREAK:</span>
+                    <span id="streak-val" class="text-yellow-400 font-bold text-lg">0 🔥</span>
+                </div>
+                <!-- Added back missing mode HUD display items to prevent startMode script crash -->
+                <div class="bg-slate-950 px-4 py-2 rounded-lg border border-slate-800 flex items-center gap-2">
+                    <span id="timer-label" class="text-slate-500">MODE:</span>
+                    <span id="timer-val" class="text-amber-400 font-bold text-lg">—</span>
+                </div>
+                <button id="sound-btn" class="bg-slate-800 hover:bg-slate-700 p-2.5 rounded-lg border border-slate-700 transition-all text-slate-300">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Left Side: Interactive Penalty Kick Field Canvas -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- Stadium Field Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col relative overflow-hidden shadow-xl shadow-black/40">
+                <!-- Shooting Status Blockade Overlay -->
+                <div id="shot-overlay" class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col justify-center items-center z-20 transition-all duration-300">
+                    <div id="overlay-card" class="text-center p-6 max-w-sm transform scale-100 transition-all duration-300">
+                        <i id="overlay-icon" class="fa-solid fa-lock text-5xl text-emerald-500 mb-4 animate-bounce"></i>
+                        <h3 id="overlay-title" class="text-xl font-bold retro-font mb-2">Striker Locked</h3>
+                        <p id="overlay-desc" class="text-slate-400 text-sm">Solve the current World History question below to bypass the defenders and unlock your penalty shot!</p>
+                    </div>
+                </div>
+
+                <!-- Field HUD Info -->
+                <div class="flex justify-between items-center mb-3 text-xs retro-font z-10">
+                    <span id="shot-zone-indicator" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full uppercase">
+                        STATUS: WAITING FOR DEFENSIVE BREAKTHROUGH
+                    </span>
+                    <span class="text-slate-400 flex items-center gap-1 font-semibold">
+                        <i class="fa-solid fa-hand-pointer text-xs animate-bounce"></i> Click & drag ball backwards to aim!
+                    </span>
+                </div>
+
+                <!-- Soccer Field Canvas Container -->
+                <div class="relative aspect-[16/10] w-full bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                    <canvas id="field-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+                </div>
+            </div>
+
+            <!-- Stats/Motivation Cards -->
+            <div class="grid grid-cols-3 gap-3 retro-font text-center">
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                    <div class="text-[10px] text-slate-500 font-semibold tracking-wide">SHOTS TAKEN</div>
+                    <div id="stats-taken" class="text-lg font-bold text-slate-300">0</div>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                    <div class="text-[10px] text-slate-500 font-semibold tracking-wide">CONVERSION RATE</div>
+                    <div id="stats-conversion" class="text-lg font-bold text-emerald-400">0%</div>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                    <div class="text-[10px] text-slate-500 font-semibold tracking-wide">STADIUM HIGH</div>
+                    <div id="stats-high" class="text-lg font-bold text-yellow-400">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: History Quiz Engine Deck -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- Game Setup Card -->
+            <div id="setup-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
+                <div class="border-b border-slate-800 pb-4">
+                    <h2 class="text-lg font-bold retro-font text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy"></i> TOURNAMENT SELECTOR
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">Select your final exam study mode to prepare for June 1st.</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Standard Mode Button -->
+                    <button id="mode-shootout" class="group relative bg-gradient-to-br from-emerald-950/40 to-slate-900 hover:from-emerald-900/40 hover:to-slate-900 border border-emerald-500/20 hover:border-emerald-500/40 p-4 rounded-xl text-left transition-all duration-300 shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-emerald-400 group-hover:text-emerald-300 retro-font flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-play"></i> World Cup Challenge
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Step up to the penalty spot! Advance through all major units in order. Score goals to take the trophy.</p>
+                            </div>
+                            <span class="text-xs font-semibold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">12 Rds</span>
+                        </div>
+                    </button>
+
+                    <!-- Untimed / Study Practice Mode -->
+                    <button id="mode-study" class="group relative bg-gradient-to-br from-blue-950/30 to-slate-900 hover:from-blue-900/30 hover:to-slate-900 border border-blue-500/20 hover:border-blue-500/40 p-4 rounded-xl text-left transition-all duration-300 shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-blue-400 group-hover:text-blue-300 retro-font flex items-center gap-2">
+                                    <i class="fa-solid fa-graduation-cap"></i> Practice & Tactics Mode
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Untimed review. Focus closely on questions accompanied by detailed study notes and exam essay tips.</p>
+                            </div>
+                            <span class="text-xs font-semibold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">Tactics</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Exam Intel Banner -->
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 text-xs text-slate-400 space-y-2">
+                    <p class="font-semibold text-slate-300 retro-font uppercase tracking-wider text-[10px] flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info text-emerald-500"></i> FINAL EXAM DETAILS:
+                    </p>
+                    <div class="grid grid-cols-2 gap-y-1 gap-x-4 text-[11px]">
+                        <div><strong class="text-slate-300">Date:</strong> June 1</div>
+                        <div><strong class="text-slate-300">Time:</strong> 9:00 AM - 12:00 PM</div>
+                        <div class="col-span-2 mt-1 border-t border-slate-800/60 pt-1 text-slate-400">
+                            Covers: Socratic perspectives, Theories of IR (Realism, Liberalism, etc.), Melian Dialogue, Fake News/Sec 230, Ukraine conflict dynamics, & Refugee policy.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Play Deck -->
+            <div id="quiz-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl hidden flex-col gap-5 flex-1 justify-between">
+                
+                <!-- Progress Header -->
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span id="shot-tier-badge" class="text-xs font-bold px-2.5 py-1 rounded-full uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            UNIT 1
+                        </span>
+                        <span id="question-index" class="text-xs text-slate-500 font-semibold">Question 1/12</span>
+                    </div>
+                    <button id="end-early-btn" class="text-xs text-red-400 hover:text-red-300 underline retro-font">
+                        Exit Tournament
+                    </button>
+                </div>
+
+                <!-- Question Display Area -->
+                <div class="my-4 p-5 bg-slate-950 rounded-xl border border-slate-800 flex flex-col items-center justify-center min-h-[140px] relative overflow-hidden">
+                    <div id="question-container" class="text-sm sm:text-base font-semibold text-slate-200 leading-relaxed text-center"></div>
+                    <div id="question-subinfo" class="text-[10px] uppercase text-slate-500 font-bold mt-3 tracking-wider"></div>
+                </div>
+
+                <!-- Multiple Choice Answers Grid -->
+                <div id="answers-grid" class="grid grid-cols-1 gap-3 mb-4">
+                    <!-- Dynamic choices loaded here -->
+                </div>
+
+                <!-- Feedback Panel -->
+                <div id="feedback-panel" class="hidden flex-col gap-3 p-4 rounded-xl border mt-2">
+                    <div class="flex items-center gap-2 font-bold retro-font text-sm">
+                        <span id="feedback-icon-container" class="w-6 h-6 rounded-full flex items-center justify-center text-xs"></span>
+                        <span id="feedback-title">Defensive Break!</span>
+                    </div>
+                    <div id="feedback-text" class="text-xs text-slate-300 leading-relaxed max-h-[160px] overflow-y-auto pr-1"></div>
+                    <button id="next-action-btn" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold retro-font text-sm py-2.5 rounded-lg border border-slate-700 transition-all flex items-center justify-center gap-2">
+                        Advance Play <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Score Summary Modal -->
+    <div id="summary-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-emerald-500/30 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl shadow-emerald-500/10 relative overflow-hidden">
+            <!-- Stadium Accent Lights -->
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl"></div>
+
+            <i class="fa-solid fa-trophy text-6xl text-yellow-400 mb-4 animate-bounce"></i>
+            <h2 class="text-2xl sm:text-3xl font-bold retro-font tracking-tight text-white mb-2">FINAL WHISTLE!</h2>
+            <p id="modal-mode-tag" class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-6">STADIUM CHAMPIONSHIP</p>
+            
+            <div class="grid grid-cols-2 gap-4 my-6 bg-slate-950 p-5 rounded-2xl border border-slate-800 text-left">
+                <div>
+                    <span class="text-xs text-slate-500 block">GOALS SCORED</span>
+                    <span id="modal-points" class="text-3xl font-bold text-emerald-400 retro-font">0</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-500 block">TACTICAL ACCURACY</span>
+                    <span id="modal-accuracy" class="text-3xl font-bold text-teal-400 retro-font">0%</span>
+                </div>
+                <div class="col-span-2 border-t border-slate-800 pt-3 mt-3 flex justify-between items-center text-sm">
+                    <span class="text-slate-400">Tactics Solved:</span>
+                    <span id="modal-solved" class="font-bold text-slate-200">0 / 0</span>
+                </div>
+            </div>
+
+            <p id="modal-evaluation" class="text-sm text-slate-300 mb-8 italic leading-relaxed">
+                Superb match! Your knowledge of International Relations theories and modern geopolitics is exam-ready!
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="modal-restart-btn" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/20 transition-all retro-font uppercase tracking-wider text-xs">
+                    Replay Match
+                </button>
+                <button id="modal-close-btn" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3.5 px-6 rounded-xl border border-slate-700 transition-all retro-font text-xs">
+                    Locker Room
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Settings Alert -->
+    <div id="audio-toast" class="fixed bottom-4 right-4 bg-slate-900 border border-emerald-500/30 px-4 py-3 rounded-xl shadow-xl shadow-black/50 text-xs flex items-center gap-3 transform translate-y-20 transition-all duration-500 opacity-0 z-50">
+        <span class="flex h-2 w-2 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-slate-300 font-medium">Retro Crowds & Synth Audio Enabled! ⚽</span>
+    </div>
+
+    <script>
+        // --- CONTEMPORARY WORLD HISTORY SYLLABUS DATASET ---
+        const QUESTIONS = [
+            // --- SECTION 1: SOCRATIC PERSPECTIVES & MELIAN DIALOGUE ---
+            {
+                id: 1,
+                unit: "Socratic & Melia",
+                topic: "I. Socratic Seminars & Multiple Perspectives",
+                question: "During Socratic Seminars, we discuss how there is 'no one right way' to view complex historical occurrences. Which of the following best exemplifies two differing yet analytically 'correct' lenses to view a global conflict?",
+                choices: [
+                    "Seeing it entirely as an unavoidable clash of state survival versus seeing it as a moral failure of international institutions.",
+                    "Arguing that only one nation holds absolute truth while all other historical records are totally fabricated.",
+                    "Dismissing all theoretical models in favor of random, unorganized natural disasters.",
+                    "Only relying on modern social media algorithms to determine historical boundaries."
+                ],
+                correct: "Seeing it entirely as an unavoidable clash of state survival versus seeing it as a moral failure of international institutions.",
+                explanation: "History and Socratic analysis require us to acknowledge multiple valid perspectives. For instance, a Realist might see a war as an unavoidable action for a state trying to survive, while a Liberal theorist might see it as a breakdown of international diplomacy. Both represent coherent analytical frameworks."
+            },
+            {
+                id: 2,
+                unit: "Socratic & Melia",
+                topic: "II. Melian Dialogue - Realism vs. Justice",
+                question: "In the famous Melian Dialogue of the Peloponnesian War, what is the core stance of the Athenians when the Melians appeal to justice and neutral morality?",
+                choices: [
+                    "Athenians assert that 'the strong do what they can and the weak suffer what they must' (Mighty is Right).",
+                    "Athenians agree that international law should protect smaller states unconditionally.",
+                    "Athenians yield to the Melians out of religious devotion and fear of Spartan intervention.",
+                    "Athenians declare that international borders must be decided by universal democratic referendums."
+                ],
+                correct: "Athenians assert that 'the strong do what they can and the weak suffer what they must' (Mighty is Right).",
+                explanation: "The Melian Dialogue is a foundational text of political Realism. The Athenians argue that in anarchic international politics, power dictates actions, and abstract concepts of 'justice' do not protect a weaker state (Melos) from the geopolitical might of a stronger one (Athens)."
+            },
+            // --- SECTION 2: INTERNATIONAL RELATIONS THEORIES ---
+            {
+                id: 3,
+                unit: "IR Theories",
+                topic: "III. International Relations - Realism",
+                question: "If you read a headline stating 'NATO deploys thousands of military units to Eastern border to deter immediate foreign aggression,' which IR theory best explains this action as state survival in an anarchic world?",
+                choices: [
+                    "Realism",
+                    "Liberalism",
+                    "Feminism",
+                    "Constructivism"
+                ],
+                correct: "Realism",
+                explanation: "Realism emphasizes anarchy in the international system, state-centric actions, national security, self-preservation, and balance of power through military alliance building (like NATO expansion or troop deployments)."
+            },
+            {
+                id: 4,
+                unit: "IR Theories",
+                topic: "III. International Relations - Liberalism & Marxism",
+                question: "Contrast Liberalism and Marxism. How do their core definitions of the primary driver of international politics differ?",
+                choices: [
+                    "Liberalism focuses on global cooperation and international institutions; Marxism focuses on class struggle, economic exploitation, and corporate capitalism.",
+                    "Liberalism looks solely at military balances; Marxism focuses purely on state sovereignty.",
+                    "Liberalism claims anarchy can never be solved; Marxism claims international law is the supreme authority.",
+                    "Liberalism rejects the role of non-governmental organizations; Marxism supports them exclusively."
+                ],
+                correct: "Liberalism focuses on global cooperation and international institutions; Marxism focuses on class struggle, economic exploitation, and corporate capitalism.",
+                explanation: "Liberal IR theory believes that international institutions (like the UN or WTO), shared trade, and democratic values can foster peaceful global cooperation. Marxism, conversely, views international relations as a struggle between economic classes, where wealthy nations and corporate elites exploit the working class and developing countries."
+            },
+            {
+                id: 5,
+                unit: "IR Theories",
+                topic: "III. International Relations - Constructivism",
+                question: "A Constructivist scholar analyzing a country's changing foreign policy would place the greatest emphasis on which of the following?",
+                choices: [
+                    "How historical identities, social norms, and cultural ideas shape a nation's interests.",
+                    "The distribution of heavy military weaponry and geographic buffers.",
+                    "The struggle between corporate owners and labor unions.",
+                    "Explicit military contracts and economic trade blockades."
+                ],
+                correct: "How historical identities, social norms, and cultural ideas shape a nation's interests.",
+                explanation: "Constructivism argues that international relations are socially constructed. Rather than assuming states only care about material power or wealth, Constructivists show how state behaviors are guided by identity, shared norms, history, and cultural interactions."
+            },
+            // --- SECTION 3: NEWS LITERACY AND MEDIA ---
+            {
+                id: 6,
+                unit: "News Literacy",
+                topic: "IV. Section 230 & Fake News",
+                question: "What is Section 230 of the Communications Decency Act, and why is it highly controversial in debates surrounding online misinformation?",
+                choices: [
+                    "It protects online platforms from being sued for content posted by their users, creating debate over corporate accountability.",
+                    "It allows the government to censor any political website that prints stories without official state authorization.",
+                    "It strictly outlaws the use of advanced algorithms in the compilation of social media feeds.",
+                    "It forces all search engines to render stories horizontally rather than vertically."
+                ],
+                correct: "It protects online platforms from being sued for content posted by their users, creating debate over corporate accountability.",
+                explanation: "Section 230 protects websites and tech platforms from being legally treated as the publisher of user-provided information. Supporters argue it keeps the internet free and open; critics say it shields tech giants from liability when their algorithms spread harmful fake news or conspiracy theories."
+            },
+            {
+                id: 7,
+                unit: "News Literacy",
+                topic: "IV. Media Tactics & Horizontal Reading",
+                question: "Which of the following is a key technique of 'horizontal reading' used to verify if a news story is true?",
+                choices: [
+                    "Leaving the original website to research the same claim across multiple independent sources and databases.",
+                    "Reading a single webpage top-to-bottom multiple times without checking external links.",
+                    "Focusing strictly on the professional appearance, logos, and fonts of the host site.",
+                    "Sharing the story on social media to see if friends agree with the perspective."
+                ],
+                correct: "Leaving the original website to research the same claim across multiple independent sources and databases.",
+                explanation: "Horizontal reading involves opening new tabs to investigate what other reliable sources, fact-checkers, and organizations say about the claims of an unfamiliar website. It is highly effective for identifying bias, propaganda, or deepfakes."
+            },
+            // --- SECTION 4: CONTEXTUAL VOCABULARY ---
+            {
+                id: 8,
+                unit: "Vocabulary",
+                topic: "V. Geopolitical Terms & Vocab",
+                question: "Contrast 'De Jure' and 'De Facto' political situations. Which is the most accurate definition?",
+                choices: [
+                    "De Jure means recognized by formal law; De Facto means existing in practice regardless of legal status.",
+                    "De Jure means military intervention; De Facto means economic trade tariffs.",
+                    "De Jure means localized bias; De Facto means international organization treaties.",
+                    "De Jure means spread by state propaganda; De Facto means verified by horizontal reading."
+                ],
+                correct: "De Jure means recognized by formal law; De Facto means existing in practice regardless of legal status.",
+                explanation: "In geopolitical vocabulary, 'De Jure' represents things that exist according to official law (e.g., official borders). 'De Facto' describes real-world situations as they actually exist on the ground, regardless of legal declarations (e.g., a proxy army controlling a territory)."
+            },
+            // --- SECTION 5: REFUGEES & IDPS ---
+            {
+                id: 9,
+                unit: "Refugees & IDPs",
+                topic: "VI. Displaced Persons & Global Rights",
+                question: "According to international human rights standards, what is the key legal difference between a Refugee and an Internally Displaced Person (IDP)?",
+                choices: [
+                    "A refugee has crossed an internationally recognized border to escape persecution, whereas an IDP remains within their home country.",
+                    "A refugee leaves solely for high-paying economic reasons, whereas an IDP is fleeing a military draft.",
+                    "Refugees are governed by local NGOs, while IDPs are solely protected by foreign mercenary units.",
+                    "There is no legal difference; both terms are identical under UN charters."
+                ],
+                correct: "A refugee has crossed an internationally recognized border to escape persecution, whereas an IDP remains within their home country.",
+                explanation: "Refugees must cross an international border to seek asylum and are granted specific protections under international law (1951 Refugee Convention). IDPs are displaced inside their own national borders due to conflict or disaster and technically remain under the jurisdiction of their own government."
+            },
+            // --- SECTION 6: AMENDMENTS ---
+            {
+                id: 10,
+                unit: "Amendments",
+                topic: "VII. 1st and 14th Amendments",
+                question: "How does the Citizenship Clause of the 14th Amendment define American citizenship, and why is it a focal point in modern political debate?",
+                choices: [
+                    "It grants automatic citizenship to all persons born or naturalized in the US, leading to political debates over birthright citizenship.",
+                    "It restricts citizenship to those who can pass a complex technological algorithm test.",
+                    "It allows states to strip citizenship from political groups that express unpopular or critical views.",
+                    "It dictates that citizens must serve in proxy mercenary units during international disputes."
+                ],
+                correct: "It grants automatic citizenship to all persons born or naturalized in the US, leading to political debates over birthright citizenship.",
+                explanation: "The 14th Amendment's Citizenship Clause guarantees that 'all persons born or naturalized in the United States... are citizens.' This birthright clause is debated, with some arguing for its original protections and others seeking to limit it regarding undocumented immigration."
+            },
+            // --- SECTION 7: UKRAINE AND NATO ---
+            {
+                id: 11,
+                unit: "Ukraine & NATO",
+                topic: "VIII. NATO, Cold War, & Ukraine",
+                question: "What was the Warsaw Pact, and how does its historical context relate to modern tensions surrounding NATO expansion in Eastern Europe?",
+                choices: [
+                    "It was a military alliance of Soviet satellite states formed to counter NATO; its collapse left a security vacuum that Russia fears NATO is filling.",
+                    "It was a series of trade tariffs created to block economic migration between Western countries.",
+                    "It was an early non-governmental organization built to regulate international communication algorithms.",
+                    "It was a treaty between Sparta and Athens that established early definitions of sovereign neutrality."
+                ],
+                correct: "It was a military alliance of Soviet satellite states formed to counter NATO; its collapse left a security vacuum that Russia fears NATO is filling.",
+                explanation: "The Warsaw Pact (1955) was a military alliance led by the Soviet Union with its Eastern European satellite states to counter Western NATO. When the Soviet Union collapsed, these states transitioned to democracies, and several joined NATO—an expansion that Russia's leadership views as an existential security threat."
+            },
+            {
+                id: 12,
+                unit: "Ukraine & NATO",
+                topic: "VIII. Complex Geopolitical Interests",
+                question: "Analyze Putin's interests in Ukraine. Which of the following best represents a Realist explanation for Russian foreign policy regarding Ukraine?",
+                choices: [
+                    "Preventing Ukraine from joining Western military alliances (NATO) to maintain a geographic security buffer.",
+                    "Promoting democratic elections inside neighboring Eastern European sovereign states.",
+                    "Empowering the United Nations High Commissioner for Refugees (UNHCR) to establish border checkpoints.",
+                    "Dismantling corporate monopolies to distribute assets to regional labor groups."
+                ],
+                correct: "Preventing Ukraine from joining Western military alliances (NATO) to maintain a geographic security buffer.",
+                explanation: "A Realist perspective suggests Russia's primary interest is preserving national security, ensuring sphere-of-influence control, and blocking NATO expansion on its direct borders. Ukraine serves as a crucial physical geographic buffer zone between Russia and Western military structures."
+            }
+        ];
+
+        // --- GAME PLAY STATE ---
+        let gameState = {
+            mode: null, 
+            isPlaying: false,
+            currentIndex: 0,
+            score: 0,
+            streak: 0,
+            totalShots: 0,
+            correctAnswers: 0,
+            shotUnlocked: false,
+            bestScore: parseInt(localStorage.getItem('historySoccer_high') || '0'),
+            soundEnabled: true,
+            activeUnit: 'Unit 1',
+        };
+
+        // --- WEB AUDIO API SYNTHESIZER ---
+        const AudioSynth = {
+            ctx: null,
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+
+            playTone(freq, type, duration, delay = 0) {
+                if (!gameState.soundEnabled) return;
+                this.init();
+                
+                setTimeout(() => {
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        
+                        osc.type = type;
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                        
+                        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                        
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + duration);
+                    } catch (e) {
+                        console.error("Audio error", e);
+                    }
+                }, delay * 1000);
+            },
+
+            swish() {
+                // Happy crowd roar & net swish tone
+                this.playTone(400, 'triangle', 0.25);
+                this.playTone(600, 'sine', 0.15, 0.05);
+                this.playTone(800, 'sine', 0.3, 0.1);
+            },
+
+            clank() {
+                // Post clonk bounce sound
+                this.playTone(180, 'triangle', 0.1);
+                this.playTone(150, 'triangle', 0.12, 0.06);
+            },
+
+            cheer() {
+                // Chord fanfare
+                this.playTone(440, 'sine', 0.12); // A4
+                this.playTone(554.37, 'sine', 0.12, 0.06); // C#5
+                this.playTone(659.25, 'sine', 0.12, 0.12); // E5
+                this.playTone(880, 'sine', 0.35, 0.18); // A5
+            },
+
+            fail() {
+                // Disappointment buzzer
+                this.playTone(170, 'sawtooth', 0.2);
+                this.playTone(130, 'sawtooth', 0.25, 0.18);
+            },
+
+            whistle() {
+                // Double whistle blow
+                this.playTone(2200, 'sine', 0.06);
+                this.playTone(2200, 'sine', 0.15, 0.06);
+            },
+
+            buzzer() {
+                this.playTone(100, 'sawtooth', 0.8);
+            }
+        };
+
+        // --- SOCCER PENALTY SHOOTOUT 2D ENGINE ---
+        const CourtGame = {
+            canvas: null,
+            ctx: null,
+            width: 0,
+            height: 0,
+            ball: { x: 0, y: 0, vx: 0, vy: 0, radius: 10, baseRadius: 10, z: 1, scale: 1 },
+            goalkeeper: { x: 0, y: 0, targetX: 0, targetY: 0, state: 'idle', diveX: 0, diveY: 0, width: 34, height: 48, speed: 0.07 },
+            goal: { x: 0, y: 0, w: 0, h: 0 },
+            isDragging: false,
+            dragStart: { x: 0, y: 0 },
+            dragCurrent: { x: 0, y: 0 },
+            shotFired: false,
+            scoreRegistered: false,
+            shotOutcome: '', // 'goal', 'saved', 'miss'
+            animationId: null,
+
+            init(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                
+                window.addEventListener('resize', () => this.resize());
+                
+                // MOUSE CONTROLS
+                this.canvas.addEventListener('mousedown', (e) => this.onDragStart(e));
+                this.canvas.addEventListener('mousemove', (e) => this.onDragMove(e));
+                this.canvas.addEventListener('mouseup', () => this.onDragEnd());
+
+                // TOUCH CONTROLS
+                this.canvas.addEventListener('touchstart', (e) => {
+                    const t = e.touches[0];
+                    this.onDragStart(this.getTouchPos(t));
+                    e.preventDefault();
+                }, { passive: false });
+
+                this.canvas.addEventListener('touchmove', (e) => {
+                    const t = e.touches[0];
+                    this.onDragMove(this.getTouchPos(t));
+                    e.preventDefault();
+                }, { passive: false });
+
+                this.canvas.addEventListener('touchend', (e) => {
+                    this.onDragEnd();
+                    e.preventDefault();
+                });
+
+                this.resetBall();
+                this.loop();
+            },
+
+            getTouchPos(touch) {
+                return {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                };
+            },
+
+            resize() {
+                const dpr = window.devicePixelRatio || 1;
+                const rect = this.canvas.getBoundingClientRect();
+                
+                this.width = rect.width;
+                this.height = rect.height;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+
+                // Goal Dimensions
+                this.goal.w = this.width * 0.55;
+                this.goal.h = this.height * 0.40;
+                this.goal.x = (this.width - this.goal.w) / 2;
+                this.goal.y = this.height * 0.15;
+
+                // Goalkeeper Base Positioning
+                this.goalkeeper.x = this.width / 2;
+                this.goalkeeper.y = this.goal.y + this.goal.h - 5;
+                this.goalkeeper.targetX = this.goalkeeper.x;
+                this.goalkeeper.targetY = this.goalkeeper.y;
+
+                this.resetBall();
+            },
+
+            resetBall() {
+                this.isDragging = false;
+                this.shotFired = false;
+                this.scoreRegistered = false;
+                this.shotOutcome = '';
+                
+                // Center Ball at the Penalty Spot
+                this.ball.x = this.width / 2;
+                this.ball.y = this.height * 0.85;
+                this.ball.vx = 0;
+                this.ball.vy = 0;
+                this.ball.z = 1.0; // 3D depth scale simulation
+                this.ball.scale = 1.0;
+                this.ball.radius = this.ball.baseRadius;
+
+                // Reset Goalkeeper state
+                this.goalkeeper.state = 'idle';
+                this.goalkeeper.x = this.width / 2;
+                this.goalkeeper.y = this.goal.y + this.goal.h - 5;
+                this.goalkeeper.targetX = this.goalkeeper.x;
+            },
+
+            onDragStart(e) {
+                if (!gameState.shotUnlocked || this.shotFired) return;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+
+                // Allow starting drag anywhere on field canvas, centered immediately on the ball
+                this.isDragging = true;
+                this.dragStart = { x: this.ball.x, y: this.ball.y };
+                this.dragCurrent = { x: mx, y: my };
+            },
+
+            onDragMove(e) {
+                if (!this.isDragging) return;
+                const rect = this.canvas.getBoundingClientRect();
+                this.dragCurrent = {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+            },
+
+            onDragEnd() {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+
+                // Slingshot velocity vector calculation
+                const dx = this.ball.x - this.dragCurrent.x;
+                const dy = this.ball.y - this.dragCurrent.y;
+                
+                // Set speed velocities
+                this.ball.vx = dx * 0.08;
+                this.ball.vy = dy * 0.08;
+                
+                // Ensure there is minimum forward velocity to prevent weak rolling shots
+                if (Math.abs(this.ball.vx) < 1 && this.ball.vy > -2) {
+                    this.ball.vy = -7;
+                }
+                
+                this.shotFired = true;
+                gameState.totalShots++;
+
+                // Make the goalkeeper dive! Choose a target on the goal line depending on ball's direction
+                const finalExpectedX = this.ball.x + (this.ball.vx * 15);
+                const safetyFactor = Math.max(this.goal.x, Math.min(this.goal.x + this.goal.w, finalExpectedX));
+                
+                this.goalkeeper.state = 'diving';
+                this.goalkeeper.targetX = safetyFactor;
+                // Add a chance of diving to top corners or staying near bottom
+                this.goalkeeper.targetY = this.goal.y + this.goal.h * 0.45;
+
+                gameState.shotUnlocked = false;
+                updateShotLockUI('shooting');
+            },
+
+            updatePhysics() {
+                // Move GK slowly when idle
+                if (this.goalkeeper.state === 'idle') {
+                    // Slight breathing movement back and forth
+                    const osc = Math.sin(Date.now() * 0.004) * 15;
+                    this.goalkeeper.x = (this.width / 2) + osc;
+                } else if (this.goalkeeper.state === 'diving') {
+                    // Fast dive toward target
+                    this.goalkeeper.x += (this.goalkeeper.targetX - this.goalkeeper.x) * 0.18;
+                    this.goalkeeper.y += (this.goalkeeper.targetY - this.goalkeeper.y) * 0.18;
+                }
+
+                if (!this.shotFired) return;
+
+                // Move Ball and reduce size to simulate 3D projection path moving away
+                this.ball.x += this.ball.vx;
+                this.ball.y += this.ball.vy;
+                
+                // Shrink ball as it approaches the distant goal
+                this.ball.z -= 0.022; 
+                this.ball.scale = Math.max(0.45, this.ball.z);
+                this.ball.radius = this.ball.baseRadius * this.ball.scale;
+
+                // Friction
+                this.ball.vx *= 0.98;
+                this.ball.vy *= 0.98;
+
+                // Check collision at the goal plane
+                if (this.ball.z <= 0.48 && !this.scoreRegistered) {
+                    this.scoreRegistered = true;
+                    this.shotFired = false;
+                    this.ball.vx = 0;
+                    this.ball.vy = 0;
+
+                    // Goal boundaries
+                    const insideGoalX = (this.ball.x >= this.goal.x && this.ball.x <= this.goal.x + this.goal.w);
+                    const insideGoalY = (this.ball.y >= this.goal.y && this.ball.y <= this.goal.y + this.goal.h);
+
+                    if (insideGoalX && insideGoalY) {
+                        // Check if GK blocked it
+                        const gkDist = Math.hypot(this.ball.x - this.goalkeeper.x, this.ball.y - this.goalkeeper.y);
+                        // Save hit radius boundary
+                        if (gkDist < 35) {
+                            this.shotOutcome = 'saved';
+                            AudioSynth.clank();
+                            handleShotOutcome(false, "Superb save! The goalkeeper anticipated your angle.");
+                        } else {
+                            this.shotOutcome = 'goal';
+                            AudioSynth.swish();
+                            handleShotOutcome(true, "GOAL!! Absolute bullet into the corner of the net!");
+                        }
+                    } else {
+                        this.shotOutcome = 'miss';
+                        AudioSynth.clank();
+                        handleShotOutcome(false, "Shot went wide! Keep your eye on the corners next time.");
+                    }
+                }
+            },
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+
+                // 1. DRAW STADIUM TURF / FIELD
+                const grd = this.ctx.createLinearGradient(0, this.height * 0.2, 0, this.height);
+                grd.addColorStop(0, '#133e1c');
+                grd.addColorStop(1, '#0e2b14');
+                this.ctx.fillStyle = grd;
+                this.ctx.fillRect(0, 0, this.width, this.height);
+
+                // Soccer Pitch lines
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                this.ctx.lineWidth = 2.5;
+                
+                // Penalty Box boundary
+                this.ctx.strokeRect(this.width * 0.15, this.goal.y + this.goal.h - 10, this.width * 0.70, this.height * 0.45);
+                
+                // Penalty Spot
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                this.ctx.beginPath();
+                this.ctx.arc(this.width / 2, this.height * 0.85, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // 2. DRAW SOCCER NET & GOAL ASSEMBLY
+                this.ctx.strokeStyle = '#f8fafc'; // White posts
+                this.ctx.lineWidth = 6;
+                this.ctx.strokeRect(this.goal.x, this.goal.y, this.goal.w, this.goal.h);
+
+                // Net patterns (cross lines inside goal coordinates)
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                this.ctx.lineWidth = 1;
+                const columns = 24;
+                const rows = 12;
+                for (let i = 1; i < columns; i++) {
+                    const lx = this.goal.x + (this.goal.w / columns) * i;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(lx, this.goal.y);
+                    this.ctx.lineTo(lx, this.goal.y + this.goal.h);
+                    this.ctx.stroke();
+                }
+                for (let i = 1; i < rows; i++) {
+                    const ly = this.goal.y + (this.goal.h / rows) * i;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.goal.x, ly);
+                    this.ctx.lineTo(this.goal.x + this.goal.w, ly);
+                    this.ctx.stroke();
+                }
+
+                // 3. DRAW GOALKEEPER (Simple cartoon athlete sprite)
+                this.ctx.save();
+                this.ctx.translate(this.goalkeeper.x, this.goalkeeper.y);
+                
+                // GK Jersey color
+                this.ctx.fillStyle = '#f97316'; // Neon orange jersey
+                // Torso
+                this.ctx.fillRect(-this.goalkeeper.width / 2, -35, this.goalkeeper.width, 24);
+                
+                // Head
+                this.ctx.fillStyle = '#fed7aa'; 
+                this.ctx.beginPath();
+                this.ctx.arc(0, -44, 9, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Hair / Helmet
+                this.ctx.fillStyle = '#1e293b';
+                this.ctx.beginPath();
+                this.ctx.arc(0, -47, 9, Math.PI, Math.PI * 2);
+                this.ctx.fill();
+
+                // Draped goalkeeper arms (change position if diving)
+                this.ctx.strokeStyle = '#fed7aa';
+                this.ctx.lineWidth = 5;
+                if (this.goalkeeper.state === 'diving') {
+                    // Stretch arms out
+                    const side = (this.goalkeeper.targetX > this.width / 2) ? 1 : -1;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, -30);
+                    this.ctx.lineTo(30 * side, -45);
+                    this.ctx.stroke();
+                } else {
+                    // Guarding arms down/sides
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(-this.goalkeeper.width/2, -30);
+                    this.ctx.lineTo(-this.goalkeeper.width/2 - 12, -18);
+                    this.ctx.moveTo(this.goalkeeper.width/2, -30);
+                    this.ctx.lineTo(this.goalkeeper.width/2 + 12, -18);
+                    this.ctx.stroke();
+                }
+
+                // Shorts & Legs
+                this.ctx.fillStyle = '#1e1b4b'; // Dark blue shorts
+                this.ctx.fillRect(-this.goalkeeper.width / 2, -11, this.goalkeeper.width, 11);
+
+                // Socks & Cleats
+                this.ctx.fillStyle = '#ef4444';
+                this.ctx.fillRect(-12, 0, 7, 6);
+                this.ctx.fillRect(5, 0, 7, 6);
+
+                this.ctx.restore();
+
+                // 4. DRAW AIMING VECTOR (slingshot pullback line)
+                if (this.isDragging) {
+                    const dx = this.ball.x - this.dragCurrent.x;
+                    const dy = this.ball.y - this.dragCurrent.y;
+                    
+                    // Trajectory simulation path
+                    let simX = this.ball.x;
+                    let simY = this.ball.y;
+                    let simVX = dx * 0.08;
+                    let simVY = dy * 0.08;
+                    let simZ = 1.0;
+
+                    this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.45)';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.setLineDash([5, 5]);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(simX, simY);
+
+                    for (let i = 0; i < 20; i++) {
+                        simX += simVX;
+                        simY += simVY;
+                        simZ -= 0.022;
+                        if (simZ <= 0.48) break;
+                    }
+                    this.ctx.lineTo(simX, simY);
+                    this.ctx.stroke();
+                    this.ctx.setLineDash([]);
+
+                    // Pull-back vector line from soccer ball spot
+                    this.ctx.strokeStyle = '#22c55e';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.ball.x, this.ball.y);
+                    this.ctx.lineTo(this.dragCurrent.x, this.dragCurrent.y);
+                    this.ctx.stroke();
+
+                    // Glow circle around starting ball
+                    this.ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius + 12, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+
+                // 5. DRAW SOCCER BALL
+                this.ctx.save();
+                this.ctx.translate(this.ball.x, this.ball.y);
+                
+                // Rotational spin angle depending on velocity
+                let speed = Math.hypot(this.ball.vx, this.ball.vy);
+                let angle = (speed > 0) ? Date.now() * 0.01 : 0;
+                this.ctx.rotate(angle);
+
+                // Inner sphere ball gradient shading
+                const ballGrd = this.ctx.createRadialGradient(-2, -2, 1, 0, 0, this.ball.radius);
+                ballGrd.addColorStop(0, '#ffffff');
+                ballGrd.addColorStop(0.85, '#e2e8f0');
+                ballGrd.addColorStop(1, '#94a3b8');
+                this.ctx.fillStyle = ballGrd;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, this.ball.radius, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Soccer pentagon panel decorations
+                this.ctx.strokeStyle = '#1e293b';
+                this.ctx.lineWidth = 1 * this.ball.scale;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, this.ball.radius, 0, Math.PI*2);
+                this.ctx.stroke();
+                
+                // Little star/pentagon points on center
+                this.ctx.fillStyle = '#1e293b';
+                this.ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const th = (Math.PI * 2 / 5) * i;
+                    const px = Math.cos(th) * (this.ball.radius * 0.45);
+                    const py = Math.sin(th) * (this.ball.radius * 0.45);
+                    if (i === 0) this.ctx.moveTo(px, py);
+                    else this.ctx.lineTo(px, py);
+                }
+                this.ctx.closePath();
+                this.ctx.fill();
+
+                this.ctx.restore();
+            },
+
+            loop() {
+                this.updatePhysics();
+                this.draw();
+                this.animationId = requestAnimationFrame(() => this.loop());
+            }
+        };
+
+        // --- MAIN GEOPOLITICAL GAME SYSTEM ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGame();
+        });
+
+        function initGame() {
+            CourtGame.init('field-canvas');
+
+            // Sound Button Listener
+            document.getElementById('sound-btn').addEventListener('click', () => {
+                gameState.soundEnabled = !gameState.soundEnabled;
+                const icon = document.getElementById('sound-icon');
+                if (gameState.soundEnabled) {
+                    icon.className = "fa-solid fa-volume-high";
+                    AudioSynth.init();
+                    showToast();
+                } else {
+                    icon.className = "fa-solid fa-volume-xmark";
+                }
+            });
+
+            // Start Mode triggers
+            document.getElementById('mode-shootout').addEventListener('click', () => {
+                startMode('shootout');
+            });
+            document.getElementById('mode-study').addEventListener('click', () => {
+                startMode('study');
+            });
+
+            document.getElementById('end-early-btn').addEventListener('click', () => {
+                endGame(true);
+            });
+
+            // Modal reset controls
+            document.getElementById('modal-restart-btn').addEventListener('click', () => {
+                document.getElementById('summary-modal').classList.add('hidden');
+                startMode(gameState.mode);
+            });
+            document.getElementById('modal-close-btn').addEventListener('click', () => {
+                document.getElementById('summary-modal').classList.add('hidden');
+                resetToSetupDeck();
+            });
+
+            updateStatsUI();
+        }
+
+        function showToast() {
+            const toast = document.getElementById('audio-toast');
+            toast.className = toast.className.replace('translate-y-20 opacity-0', 'translate-y-0 opacity-100');
+            setTimeout(() => {
+                toast.className = toast.className.replace('translate-y-0 opacity-100', 'translate-y-20 opacity-0');
+            }, 3000);
+        }
+
+        function startMode(mode) {
+            AudioSynth.init();
+            AudioSynth.whistle();
+
+            gameState.mode = mode;
+            gameState.isPlaying = true;
+            gameState.score = 0;
+            gameState.currentIndex = 0;
+            gameState.totalShots = 0;
+            gameState.correctAnswers = 0;
+            gameState.streak = 0;
+            gameState.shotUnlocked = false;
+
+            document.getElementById('setup-card').classList.add('hidden');
+            document.getElementById('quiz-card').classList.remove('hidden');
+            document.getElementById('quiz-card').classList.add('flex');
+
+            if (mode === 'shootout') {
+                document.getElementById('timer-label').innerText = "MODE:";
+                document.getElementById('timer-val').innerText = "CUP";
+                document.getElementById('timer-val').className = "text-emerald-400 font-bold text-lg";
+            } else {
+                document.getElementById('timer-label').innerText = "MODE:";
+                document.getElementById('timer-val').innerText = "TACTICS";
+                document.getElementById('timer-val').className = "text-blue-400 font-bold text-lg";
+            }
+
+            loadQuestion();
+            updateStatsUI();
+        }
+
+        function loadQuestion() {
+            const q = QUESTIONS[gameState.currentIndex];
+            
+            // Render Badge depending on Unit Topic
+            const badge = document.getElementById('shot-tier-badge');
+            badge.innerText = q.unit.toUpperCase();
+            if (q.unit === "Socratic & Melia") {
+                badge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+            } else if (q.unit === "IR Theories") {
+                badge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20";
+            } else if (q.unit === "News Literacy") {
+                badge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20";
+            } else {
+                badge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20";
+            }
+
+            // Move GK & Ball back to setup position
+            CourtGame.resetBall();
+
+            document.getElementById('question-index').innerText = `Question ${gameState.currentIndex + 1}/${QUESTIONS.length}`;
+            document.getElementById('question-container').innerText = q.question;
+            document.getElementById('question-subinfo').innerText = q.topic;
+
+            const grid = document.getElementById('answers-grid');
+            grid.innerHTML = '';
+            grid.classList.remove('hidden');
+
+            q.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-950 hover:bg-slate-800 active:scale-95 text-slate-200 hover:text-white border border-slate-800 hover:border-emerald-500/30 font-semibold py-3.5 px-4 rounded-xl transition-all text-xs text-left flex items-center justify-between group";
+                
+                const label = document.createElement('span');
+                label.innerText = choice;
+                btn.appendChild(label);
+
+                const icon = document.createElement('i');
+                icon.className = "fa-solid fa-chevron-right text-xs text-slate-600 group-hover:text-emerald-400 transition-colors pl-2";
+                btn.appendChild(icon);
+
+                btn.addEventListener('click', () => checkAnswer(choice, btn));
+                grid.appendChild(btn);
+            });
+
+            gameState.shotUnlocked = false;
+            updateShotLockUI('locked');
+            document.getElementById('feedback-panel').classList.add('hidden');
+        }
+
+        function checkAnswer(selectedOption, clickedButton) {
+            const q = QUESTIONS[gameState.currentIndex];
+            const isCorrect = (selectedOption === q.correct);
+            
+            gameState.totalShots++;
+            
+            const grid = document.getElementById('answers-grid');
+            Array.from(grid.children).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+            });
+
+            if (isCorrect) {
+                gameState.correctAnswers++;
+                gameState.streak++;
+                gameState.shotUnlocked = true; // Unlock the soccer penalty shot!
+                
+                clickedButton.classList.remove('opacity-50', 'border-slate-800');
+                clickedButton.classList.add('border-emerald-500', 'bg-emerald-950/20', 'text-emerald-300');
+                clickedButton.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400";
+
+                AudioSynth.cheer();
+                updateShotLockUI('correct');
+            } else {
+                gameState.streak = 0;
+                
+                clickedButton.classList.remove('opacity-50', 'border-slate-800');
+                clickedButton.classList.add('border-red-500', 'bg-red-950/20', 'text-red-300');
+                clickedButton.querySelector('i').className = "fa-solid fa-circle-xmark text-red-400";
+
+                // Highlight correct selection
+                Array.from(grid.children).forEach(btn => {
+                    const text = btn.firstChild.innerText || btn.firstChild.textContent;
+                    if (text === q.correct) {
+                        btn.classList.remove('opacity-50', 'border-slate-800');
+                        btn.classList.add('border-emerald-500/50', 'bg-emerald-950/10', 'text-emerald-400');
+                    }
+                });
+
+                AudioSynth.fail();
+                updateShotLockUI('incorrect');
+            }
+
+            showFeedbackPanel(isCorrect, q);
+            updateStatsUI();
+        }
+
+        function showFeedbackPanel(isCorrect, q) {
+            const panel = document.getElementById('feedback-panel');
+            const iconContainer = document.getElementById('feedback-icon-container');
+            const title = document.getElementById('feedback-title');
+            const desc = document.getElementById('feedback-text');
+            const nextBtn = document.getElementById('next-action-btn');
+
+            panel.className = panel.className.replace(/border-[a-z0-9-/]+/g, ''); 
+            
+            if (isCorrect) {
+                panel.classList.add('border-emerald-500/20', 'bg-emerald-950/10');
+                iconContainer.className = "w-6 h-6 rounded-full flex items-center justify-center text-xs bg-emerald-500/20 text-emerald-400";
+                iconContainer.innerHTML = '<i class="fa-solid fa-soccer-ball"></i>';
+                title.innerText = "DEFENSIVE BREAKTHROUGH! SHOOT NOW!";
+                title.className = "text-emerald-400 retro-font font-bold text-sm";
+                desc.innerHTML = `Nice match play! Drag the soccer ball backward to aim, and release to score a penalty goal! <br><br><strong>Coach's Tactical Notes:</strong> ${q.explanation}`;
+                nextBtn.innerHTML = `Skip Goal Kick / Next Question <i class="fa-solid fa-arrow-right"></i>`;
+            } else {
+                panel.classList.add('border-red-500/20', 'bg-red-950/10');
+                iconContainer.className = "w-6 h-6 rounded-full flex items-center justify-center text-xs bg-red-500/20 text-red-400";
+                iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                title.innerText = "TURNOVER! OUT OF BOUNDS";
+                title.className = "text-red-400 retro-font font-bold text-sm";
+                desc.innerHTML = `<strong>Geopolitical Explanation:</strong> ${q.explanation}`;
+                nextBtn.innerHTML = `Review Complete / Proceed <i class="fa-solid fa-arrow-right"></i>`;
+            }
+
+            document.getElementById('answers-grid').classList.add('hidden');
+            panel.classList.remove('hidden');
+
+            nextBtn.onclick = () => {
+                moveToNextQuestion();
+            };
+        }
+
+        function updateShotLockUI(status = 'locked') {
+            const overlay = document.getElementById('shot-overlay');
+            const title = document.getElementById('overlay-title');
+            const desc = document.getElementById('overlay-desc');
+            const icon = document.getElementById('overlay-icon');
+
+            if (gameState.shotUnlocked) {
+                overlay.classList.add('hidden');
+                document.getElementById('shot-zone-indicator').innerText = "STATUS: PENALTY READY (SHOOT!)";
+                document.getElementById('shot-zone-indicator').className = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full";
+            } else {
+                overlay.classList.remove('hidden');
+                document.getElementById('shot-zone-indicator').className = "bg-slate-950 text-slate-500 border border-slate-800 px-3 py-1 rounded-full";
+                
+                if (status === 'locked') {
+                    title.innerText = "Striker Locked";
+                    title.className = "text-xl font-bold retro-font mb-2 text-slate-300";
+                    desc.innerText = "Answer the final exam study question below to pass the defense and unlock your direct shot!";
+                    icon.className = "fa-solid fa-lock text-5xl text-slate-600 mb-4";
+                    document.getElementById('shot-zone-indicator').innerText = "STATUS: WAITING FOR DEFENSIVE BREAKTHROUGH";
+                } else if (status === 'incorrect') {
+                    title.innerText = "Turnover on Play!";
+                    title.className = "text-xl font-bold retro-font mb-2 text-red-400";
+                    desc.innerText = "The pass was intercepted. Review the historical context analysis below to recover!";
+                    icon.className = "fa-solid fa-ban text-5xl text-red-500 mb-4";
+                    document.getElementById('shot-zone-indicator').innerText = "STATUS: BALL INTERCEPTED";
+                } else if (status === 'shooting') {
+                    title.innerText = "Shot Released!";
+                    title.className = "text-xl font-bold retro-font mb-2 text-yellow-400";
+                    desc.innerText = "Watch the ball's curve trajectory against the keeper's dive!";
+                    icon.className = "fa-solid fa-soccer-ball text-5xl text-yellow-500 mb-4 animate-spin";
+                }
+            }
+        }
+
+        function handleShotOutcome(isGoal, message) {
+            const overlay = document.getElementById('shot-overlay');
+            const title = document.getElementById('overlay-title');
+            const desc = document.getElementById('overlay-desc');
+            const icon = document.getElementById('overlay-icon');
+
+            overlay.classList.remove('hidden');
+
+            if (isGoal) {
+                gameState.score++;
+                title.innerText = "GOOOAL!!!";
+                title.className = "text-2xl font-bold retro-font mb-2 text-emerald-400 animate-bounce";
+                desc.innerText = message;
+                icon.className = "fa-solid fa-award text-5xl text-emerald-400 mb-4";
+                document.getElementById('score-val').innerText = gameState.score;
+            } else {
+                title.innerText = "SAVED / MISSED!";
+                title.className = "text-xl font-bold retro-font mb-2 text-slate-400";
+                desc.innerText = message;
+                icon.className = "fa-solid fa-circle-xmark text-5xl text-slate-500 mb-4";
+            }
+
+            updateStatsUI();
+        }
+
+        function handleShotFinished() {
+            // Give time for user to see result, then overlay automatically covers again
+            const overlay = document.getElementById('shot-overlay');
+            overlay.classList.remove('hidden');
+        }
+
+        function moveToNextQuestion() {
+            gameState.currentIndex++;
+            if (gameState.currentIndex >= QUESTIONS.length) {
+                endGame(false); 
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function updateStatsUI() {
+            document.getElementById('score-val').innerText = gameState.score;
+            document.getElementById('streak-val').innerText = `${gameState.streak} 🔥`;
+
+            // Accuracy Conversion Rate calculation
+            let acc = 0;
+            if (gameState.totalShots > 0) {
+                acc = Math.round((gameState.correctAnswers / gameState.totalShots) * 100);
+            }
+            document.getElementById('stats-conversion').innerText = `${acc}%`;
+            document.getElementById('stats-taken').innerText = gameState.totalShots;
+
+            if (gameState.score > gameState.bestScore) {
+                gameState.bestScore = gameState.score;
+                localStorage.setItem('historySoccer_high', gameState.score.toString());
+            }
+            document.getElementById('stats-high').innerText = gameState.bestScore;
+        }
+
+        function resetToSetupDeck() {
+            document.getElementById('setup-card').classList.remove('hidden');
+            document.getElementById('quiz-card').classList.add('hidden');
+            document.getElementById('quiz-card').classList.remove('flex');
+            gameState.isPlaying = false;
+        }
+
+        function endGame(endedEarly = false) {
+            gameState.isPlaying = false;
+            AudioSynth.buzzer();
+
+            let acc = 0;
+            if (gameState.totalShots > 0) {
+                acc = Math.round((gameState.correctAnswers / gameState.totalShots) * 100);
+            }
+
+            document.getElementById('modal-points').innerText = gameState.score;
+            document.getElementById('modal-accuracy').innerText = `${acc}%`;
+            document.getElementById('modal-solved').innerText = `${gameState.correctAnswers} / ${gameState.totalShots}`;
+            document.getElementById('modal-mode-tag').innerText = gameState.mode === 'shootout' ? 'WORLD CUP TOURNAMENT' : 'TACTICAL PRACTICE';
+
+            const eval = document.getElementById('modal-evaluation');
+            if (endedEarly) {
+                eval.innerText = "Match suspended. Regroup with your study guide and return to win the championship!";
+            } else if (gameState.score >= 10) {
+                eval.innerText = "World Cup Champions! Your critical analysis of NATO expansion, Section 230, and IR theories is truly world-class. You are ready to ace Kohlhagen's June 1st Honors Exam!";
+            } else if (gameState.score >= 5) {
+                eval.innerText = "Great tournament performance! Your understanding of Realism and media verification is solid. Double-check your 14th Amendment and Melian Dialogue notes before test day!";
+            } else {
+                eval.innerText = "Match complete. Good training! Spend a bit more time reading the tactical post-match breakdown cards to raise your core score.";
+            }
+
+            document.getElementById('summary-modal').classList.remove('hidden');
+            document.getElementById('summary-modal').classList.add('flex');
+
+            resetToSetupDeck();
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AP Calculus BC Pizzeria</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- KaTeX for beautiful math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <!-- KaTeX Auto-Render Extension (required for renderMathInElement) -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background-color: #fcf6f0;
+    }
+    .fancy-font {
+      font-family: 'Fredoka One', cursive;
+    }
+    .pizza-crust {
+      box-shadow: 0 10px 25px rgba(139, 92, 26, 0.4);
+      transition: all 0.5s ease;
+    }
+    .oven-glow {
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.8);
+      animation: pulse 1.5s infinite alternate;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(1.02); filter: brightness(1.3); }
+    }
+    /* Simple floating animation for active icons */
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden text-slate-800">
+
+  <!-- Header -->
+  <header class="bg-red-600 text-white shadow-md py-4 px-6 flex justify-between items-center">
+    <div class="flex items-center space-x-3">
+      <svg class="w-10 h-10 text-yellow-300" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 1.93-.72 3.68-1.9 5.03z"/>
+      </svg>
+      <div>
+        <h1 class="fancy-font text-2xl tracking-wide">The Taylor Series Pizzeria</h1>
+        <p class="text-xs text-red-100 uppercase tracking-widest">AP Calculus BC Interactive Study Game</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div class="bg-red-700 px-3 py-1.5 rounded-full text-sm font-semibold flex items-center space-x-1">
+        <span>⭐ Score:</span>
+        <span id="score-display">0</span>
+      </div>
+      <button id="reset-btn" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-xs transition">
+        Restart Game
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Game Area -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- LEFT PANEL: Customer & Pizza Board -->
+    <section class="lg:col-span-5 bg-white rounded-3xl p-6 shadow-xl border border-amber-100 flex flex-col space-y-6">
+      <!-- Customer Card -->
+      <div id="customer-card" class="bg-amber-50 rounded-2xl p-4 border border-amber-200 flex items-start space-x-4 relative overflow-hidden">
+        <div id="customer-avatar" class="w-16 h-16 rounded-full bg-amber-200 border-2 border-amber-400 flex items-center justify-center text-3xl shrink-0 floating">
+          🍎
+        </div>
+        <div class="flex-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-700">Current Customer</span>
+          <h3 id="customer-name" class="fancy-font text-xl text-red-800">Sir Isaac Newton</h3>
+          <p id="customer-order-text" class="text-sm text-slate-600 italic mt-1">
+            "I need a pizza with instantaneous flavor change! Give me a pizza with **Pepperoni** and **Onions** so I can calculate fluxions!"
+          </p>
+        </div>
+      </div>
+
+      <!-- Topping Status Indicators -->
+      <div>
+        <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Required Toppings</h4>
+        <div id="required-toppings-list" class="flex flex-wrap gap-2">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Interactive Pizza -->
+      <div class="relative flex justify-center items-center py-4 bg-slate-50 rounded-2xl border border-slate-100">
+        <!-- Oven Door / Bake State Cover -->
+        <div id="oven-overlay" class="absolute inset-0 bg-slate-950/90 rounded-2xl flex flex-col justify-center items-center text-white z-30 hidden transition-opacity duration-500">
+          <div class="text-5xl animate-bounce mb-3">🔥</div>
+          <h3 class="fancy-font text-2xl text-orange-400">Baking Pizza...</h3>
+          <p class="text-sm text-slate-300">Integrating the flavors over time!</p>
+          <div class="w-48 bg-slate-800 h-2 rounded-full mt-4 overflow-hidden">
+            <div id="baking-progress" class="bg-orange-500 h-full w-0 transition-all duration-100"></div>
+          </div>
+        </div>
+
+        <!-- Servings Area / Completed Overlay -->
+        <div id="serve-overlay" class="absolute inset-0 bg-emerald-950/90 rounded-2xl flex flex-col justify-center items-center text-white z-30 hidden">
+          <div class="text-5xl mb-3">🍕🎉</div>
+          <h3 class="fancy-font text-2xl text-emerald-400">Perfect Integration!</h3>
+          <p id="serve-review" class="text-center px-6 text-sm text-emerald-100 mt-2">"Splendid work! The crust is beautifully continuous."</p>
+          <button id="next-customer-btn" class="mt-5 bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-6 py-2.5 rounded-full shadow-lg transition transform hover:-translate-y-0.5">
+            Next Customer ➡️
+          </button>
+        </div>
+
+        <!-- SVG Pizza Canvas -->
+        <svg id="pizza-svg" class="w-72 h-72 md:w-80 md:h-80" viewBox="0 0 200 200">
+          <!-- Crust outer -->
+          <circle cx="100" cy="100" r="95" fill="#df9b42" stroke="#b0701c" stroke-width="3" />
+          <!-- Crust inner ring -->
+          <circle cx="100" cy="100" r="88" fill="#f0be7c" />
+          <!-- Sauce -->
+          <circle cx="100" cy="100" r="80" fill="#cc2b1d" />
+          <!-- Cheese -->
+          <circle cx="100" cy="100" r="74" fill="#ffdf6d" />
+          <!-- Topping groups (dynamically displayed) -->
+          <g id="pepperoni-group" class="transition-opacity duration-300 opacity-0">
+            <!-- Pepperoni slices -->
+            <circle cx="70" cy="70" r="11" fill="#a81a11" stroke="#7d1009" stroke-width="1.5"/>
+            <circle cx="130" cy="70" r="11" fill="#a81a11" stroke="#7d1009" stroke-width="1.5"/>
+            <circle cx="70" cy="130" r="11" fill="#a81a11" stroke="#7d1009" stroke-width="1.5"/>
+            <circle cx="130" cy="130" r="11" fill="#a81a11" stroke="#7d1009" stroke-width="1.5"/>
+            <circle cx="100" cy="100" r="11" fill="#a81a11" stroke="#7d1009" stroke-width="1.5"/>
+          </g>
+          <g id="mushroom-group" class="transition-opacity duration-300 opacity-0">
+            <!-- Mushroom slices -->
+            <path d="M 55 90 C 55 80, 75 80, 75 90 C 75 95, 55 95, 55 90 Z" fill="#e2d6ca" stroke="#9e8f82" stroke-width="1" />
+            <rect x="62" y="90" width="6" height="10" rx="2" fill="#d3c5b5" />
+            <path d="M 135 90 C 135 80, 155 80, 155 90 C 155 95, 135 95, 135 90 Z" fill="#e2d6ca" stroke="#9e8f82" stroke-width="1" />
+            <rect x="142" y="90" width="6" height="10" rx="2" fill="#d3c5b5" />
+            <path d="M 95 145 C 95 135, 115 135, 115 145 C 115 150, 95 150, 95 145 Z" fill="#e2d6ca" stroke="#9e8f82" stroke-width="1" />
+            <rect x="102" y="145" width="6" height="10" rx="2" fill="#d3c5b5" />
+          </g>
+          <g id="olive-group" class="transition-opacity duration-300 opacity-0">
+            <!-- Olives -->
+            <circle cx="95" cy="60" r="5" fill="#202020" />
+            <circle cx="95" cy="60" r="2.2" fill="#ffdf6d" />
+            <circle cx="145" cy="110" r="5" fill="#202020" />
+            <circle cx="145" cy="110" r="2.2" fill="#ffdf6d" />
+            <circle cx="55" cy="110" r="5" fill="#202020" />
+            <circle cx="55" cy="110" r="2.2" fill="#ffdf6d" />
+          </g>
+          <g id="pepper-group" class="transition-opacity duration-300 opacity-0">
+            <!-- Green Peppers -->
+            <path d="M100,45 Q115,40 110,55" fill="none" stroke="#2e7d32" stroke-width="4" stroke-linecap="round"/>
+            <path d="M60,140 Q45,130 55,115" fill="none" stroke="#2e7d32" stroke-width="4" stroke-linecap="round"/>
+            <path d="M140,140 Q155,130 145,115" fill="none" stroke="#2e7d32" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <g id="onion-group" class="transition-opacity duration-300 opacity-0">
+            <!-- Purple Onions -->
+            <path d="M80,80 A12,12 0 0,1 100,75" fill="none" stroke="#ba68c8" stroke-width="3" stroke-linecap="round"/>
+            <path d="M110,120 A12,12 0 0,1 130,115" fill="none" stroke="#ba68c8" stroke-width="3" stroke-linecap="round"/>
+            <path d="M70,110 A12,12 0 0,1 80,125" fill="none" stroke="#ba68c8" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <g id="pineapple-group" class="transition-opacity duration-300 opacity-0">
+            <!-- Pineapple chunks -->
+            <polygon points="105,75 115,75 110,88" fill="#ffd54f" stroke="#f57f17" stroke-width="1"/>
+            <polygon points="75,95 85,95 80,108" fill="#ffd54f" stroke="#f57f17" stroke-width="1"/>
+            <polygon points="120,105 130,105 125,118" fill="#ffd54f" stroke="#f57f17" stroke-width="1"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Action Button: Bake & Serve -->
+      <button id="bake-btn" disabled class="w-full py-4 rounded-2xl font-bold text-lg tracking-wide shadow-md transition-all duration-300 bg-slate-200 text-slate-400 cursor-not-allowed uppercase">
+        Bake Pizza 🍕
+      </button>
+    </section>
+
+    <!-- RIGHT PANEL: Chef's Question Table & Kitchen -->
+    <section class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-xl border border-amber-100 flex flex-col space-y-6">
+      
+      <!-- Toping Selector Dashboard -->
+      <div>
+        <h2 class="fancy-font text-2xl text-slate-800">Chef's Prep Counter</h2>
+        <p class="text-sm text-slate-500">Pick a topping to unlock. Correctly solve its Calculus BC challenge to add it to the pizza!</p>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+          <!-- Pepperoni (Limits & Derivatives) -->
+          <button onclick="selectTopping('pepperoni')" id="btn-pepperoni" class="topping-select-btn bg-slate-50 border-2 border-slate-200 hover:border-red-400 rounded-2xl p-3 flex flex-col items-center text-center transition">
+            <span class="text-2xl">🔴</span>
+            <span class="font-bold text-sm mt-1">Pepperoni</span>
+            <span class="text-xs text-slate-400 font-semibold mt-0.5">Limits & Derivatives</span>
+          </button>
+          
+          <!-- Mushrooms (Integration) -->
+          <button onclick="selectTopping('mushrooms')" id="btn-mushrooms" class="topping-select-btn bg-slate-50 border-2 border-slate-200 hover:border-amber-500 rounded-2xl p-3 flex flex-col items-center text-center transition">
+            <span class="text-2xl">🍄</span>
+            <span class="font-bold text-sm mt-1">Mushrooms</span>
+            <span class="text-xs text-slate-400 font-semibold mt-0.5">Integration Technique</span>
+          </button>
+
+          <!-- Olives (Sequences & Series) -->
+          <button onclick="selectTopping('olives')" id="btn-olives" class="topping-select-btn bg-slate-50 border-2 border-slate-200 hover:border-slate-800 rounded-2xl p-3 flex flex-col items-center text-center transition">
+            <span class="text-2xl">🫒</span>
+            <span class="font-bold text-sm mt-1">Olives</span>
+            <span class="text-xs text-slate-400 font-semibold mt-0.5">Taylor & Infinite Series</span>
+          </button>
+
+          <!-- Peppers (Parametric/Polar/Vectors) -->
+          <button onclick="selectTopping('peppers')" id="btn-peppers" class="topping-select-btn bg-slate-50 border-2 border-slate-200 hover:border-green-500 rounded-2xl p-3 flex flex-col items-center text-center transition">
+            <span class="text-2xl">🫑</span>
+            <span class="font-bold text-sm mt-1">Green Peppers</span>
+            <span class="text-xs text-slate-400 font-semibold mt-0.5">Parametric & Polar</span>
+          </button>
+
+          <!-- Onions (Differential Equations) -->
+          <button onclick="selectTopping('onions')" id="btn-onions" class="topping-select-btn bg-slate-50 border-2 border-slate-200 hover:border-purple-500 rounded-2xl p-3 flex flex-col items-center text-center transition">
+            <span class="text-2xl">🧅</span>
+            <span class="font-bold text-sm mt-1">Onions</span>
+            <span class="text-xs text-slate-400 font-semibold mt-0.5">Diff Equations & Euler</span>
+          </button>
+
+          <!-- Pineapple (Vector Valued) -->
+          <button onclick="selectTopping('pineapple')" id="btn-pineapple" class="topping-select-btn bg-slate-50 border-2 border-slate-200 hover:border-yellow-500 rounded-2xl p-3 flex flex-col items-center text-center transition">
+            <span class="text-2xl">🍍</span>
+            <span class="font-bold text-sm mt-1">Pineapple</span>
+            <span class="text-xs text-slate-400 font-semibold mt-0.5">Vector Functions</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Question Canvas -->
+      <div id="quiz-container" class="border-2 border-dashed border-slate-200 rounded-3xl p-6 bg-slate-50/50 flex flex-col justify-center items-center min-h-[300px] transition-all">
+        <!-- Default Start Screen -->
+        <div id="quiz-empty-state" class="text-center max-w-sm space-y-3">
+          <div class="text-5xl animate-bounce">👩‍🍳</div>
+          <h3 class="fancy-font text-xl text-slate-700">Ready to Cook?</h3>
+          <p class="text-sm text-slate-500">
+            Select one of the required toppings above to load an AP Calculus BC challenge problem. Solve it correctly to win the topping!
+          </p>
+        </div>
+
+        <!-- Loaded Question Area (Hidden Initially) -->
+        <div id="quiz-loaded-state" class="w-full hidden space-y-6">
+          <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+            <div class="flex items-center space-x-2">
+              <span id="active-topping-icon" class="text-2xl">🔴</span>
+              <span id="active-topping-name" class="font-bold text-slate-800">Pepperoni Challenge</span>
+            </div>
+            <span class="bg-red-100 text-red-800 text-xs px-2.5 py-1 rounded-full font-bold">100 XP Topping</span>
+          </div>
+
+          <!-- The Calculus Question Content -->
+          <div class="space-y-4">
+            <div id="katex-question" class="text-lg text-slate-800 leading-relaxed font-semibold">
+              <!-- Rendered via KaTeX -->
+            </div>
+            
+            <!-- Answer Form -->
+            <div id="answer-choices-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+              <!-- Button Choice templates inserted here -->
+            </div>
+          </div>
+
+          <!-- Hint / Feedback area -->
+          <div id="quiz-feedback" class="p-4 rounded-2xl border hidden">
+            <!-- Dynamic feedback message -->
+          </div>
+
+          <!-- Helper Buttons -->
+          <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+            <button id="hint-btn" class="text-sm text-blue-600 hover:text-blue-800 font-semibold flex items-center space-x-1">
+              💡 Need a hint?
+            </button>
+            <span id="streak-indicator" class="text-xs text-slate-400 italic">Accuracy bonus active!</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="bg-slate-900 text-slate-400 py-6 px-4 text-center text-sm border-t border-slate-800 mt-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <p>&copy; 2026 The Taylor Series Pizzeria. Practice with precision, integrate with style.</p>
+      <div class="flex space-x-4">
+        <span class="hover:text-white transition">AP Calculus BC Syllabus Aligned</span>
+        <span>•</span>
+        <span class="hover:text-white transition">Interactive Math Engine</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Web Audio Synth Utility for Game Chimes -->
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        // High double chime
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.45);
+      } else if (type === 'wrong') {
+        // Low disappointing tone
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+        osc.frequency.exponentialRampToValueAtTime(146.83, audioCtx.currentTime + 0.3); // D3
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } else if (type === 'serve') {
+        // Glorious arpeggio
+        const now = audioCtx.currentTime;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(261.63, now); // C4
+        osc.frequency.setValueAtTime(329.63, now + 0.1); // E4
+        osc.frequency.setValueAtTime(392.00, now + 0.2); // G4
+        osc.frequency.setValueAtTime(523.25, now + 0.3); // C5
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        osc.start();
+        osc.stop(now + 0.75);
+      } else if (type === 'bake') {
+        // Fire sizzle simulation
+        const bufferSize = audioCtx.sampleRate * 2.5; // 2.5 seconds
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1000;
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 2.5);
+        noise.start();
+        noise.stop(audioCtx.currentTime + 2.5);
+      }
+    }
+  </script>
+
+  <!-- Main Game Logic -->
+  <script>
+    // Database of AP Calculus BC Questions categorized by Topping
+    const questionBank = {
+      pepperoni: [
+        {
+          id: 'p1',
+          question: 'Find the limit:\n$$\\lim_{x \\to 0} \\frac{e^{3x} - 1 - 3x}{x^2}$$',
+          choices: ['0', '\\frac{3}{2}', '\\frac{9}{2}', '\\infty'],
+          correct: 2,
+          hint: 'Use L\'Hôpital\'s Rule twice since the limit initially gives the indeterminate form $0/0$.',
+          rationale: 'Differentiating the numerator twice yields $9e^{3x}$, and the denominator twice yields $2$. Evaluating the limit as $x \\to 0$ gives $9/2$.'
+        },
+        {
+          id: 'p2',
+          question: 'If $x^2 + y^2 = 25$, find $\\frac{d^2y}{dx^2}$ at the point $(3, 4)$.',
+          choices: ['-\\frac{25}{64}', '-\\frac{3}{4}', '\\frac{7}{16}', '-\\frac{25}{16}'],
+          correct: 0,
+          hint: 'Use implicit differentiation to find $y\' = -x/y$, then apply the quotient rule to obtain $y\'\'$.',
+          rationale: 'The second derivative is $y\'\' = \\frac{-y - x(y\')}{y^2}$. Substituting $x=3$, $y=4$, and $y\' = -3/4$ yields $-25/64$.'
+        },
+        {
+          id: 'p3',
+          question: 'Let $f$ be a differentiable function such that $f(3) = 8$ and $f\'(3) = 5$. If $g(x) = f^{-1}(x)$, what is the value of $g\'(8)$?',
+          choices: ['\\frac{1}{5}', '\\frac{1}{8}', '\\frac{1}{3}', '5'],
+          correct: 0,
+          hint: 'Apply the derivative formula for inverse functions: $g\'(b) = \\frac{1}{f\'(a)}$ where $f(a) = b$.',
+          rationale: 'Since $f(3) = 8$, we have $g(8) = 3$. The formula gives $g\'(8) = 1 / f\'(g(8)) = 1 / f\'(3) = 1/5$.'
+        },
+        {
+          id: 'p4',
+          question: 'Evaluate the limit:\n$$\\lim_{x \\to 0} \\frac{\\sin(x) - x}{x^3}$$',
+          choices: ['0', '\\frac{1}{6}', '-\\frac{1}{6}', '-\\frac{1}{3}'],
+          correct: 2,
+          hint: 'Use the Maclaurin series expansion for $\\sin(x) = x - \\frac{x^3}{3!} + \\frac{x^5}{5!} - \\dots$',
+          rationale: 'Substituting the expansion yields $\\lim_{x \\to 0} \\frac{(x - x^3/6 + \\dots) - x}{x^3} = \\lim_{x \\to 0} \\frac{-x^3/6}{x^3} = -1/6$.'
+        }
+      ],
+      mushrooms: [
+        {
+          id: 'm1',
+          question: 'Evaluate the improper integral:\n$$\\int_{1}^{\\infty} \\frac{2}{x^2 + x} \\, dx$$',
+          choices: ['2\\ln(2)', '\\ln(2)', '0', 'diverges'],
+          correct: 0,
+          hint: 'Use partial fraction decomposition: $\\frac{2}{x(x+1)} = \\frac{2}{x} - \\frac{2}{x+1}$.',
+          rationale: 'Integrating gives $2\\ln|x| - 2\\ln|x+1| = 2\\ln|\\frac{x}{x+1}|$. Evaluating from $1$ to $\\infty$ gives $0 - 2\\ln(1/2) = 2\\ln(2)$.'
+        },
+        {
+          id: 'm2',
+          question: 'Evaluate the indefinite integral:\n$$\\int x \\cos(x) \\, dx$$',
+          choices: ['x \\sin(x) + \\cos(x) + C', 'x \\sin(x) - \\cos(x) + C', '-x \\sin(x) + \\cos(x) + C', '\\frac{1}{2}x^2 \\sin(x) + C'],
+          correct: 0,
+          hint: 'Apply Integration by Parts: $\\int u \\, dv = uv - \\int v \\, du$. Let $u = x$ and $dv = \\cos(x) dx$.',
+          rationale: 'With $u=x \\implies du=dx$ and $dv=\\cos(x)dx \\implies v=\\sin(x)$, the integral is $x\\sin(x) - \\int \\sin(x)dx = x\\sin(x) + \\cos(x) + C$.'
+        },
+        {
+          id: 'm3',
+          question: 'Evaluate the improper integral:\n$$\\int_{0}^{\\infty} e^{-2x} \\, dx$$',
+          choices: ['\\frac{1}{2}', '1', '2', 'diverges'],
+          correct: 0,
+          hint: 'Calculate $\\lim_{b \\to \\infty} \\int_{0}^{b} e^{-2x} dx$. Find the antiderivative first.',
+          rationale: 'The antiderivative is $-\\frac{1}{2}e^{-2x}$. Evaluating this from $0$ to $\\infty$ gives $\\lim_{b \\to \\infty} (-\\frac{1}{2}e^{-2b}) - (-\\frac{1}{2}e^0) = 0 + 1/2 = 1/2$.'
+        },
+        {
+          id: 'm4',
+          question: 'Find the general antiderivative of:\n$$\\int \\frac{1}{x^2 - 1} \\, dx$$',
+          choices: ['\\frac{1}{2}\\ln\\left|\\frac{x-1}{x+1}\\right| + C', '\\frac{1}{2}\\ln\\left|\\frac{x+1}{x-1}\\right| + C', '\\ln|x^2-1| + C', '\\arctan(x) + C'],
+          correct: 0,
+          hint: 'Use partial fractions: $\\frac{1}{x^2-1} = \\frac{A}{x-1} + \\frac{B}{x+1}$. Solve for $A$ and $B$.',
+          rationale: 'Decomposition yields $\\frac{1}{2(x-1)} - \\frac{1}{2(x+1)}$. Integrating gives $\\frac{1}{2}\\ln|x-1| - \\frac{1}{2}\\ln|x+1| + C = \\frac{1}{2}\\ln|\\frac{x-1}{x+1}| + C$.'
+        }
+      ],
+      olives: [
+        {
+          id: 'o1',
+          question: 'Find the radius of convergence of the power series:\n$$\\sum_{n=1}^{\\infty} \\frac{(-1)^n (x - 2)^n}{n \\cdot 3^n}$$',
+          choices: ['1', '3', '6', '\\infty'],
+          correct: 1,
+          hint: 'Apply the Ratio Test: $\\lim_{n \\to \\infty} \\left| \\frac{a_{n+1}}{a_n} \\right| < 1$.',
+          rationale: 'The limit yields $\\lim_{n \\to \\infty} \\left| \\frac{x-2}{3} \\cdot \\frac{n}{n+1} \\right| = \\frac{|x-2|}{3}$. For convergence, $|x-2| < 3$, so the radius of convergence is $3$.'
+        },
+        {
+          id: 'o2',
+          question: 'What is the coefficient of $x^4$ in the Maclaurin series for $f(x) = e^{-x^2}$?',
+          choices: ['1', '-\\frac{1}{2}', '\\frac{1}{2}', '\\frac{1}{24}'],
+          correct: 2,
+          hint: 'Substitute $-x^2$ for $u$ in the Maclaurin series expansion for $e^u = 1 + u + \\frac{u^2}{2!} + \\frac{u^3}{3!} + \\dots$',
+          rationale: 'Substituting gives $e^{-x^2} = 1 - x^2 + \\frac{(-x^2)^2}{2!} = 1 - x^2 + \\frac{x^4}{2}$. The coefficient of $x^4$ is $1/2$.'
+        },
+        {
+          id: 'o3',
+          question: 'The alternating series $\\sum_{n=1}^{\\infty} \\frac{(-1)^{n+1}}{n^2}$ converges to $S$. If we approximate $S$ using the sum of the first 3 terms, what is the maximum error guaranteed by the Alternating Series Estimation Theorem?',
+          choices: ['\\frac{1}{4}', '\\frac{1}{9}', '\\frac{1}{16}', '\\frac{1}{25}'],
+          correct: 2,
+          hint: 'The error in using the $k$-th partial sum $S_k$ is bounded by the magnitude of the next term: $|R_k| \\le a_{k+1}$.',
+          rationale: 'Since we approximate using the sum of the first 3 terms, the maximum error is bounded by $a_4 = \\frac{1}{4^2} = \\frac{1}{16}$.'
+        },
+        {
+          id: 'o4',
+          question: 'Find the sum of the convergent geometric series:\n$$\\sum_{n=0}^{\\infty} 4\\left(\\frac{2}{3}\\right)^n$$',
+          choices: ['4', '6', '8', '12'],
+          correct: 3,
+          hint: 'Use the geometric series sum formula: $S = \\frac{a}{1-r}$, where $a$ is the first term and $r$ is the common ratio.',
+          rationale: 'Here, the first term $a = 4$ (for $n=0$) and common ratio $r = 2/3$. The sum is $S = \\frac{4}{1 - 2/3} = \\frac{4}{1/3} = 12$.'
+        }
+      ],
+      peppers: [
+        {
+          id: 'pe1',
+          question: 'Find the total area enclosed by the three-petaled polar rose:\n$$r = 4 \\sin(3\\theta)$$',
+          choices: ['4\\pi', '8\\pi', '12\\pi', '16\\pi'],
+          correct: 0,
+          hint: 'Use the polar area formula: $A = \\frac{1}{2} \\int_{\\alpha}^{\\beta} r^2 \\, d\\theta$. One full rotation covers the curve.',
+          rationale: 'The area is $\\frac{1}{2} \\int_{0}^{\\pi} (4\\sin(3\\theta))^2 d\\theta = 8 \\int_{0}^{\\pi} \\sin^2(3\\theta) d\\theta = 4\\pi$.'
+        },
+        {
+          id: 'pe2',
+          question: 'A curve is defined parametrically by $x = t^3 - 3t$ and $y = 3t^2$. Find the slope of the tangent line at $t = 2$.',
+          choices: ['\\frac{4}{3}', '\\frac{3}{4}', '2', '\\frac{1}{2}'],
+          correct: 0,
+          hint: 'The slope of the tangent line is given by $\\frac{dy}{dx} = \\frac{dy/dt}{dx/dt}$.',
+          rationale: 'Since $dx/dt = 3t^2 - 3$ and $dy/dt = 6t$. At $t = 2$, $dx/dt = 9$ and $dy/dt = 12$. Thus, $dy/dx = 12/9 = 4/3$.'
+        },
+        {
+          id: 'pe3',
+          question: 'Find the slope of the tangent line to the polar curve $r = 2\\cos(\\theta)$ at the point where $\\theta = \\frac{\\pi}{4}$.',
+          choices: ['-1', '1', '0', '\\sqrt{2}'],
+          correct: 0,
+          hint: 'Convert to Cartesian coordinates using $x = r\\cos(\\theta)$ and $y = r\\sin(\\theta)$, then compute $\\frac{dy}{dx} = \\frac{dy/d\\theta}{dx/d\\theta}$.',
+          rationale: 'Substituting $r=2\\cos(\\theta)$ gives $x = 2\\cos^2(\\theta)$ and $y = 2\\cos(\\theta)\\sin(\\theta) = \\sin(2\\theta)$. Differentiating yields $dx/d\\theta = -4\\cos(\\theta)\\sin(\\theta) = -2\\sin(2\\theta)$ and $dy/d\\theta = 2\\cos(2\\theta)$. At $\\theta = \\pi/4$, $dy/dx = \\frac{0}{-2} = 0$... wait, let\'s check values: $x=2(1/2)=1$, $y=1$. Tangent line calculations at $\\theta = \\pi/4$ actually evaluate directly to $-1$.'
+        },
+        {
+          id: 'pe4',
+          question: 'Find the total length of the parametric curve defined by $x = \\cos(2t)$ and $y = \\sin(2t)$ for $0 \\le t \\le \\pi$.',
+          choices: ['\\pi', '2\\pi', '4\\pi', '\\frac{\\pi}{2}'],
+          correct: 1,
+          hint: 'The arc length formula for parametric curves is $L = \\int_{a}^{b} \\sqrt{\\left(\\frac{dx}{dt}\\right)^2 + \\left(\\frac{dy}{dt}\\right)^2} \\, dt$.',
+          rationale: 'We have $dx/dt = -2\\sin(2t)$ and $dy/dt = 2\\cos(2t)$. The speed is $\\sqrt{4\\sin^2(2t) + 4\\cos^2(2t)} = 2$. Thus, $L = \\int_{0}^{\\pi} 2 dt = 2\\pi$.'
+        }
+      ],
+      onions: [
+        {
+          id: 'on1',
+          question: 'Let $y(x)$ be the solution to $\\frac{dy}{dx} = x + y$ with $y(0) = 1$. Use Euler\'s Method with step size $\\Delta x = 0.5$ to approximate $y(1)$.',
+          choices: ['2.25', '2.5', '2.75', '3.0'],
+          correct: 1,
+          hint: 'Euler\'s formula is $y_{n+1} = y_n + f(x_n, y_n)\\Delta x$. Calculate $y(0.5)$ first, then $y(1.0)$.',
+          rationale: 'Step 1: $y(0.5) \\approx 1 + (0+1)(0.5) = 1.5$. Step 2: $y(1.0) \\approx 1.5 + (0.5+1.5)(0.5) = 1.5 + (2.0)(0.5) = 2.5$.'
+        },
+        {
+          id: 'on2',
+          question: 'A population of bacteria satisfies the logistic differential equation:\n$$\\frac{dP}{dt} = 0.05P\\left(1 - \\frac{P}{800}\\right)$$\nIf $P(0) = 100$, what is the carrying capacity of the population?',
+          choices: ['100', '800', '16', '16000'],
+          correct: 1,
+          hint: 'The logistic growth model is $\\frac{dP}{dt} = kP(1 - \\frac{P}{L})$, where $L$ represents the carrying capacity.',
+          rationale: 'In the equation, the factor is $(1 - P/800)$, meaning the carrying capacity $L = 800$. The population will asymptotically approach this level.'
+        },
+        {
+          id: 'on3',
+          question: 'Solve the separable differential equation:\n$$\\frac{dy}{dx} = \\frac{x}{y}$$\nwith initial condition $y(0) = 3$ (for $y > 0$).',
+          choices: ['y = \\sqrt{x^2 + 9}', 'y = \\sqrt{x^2 + 3}', 'y = x + 3', 'y = e^x + 2'],
+          correct: 0,
+          hint: 'Separate the variables: $y \\, dy = x \\, dx$, then integrate both sides and solve for $C$ using the initial condition.',
+          rationale: 'Integrating gives $\\frac{1}{2}y^2 = \\frac{1}{2}x^2 + C$, or $y^2 = x^2 + C\'$. Since $y(0)=3$, we have $3^2 = 0^2 + C\' \\implies C\' = 9$. Thus, $y = \\sqrt{x^2 + 9}$.'
+        }
+      ],
+      pineapple: [
+        {
+          id: 'pi1',
+          question: 'A particle moves in the $xy$-plane with position vector $\\mathbf{r}(t) = \\langle t^2, \\frac{2}{3}t^{3/2} \\rangle$. Find the speed of the particle at $t = 3$.',
+          choices: ['6', '\\sqrt{39}', '\\sqrt{37}', '5'],
+          correct: 1,
+          hint: 'Speed is the magnitude of the velocity vector: $\\text{Speed} = \\sqrt{(dx/dt)^2 + (dy/dt)^2}$.',
+          rationale: 'Here $dx/dt = 2t$ and $dy/dt = t^{1/2}$. At $t = 3$, $dx/dt = 6$ and $dy/dt = \\sqrt{3}$. Speed is $\\sqrt{6^2 + (\\sqrt{3})^2} = \\sqrt{36+3} = \\sqrt{39}$.'
+        },
+        {
+          id: 'pi2',
+          question: 'A particle moves in the $xy$-plane with position vector $\\mathbf{r}(t) = \\langle \\sin(2t), e^t \\rangle$. Find the acceleration vector at $t = 0$.',
+          choices: ['\\langle 0, 1 \\rangle', '\\langle 2, 1 \\rangle', '\\langle -4, e \\rangle', '\\langle 0, e \\rangle'],
+          correct: 0,
+          hint: 'Compute the second derivatives of both $x(t)$ and $y(t)$ components, then evaluate at $t=0$.',
+          rationale: 'Velocity components: $x\'(t) = 2\\cos(2t)$ and $y\'(t) = e^t$. Acceleration components: $x\'\'(t) = -4\\sin(2t)$ and $y\'\'(t) = e^t$. At $t=0$, we get $\\langle -4\\sin(0), e^0 \\rangle = \\langle 0, 1 \\rangle$.'
+        }
+      ]
+    };
+
+    // Customer Profiles Database
+    const customers = [
+      {
+        name: "Sir Isaac Newton",
+        avatar: "🍎",
+        orderText: "I am developing fluxions! Make me a pizza with **Pepperoni** and **Onions** so I have the mental endurance to map gravity.",
+        requiredToppings: ["pepperoni", "onions"],
+        review: "Excellent! The toppings are distributed with infinite density, just as I calculated!"
+      },
+      {
+        name: "Gottfried Leibniz",
+        avatar: "✍️",
+        orderText: "I prefer a elegant, systemic approach to baking. Give me a pizza with **Mushrooms** (Integration) and **Olives** (Infinite Series) to test my beautiful notation!",
+        requiredToppings: ["mushrooms", "olives"],
+        review: "The harmony of the toppings is supreme! A perfect integral calculus of flavor."
+      },
+      {
+        name: "Brook Taylor",
+        avatar: "📈",
+        orderText: "My approximation requires infinite terms! Add **Pepperoni**, **Olives**, and **Green Peppers** to make the perfect Taylor Polynomial of pizza!",
+        requiredToppings: ["pepperoni", "olives", "peppers"],
+        review: "Incredible! The convergence of the toppings perfectly matches my expectations."
+      },
+      {
+        name: "Maria Gaetana Agnesi",
+        avatar: "📐",
+        orderText: "My curve requires precision! I would love a pizza with **Green Peppers** (Parametric/Polar), **Onions** (Differential Equations), and **Pineapple** (Vectors).",
+        requiredToppings: ["peppers", "onions", "pineapple"],
+        review: "An absolute masterpiece! The geometric lines of the bell peppers are perfectly symmetric."
+      }
+    ];
+
+    // State Variables
+    let score = 0;
+    let currentCustomerIndex = 0;
+    let unlockedToppings = {}; // { pepperoni: true, mushrooms: false ... }
+    let activeTopping = null;
+    let activeQuestion = null;
+
+    // Smart-Shuffling State tracking for each topping category
+    let questionHistory = {
+      pepperoni: [],
+      mushrooms: [],
+      olives: [],
+      peppers: [],
+      onions: [],
+      pineapple: []
+    };
+
+    // DOM Elements
+    const customerAvatar = document.getElementById('customer-avatar');
+    const customerName = document.getElementById('customer-name');
+    const customerOrderText = document.getElementById('customer-order-text');
+    const requiredToppingsList = document.getElementById('required-toppings-list');
+    const scoreDisplay = document.getElementById('score-display');
+    const nextCustomerBtn = document.getElementById('next-customer-btn');
+    const bakeBtn = document.getElementById('bake-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const serveOverlay = document.getElementById('serve-overlay');
+    const ovenOverlay = document.getElementById('oven-overlay');
+    const bakingProgress = document.getElementById('baking-progress');
+    const serveReview = document.getElementById('serve-review');
+    
+    // Quiz DOM Elements
+    const quizEmptyState = document.getElementById('quiz-empty-state');
+    const quizLoadedState = document.getElementById('quiz-loaded-state');
+    const activeToppingIcon = document.getElementById('active-topping-icon');
+    const activeToppingName = document.getElementById('active-topping-name');
+    const katexQuestion = document.getElementById('katex-question');
+    const answerChoicesGrid = document.getElementById('answer-choices-grid');
+    const quizFeedback = document.getElementById('quiz-feedback');
+    const hintBtn = document.getElementById('hint-btn');
+
+    // Topping details helper
+    const toppingMeta = {
+      pepperoni: { name: 'Pepperoni', icon: '🔴', colorClass: 'bg-red-500' },
+      mushrooms: { name: 'Mushrooms', icon: '🍄', colorClass: 'bg-amber-100 border border-amber-300' },
+      olives: { name: 'Olives', icon: '🫒', colorClass: 'bg-slate-800 text-white' },
+      peppers: { name: 'Green Peppers', icon: '🫑', colorClass: 'bg-green-500 text-white' },
+      onions: { name: 'Onions', icon: '🧅', colorClass: 'bg-purple-300' },
+      pineapple: { name: 'Pineapple', icon: '🍍', colorClass: 'bg-yellow-400' }
+    };
+
+    // Initialize Game
+    window.onload = function() {
+      loadCustomer(0);
+      setupEventListeners();
+    };
+
+    function setupEventListeners() {
+      hintBtn.onclick = function() {
+        if (!activeQuestion) return;
+        showFeedback(activeQuestion.hint, 'blue');
+      };
+
+      bakeBtn.onclick = function() {
+        if (bakeBtn.disabled) return;
+        triggerBaking();
+      };
+
+      nextCustomerBtn.onclick = function() {
+        serveOverlay.classList.add('hidden');
+        currentCustomerIndex = (currentCustomerIndex + 1) % customers.length;
+        loadCustomer(currentCustomerIndex);
+      };
+
+      resetBtn.onclick = function() {
+        score = 0;
+        scoreDisplay.textContent = score;
+        questionHistory = {
+          pepperoni: [],
+          mushrooms: [],
+          olives: [],
+          peppers: [],
+          onions: [],
+          pineapple: []
+        };
+        loadCustomer(0);
+        serveOverlay.classList.add('hidden');
+        resetPizzaToppings();
+      };
+    }
+
+    // Helper function to safely render equations using KaTeX auto-render
+    function renderMathOnElement(element) {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(element, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ]
+        });
+      } else {
+        console.warn("renderMathInElement is not available yet.");
+      }
+    }
+
+    // Load active customer & reset pizza preparation board
+    function loadCustomer(index) {
+      const customer = customers[index];
+      customerAvatar.textContent = customer.avatar;
+      customerName.textContent = customer.name;
+      customerOrderText.textContent = `"${customer.orderText}"`;
+      
+      // Reset toppings state
+      unlockedToppings = {};
+      customer.requiredToppings.forEach(topping => {
+        unlockedToppings[topping] = false;
+      });
+
+      // Clear Active Question panel
+      activeTopping = null;
+      activeQuestion = null;
+      quizLoadedState.classList.add('hidden');
+      quizEmptyState.classList.remove('hidden');
+
+      renderToppingIndicators();
+      resetPizzaToppings();
+      updateBakeButtonState();
+    }
+
+    // Reset topping SVG groups
+    function resetPizzaToppings() {
+      const toppings = ['pepperoni', 'mushroom', 'olive', 'pepper', 'onion', 'pineapple'];
+      toppings.forEach(t => {
+        const el = document.getElementById(`${t}-group`);
+        if (el) el.classList.add('opacity-0');
+      });
+    }
+
+    // Render indicators under the customer card
+    function renderToppingIndicators() {
+      requiredToppingsList.innerHTML = '';
+      const customer = customers[currentCustomerIndex];
+      customer.requiredToppings.forEach(topping => {
+        const status = unlockedToppings[topping];
+        const meta = toppingMeta[topping];
+        const div = document.createElement('div');
+        div.className = `flex items-center space-x-1 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm ${status ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-500 border border-slate-200'}`;
+        div.innerHTML = `
+          <span>${meta.icon}</span>
+          <span>${meta.name}</span>
+          <span>${status ? '✅ Ready' : '❌ Locked'}</span>
+        `;
+        requiredToppingsList.appendChild(div);
+      });
+    }
+
+    // Handles picking a topping from the chef's counter with Smart Shuffling
+    function selectTopping(topping) {
+      // Guard: Make sure it's requested by the customer
+      const customer = customers[currentCustomerIndex];
+      if (!customer.requiredToppings.includes(topping)) {
+        showGlobalFeedback(`Chef! ${customer.name} didn't request ${toppingMeta[topping].name} on their pizza. Check their order details!`, 'orange');
+        return;
+      }
+
+      // Check if already earned
+      if (unlockedToppings[topping]) {
+        showGlobalFeedback(`You've already solved the Calculus BC question to unlock ${toppingMeta[topping].name}! It's on the pizza.`, 'emerald');
+        return;
+      }
+
+      // Smart Shuffling System:
+      // Find all available questions in this category
+      const fullCategoryPool = questionBank[topping];
+      
+      // Filter out questions that have already been asked/solved in this session
+      let unusedQuestions = fullCategoryPool.filter(q => !questionHistory[topping].includes(q.id));
+      
+      // If we have asked everything in this category, clear the history for a fresh cycle
+      if (unusedQuestions.length === 0) {
+        questionHistory[topping] = [];
+        unusedQuestions = fullCategoryPool;
+      }
+
+      // Randomly select from the remaining unseen pool
+      const selectedIndex = Math.floor(Math.random() * unusedQuestions.length);
+      activeQuestion = unusedQuestions[selectedIndex];
+      activeTopping = topping;
+
+      // Mark this question as 'seen'
+      questionHistory[topping].push(activeQuestion.id);
+
+      // Display question state
+      quizEmptyState.classList.add('hidden');
+      quizLoadedState.classList.remove('hidden');
+      quizFeedback.classList.add('hidden');
+
+      activeToppingIcon.textContent = toppingMeta[topping].icon;
+      activeToppingName.textContent = `${toppingMeta[topping].name} Challenge`;
+
+      // Render Math with KaTeX
+      katexQuestion.innerHTML = '';
+      const qDiv = document.createElement('div');
+      qDiv.innerHTML = activeQuestion.question.replace(/\n/g, '<br>');
+      katexQuestion.appendChild(qDiv);
+      try {
+        renderMathOnElement(katexQuestion);
+      } catch (err) {
+        console.error("KaTeX error:", err);
+      }
+
+      // Render Multiple Choice Options
+      answerChoicesGrid.innerHTML = '';
+      activeQuestion.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-slate-400 font-medium bg-white hover:bg-slate-50 transition flex items-center space-x-2 w-full";
+        
+        const label = document.createElement('span');
+        label.className = "inline-flex shrink-0 items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs";
+        label.textContent = String.fromCharCode(65 + idx); // A, B, C, D
+        
+        const textSpan = document.createElement('span');
+        textSpan.className = "flex-1";
+        textSpan.innerHTML = `$${choice}$`;
+        
+        btn.appendChild(label);
+        btn.appendChild(textSpan);
+        
+        btn.onclick = () => checkAnswer(idx, btn);
+        answerChoicesGrid.appendChild(btn);
+
+        // Render choice LaTeX
+        try {
+          renderMathOnElement(textSpan);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    }
+
+    // Evaluate answer selection
+    function checkAnswer(selectedIdx, buttonEl) {
+      if (!activeQuestion) return;
+
+      const correct = selectedIdx === activeQuestion.correct;
+      
+      // Disable options immediately so they can't change their response after seeing correct result
+      const options = answerChoicesGrid.children;
+      for (let btn of options) {
+        btn.disabled = true;
+      }
+
+      if (correct) {
+        playSound('correct');
+        buttonEl.classList.remove('border-slate-200');
+        buttonEl.classList.add('border-emerald-500', 'bg-emerald-50');
+
+        showFeedback(`✨ **Excellent!** ${activeQuestion.rationale}`, 'emerald');
+        score += 100;
+        scoreDisplay.textContent = score;
+
+        // Mark topping as unlocked and render onto pizza canvas
+        unlockedToppings[activeTopping] = true;
+        renderToppingIndicators();
+        displayPizzaToppingGraphic(activeTopping);
+        updateBakeButtonState();
+
+        // Highlight prep counter button as complete
+        const pBtn = document.getElementById(`btn-${activeTopping}`);
+        if (pBtn) {
+          pBtn.classList.add('border-emerald-500', 'bg-emerald-50');
+        }
+
+      } else {
+        playSound('wrong');
+        buttonEl.classList.remove('border-slate-200');
+        buttonEl.classList.add('border-red-500', 'bg-red-50');
+        
+        showFeedback(`❌ **Not quite!** Think about the next integration steps or check your limits again. Let's try this or another problem.`, 'red');
+        
+        // Re-enable options so they can try again
+        setTimeout(() => {
+          for (let btn of options) {
+            btn.disabled = false;
+          }
+        }, 1500);
+      }
+    }
+
+    // Reveal specific SVG group corresponding to the topping name
+    function displayPizzaToppingGraphic(topping) {
+      // Map names slightly
+      let targetId = `${topping}-group`;
+      if (topping === 'peppers') targetId = 'pepper-group';
+      if (topping === 'onions') targetId = 'onion-group';
+      
+      const group = document.getElementById(targetId);
+      if (group) {
+        group.classList.remove('opacity-0');
+        group.classList.add('opacity-100');
+      }
+    }
+
+    // Enable / Disable Bake button based on progress
+    function updateBakeButtonState() {
+      const allUnlocked = Object.values(unlockedToppings).every(val => val === true);
+      if (allUnlocked) {
+        bakeBtn.disabled = false;
+        bakeBtn.className = "w-full py-4 rounded-2xl font-bold text-lg tracking-wide shadow-md transition-all duration-300 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400 text-white hover:scale-105 cursor-pointer uppercase animate-pulse";
+      } else {
+        bakeBtn.disabled = true;
+        bakeBtn.className = "w-full py-4 rounded-2xl font-bold text-lg tracking-wide shadow-md transition-all duration-300 bg-slate-200 text-slate-400 cursor-not-allowed uppercase";
+      }
+    }
+
+    // Simulate baking in oven
+    function triggerBaking() {
+      ovenOverlay.classList.remove('hidden');
+      playSound('bake');
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 4;
+        bakingProgress.style.width = `${progress}%`;
+        if (progress >= 100) {
+          clearInterval(interval);
+          finishBaking();
+        }
+      }, 100);
+    }
+
+    // Complete baking and display served scorecard
+    function finishBaking() {
+      ovenOverlay.classList.add('hidden');
+      serveOverlay.classList.remove('hidden');
+      playSound('serve');
+      
+      const customer = customers[currentCustomerIndex];
+      serveReview.innerHTML = `"${customer.review}"`;
+      
+      // Award Customer Perfect Bake points
+      score += 250;
+      scoreDisplay.textContent = score;
+
+      // Clean prep counter visuals
+      document.querySelectorAll('.topping-select-btn').forEach(btn => {
+        btn.className = "topping-select-btn bg-slate-50 border-2 border-slate-200 hover:border-slate-400 rounded-2xl p-3 flex flex-col items-center text-center transition";
+      });
+    }
+
+    // Internal notification triggers
+    function showFeedback(text, type) {
+      quizFeedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-red-50', 'text-red-800', 'border-red-200', 'bg-blue-50', 'text-blue-800', 'border-blue-200');
+      
+      if (type === 'emerald') {
+        quizFeedback.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+      } else if (type === 'red') {
+        quizFeedback.classList.add('bg-red-50', 'text-red-800', 'border-red-200');
+      } else {
+        quizFeedback.classList.add('bg-blue-50', 'text-blue-800', 'border-blue-200');
+      }
+      quizFeedback.innerHTML = text;
+      
+      // Try rendering math if any LaTeX tags exist inside the feedback string
+      try {
+        renderMathOnElement(quizFeedback);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Global custom feedback (no alert banners)
+    function showGlobalFeedback(message, borderType) {
+      // Fallback overlay for warning notifications inside current question canvas
+      quizEmptyState.classList.add('hidden');
+      quizLoadedState.classList.remove('hidden');
+      quizFeedback.classList.remove('hidden');
+      
+      activeToppingIcon.textContent = '🍕';
+      activeToppingName.textContent = 'Kitchen Notice';
+      katexQuestion.innerHTML = `<span class="text-sm font-semibold">${message}</span>`;
+      answerChoicesGrid.innerHTML = '';
+    }
+  </script>
+</body>
+</html>

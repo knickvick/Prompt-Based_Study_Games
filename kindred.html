@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kindred: Echoes of Time - Study Game</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for premium literary typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Lora:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cinzel: ['Cinzel', 'serif'],
+            lora: ['Lora', 'serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            sepia: {
+              50: '#fdfbf7',
+              100: '#f7f2e8',
+              200: '#eddcc4',
+              300: '#dfc29b',
+              400: '#cca26e',
+              500: '#b8814c',
+              600: '#9e6438',
+              700: '#834c2d',
+              800: '#6a3b27',
+              900: '#563022',
+              950: '#2e1810',
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Premium visual effects */
+    .glass {
+      background: rgba(46, 24, 16, 0.45);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(223, 194, 155, 0.15);
+    }
+    .text-glow {
+      text-shadow: 0 0 10px rgba(247, 242, 228, 0.3);
+    }
+    .card-flip {
+      perspective: 1000px;
+    }
+    .card-inner {
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    .card-flip.is-flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      backface-visibility: hidden;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-sepia-950 via-[#1a0e0a] to-[#25130d] text-sepia-100 font-sans min-h-screen relative overflow-x-hidden selection:bg-sepia-700 selection:text-white">
+
+  <!-- Background overlay textures -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(184,129,76,0.1)_0%,transparent_70%)] pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="border-b border-sepia-900/60 sticky top-0 z-50 glass">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="changeTab('home')">
+        <span class="text-3xl">⏳</span>
+        <div>
+          <h1 class="font-cinzel text-xl sm:text-2xl font-bold tracking-wider text-sepia-300">KINDRED</h1>
+          <p class="text-[10px] tracking-[0.25em] font-sans text-sepia-400 uppercase -mt-1">Echoes of Time</p>
+        </div>
+      </div>
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium tracking-wide">
+        <button onclick="changeTab('home')" class="nav-btn text-sepia-300 hover:text-white transition duration-200">Home</button>
+        <button onclick="changeTab('journey')" class="nav-btn text-sepia-400 hover:text-white transition duration-200">Journey Mode</button>
+        <button onclick="changeTab('study')" class="nav-btn text-sepia-400 hover:text-white transition duration-200">Study Suite</button>
+        <button onclick="changeTab('trivia')" class="nav-btn text-sepia-400 hover:text-white transition duration-200">Quick Trivia</button>
+      </nav>
+      <div class="flex items-center space-x-3">
+        <div class="bg-sepia-900/60 border border-sepia-700/50 rounded-lg px-3 py-1.5 flex items-center space-x-2 text-xs">
+          <span class="text-sepia-400">🔥 Insights:</span>
+          <span id="global-insights" class="font-bold text-sepia-300">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+    
+    <!-- HOME SCREEN -->
+    <section id="tab-home" class="space-y-12 py-6">
+      <!-- Hero Banner -->
+      <div class="relative rounded-2xl overflow-hidden glass border border-sepia-800 p-8 sm:p-12 text-center max-w-4xl mx-auto shadow-2xl">
+        <div class="absolute top-4 left-4 text-xs tracking-widest text-sepia-500 font-mono">1976 ⇄ 1815</div>
+        <div class="max-w-2xl mx-auto space-y-6">
+          <span class="text-sepia-400 text-xs font-semibold tracking-[0.3em] uppercase block">An Interactive Literary Study Game</span>
+          <h2 class="font-cinzel text-4xl sm:text-5xl font-black text-sepia-200 leading-tight">Can you navigate the brutal realities of history?</h2>
+          <p class="font-lora text-sepia-300 text-lg leading-relaxed">
+            Based on Octavia Butler's masterpiece, <span class="italic font-bold text-sepia-200">Kindred</span>. Embark on Dana's harrowing time travel journeys to antebellum Maryland. Save your ancestor Rufus to ensure your own existence, while analyzing themes of race, power, literacy, and systemic survival.
+          </p>
+          <div class="pt-4 flex flex-col sm:flex-row justify-center gap-4">
+            <button onclick="changeTab('journey')" class="bg-gradient-to-r from-sepia-700 to-sepia-600 hover:from-sepia-600 hover:to-sepia-500 text-sepia-50 font-bold px-8 py-3.5 rounded-lg shadow-lg hover:shadow-sepia-900/50 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm tracking-wider uppercase font-cinzel">
+              Begin Journey Mode
+            </button>
+            <button onclick="changeTab('study')" class="bg-sepia-900/80 hover:bg-sepia-900 text-sepia-200 border border-sepia-700/60 font-medium px-8 py-3.5 rounded-lg transition-all text-sm tracking-wide">
+              Explore Study Suite
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <!-- Card 1 -->
+        <div class="glass border border-sepia-900 p-6 rounded-xl hover:border-sepia-700 transition duration-300 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="text-3xl">🧭</div>
+            <h3 class="font-cinzel text-lg font-bold text-sepia-300">Journey Mode</h3>
+            <p class="text-sm text-sepia-400 font-lora">Play through the interactive timeline matching the novel's chapters. Balance Danger and Insight to survive Weylin Plantation.</p>
+          </div>
+          <button onclick="changeTab('journey')" class="mt-4 text-xs font-semibold text-sepia-300 hover:text-white flex items-center group">
+            Play Game <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+        </div>
+        <!-- Card 2 -->
+        <div class="glass border border-sepia-900 p-6 rounded-xl hover:border-sepia-700 transition duration-300 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="text-3xl">📚</div>
+            <h3 class="font-cinzel text-lg font-bold text-sepia-300">Flashcard Study Suite</h3>
+            <p class="text-sm text-sepia-400 font-lora">Master character profiles, crucial symbolism, and major socio-historical themes with our interactive dynamic flip cards.</p>
+          </div>
+          <button onclick="changeTab('study')" class="mt-4 text-xs font-semibold text-sepia-300 hover:text-white flex items-center group">
+            Open Study Cards <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+        </div>
+        <!-- Card 3 -->
+        <div class="glass border border-sepia-900 p-6 rounded-xl hover:border-sepia-700 transition duration-300 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="text-3xl">⚡</div>
+            <h3 class="font-cinzel text-lg font-bold text-sepia-300">Quick Trivia</h3>
+            <p class="text-sm text-sepia-400 font-lora">An infinite, rapid-fire exam prep mode tracking correct answers and speed. Perfect for an active recall test review.</p>
+          </div>
+          <button onclick="changeTab('trivia')" class="mt-4 text-xs font-semibold text-sepia-300 hover:text-white flex items-center group">
+            Start Trivia <span class="ml-1 group-hover:translate-x-1 transition-transform">→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Achievements Box -->
+      <div class="max-w-4xl mx-auto glass border border-sepia-900 rounded-xl p-6">
+        <h3 class="font-cinzel text-lg font-bold text-sepia-300 mb-4 flex items-center">
+          <span class="mr-2">🏆</span> Accomplishments & Badges
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="achievements-container">
+          <!-- Achievements injected via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- JOURNEY MODE -->
+    <section id="tab-journey" class="hidden space-y-8">
+      <!-- Mode Header / Dashboard -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-sepia-950/80 p-6 rounded-xl border border-sepia-900">
+        <div>
+          <h2 class="font-cinzel text-2xl font-bold text-sepia-300">Dana's Journey Timeline</h2>
+          <p class="text-sm text-sepia-400">Experience chronological challenges. Earn Insight and keep Danger low to survive the past.</p>
+        </div>
+        <div class="flex items-center space-x-6 w-full md:w-auto">
+          <!-- Danger Meter -->
+          <div class="flex-1 md:w-48">
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-red-400 font-semibold tracking-wide uppercase">Danger Meter</span>
+              <span id="danger-text" class="text-red-400 font-bold">0%</span>
+            </div>
+            <div class="w-full bg-sepia-900 rounded-full h-2.5 overflow-hidden border border-red-950">
+              <div id="danger-bar" class="bg-gradient-to-r from-red-600 to-orange-500 h-2.5 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+          <!-- Local Chapter Score -->
+          <div>
+            <div class="text-xs text-sepia-400 tracking-wide uppercase mb-1">Chapter Insight</div>
+            <div id="chapter-insight-val" class="text-xl font-bold text-sepia-300">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Maps -->
+      <div id="timeline-map" class="relative py-12">
+        <div class="absolute top-1/2 left-4 right-4 h-1 bg-sepia-900 -translate-y-1/2 rounded z-0 hidden md:block"></div>
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-6 relative z-10" id="timeline-chapters-list">
+          <!-- Timeline Node Buttons injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Play Zone Container -->
+      <div id="play-zone" class="hidden max-w-3xl mx-auto glass border border-sepia-800 rounded-xl p-8 space-y-6 shadow-2xl transition-all duration-300">
+        <!-- Chapter banner & intro -->
+        <div class="border-b border-sepia-900/80 pb-4">
+          <div class="flex justify-between items-center">
+            <span id="active-chapter-num" class="text-xs font-mono text-sepia-400 uppercase tracking-widest">Chapter 1</span>
+            <span id="active-chapter-year" class="text-xs font-mono text-sepia-500">Maryland, 1815</span>
+          </div>
+          <h3 id="active-chapter-title" class="font-cinzel text-2xl font-black text-sepia-300 mt-1">THE RIVER</h3>
+        </div>
+
+        <!-- Scenario Text -->
+        <div class="bg-sepia-950/40 p-5 rounded-lg border border-sepia-900 font-lora text-sepia-200 leading-relaxed italic" id="active-scenario-text">
+          Dana finds herself transported from her new apartment in 1976 directly to the edge of a rushing river in Maryland, 1815. A young red-haired boy is drowning.
+        </div>
+
+        <!-- Question Prompts -->
+        <div class="space-y-4">
+          <p class="font-sans font-semibold text-sepia-300" id="active-question-text">What must Dana decide to do in this terrifying moment?</p>
+          <div class="grid grid-cols-1 gap-3" id="active-options-list">
+            <!-- Dynamic Choice Buttons -->
+          </div>
+        </div>
+
+        <!-- Interactive Explanation/Feedback Box -->
+        <div id="feedback-box" class="hidden p-5 rounded-lg border transition-all duration-300">
+          <div class="flex items-start space-x-3">
+            <span id="feedback-icon" class="text-2xl"></span>
+            <div class="space-y-2">
+              <h4 id="feedback-title" class="font-bold text-sm uppercase tracking-wider">Correct</h4>
+              <p id="feedback-text" class="text-sm font-lora text-sepia-300 leading-relaxed"></p>
+              <button id="feedback-next-btn" onclick="nextStep()" class="mt-3 bg-sepia-800 hover:bg-sepia-700 text-sepia-100 font-semibold px-4 py-2 rounded text-xs tracking-wider uppercase">
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Slip Modal (Defeat State) -->
+      <div id="timeslip-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="glass border border-red-900/60 rounded-xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
+          <span class="text-5xl block animate-bounce">🌀</span>
+          <h3 class="font-cinzel text-2xl font-extrabold text-red-400">TIME DIZZINESS!</h3>
+          <p class="font-lora text-sepia-300 text-sm leading-relaxed">
+            Your Tension/Danger reached <span class="font-bold text-red-400">100%</span>. Just like Dana, when facing imminent death or overwhelming danger, you are violently pulled back into the present day. You suffer a dizzy spell but can recover.
+          </p>
+          <div class="bg-sepia-950/60 p-3 rounded text-left border border-sepia-900">
+            <h4 class="text-xs font-bold text-sepia-400 uppercase tracking-widest mb-1">Study Advice:</h4>
+            <p class="text-xs text-sepia-300 font-lora">Dana survivability in the Antebellum South depends on acting with high historical caution and deep understanding of racial hierarchies.</p>
+          </div>
+          <button onclick="restartActiveChapter()" class="w-full bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wider text-xs">
+            Try Chapter Again
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDY SUITE -->
+    <section id="tab-study" class="hidden space-y-12">
+      <div class="text-center max-w-2xl mx-auto space-y-3">
+        <h2 class="font-cinzel text-3xl font-bold text-sepia-300">Study Suite</h2>
+        <p class="text-sepia-400 text-sm font-lora">Interactive flipcards highlighting crucial motifs, characters, and contexts necessary for essay writing and academic excellence.</p>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="flex justify-center space-x-3" id="study-filters">
+        <button onclick="filterStudy('all')" class="study-filter-btn px-4 py-2 text-xs uppercase tracking-wider rounded-lg border border-sepia-800 bg-sepia-900 text-white font-semibold">All Cards</button>
+        <button onclick="filterStudy('character')" class="study-filter-btn px-4 py-2 text-xs uppercase tracking-wider rounded-lg border border-sepia-900 text-sepia-400 hover:text-white font-semibold">Characters</button>
+        <button onclick="filterStudy('theme')" class="study-filter-btn px-4 py-2 text-xs uppercase tracking-wider rounded-lg border border-sepia-900 text-sepia-400 hover:text-white font-semibold">Themes</button>
+        <button onclick="filterStudy('context')" class="study-filter-btn px-4 py-2 text-xs uppercase tracking-wider rounded-lg border border-sepia-900 text-sepia-400 hover:text-white font-semibold">Context</button>
+      </div>
+
+      <!-- Flashcard Deck Container -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="flashcards-deck">
+        <!-- Study Flashcards dynamically loaded -->
+      </div>
+    </section>
+
+    <!-- QUICK TRIVIA -->
+    <section id="tab-trivia" class="hidden max-w-2xl mx-auto space-y-8">
+      <div class="text-center space-y-2">
+        <h2 class="font-cinzel text-3xl font-bold text-sepia-300">Quick Test Review</h2>
+        <p class="text-sepia-400 text-sm">Infinite test prep mode with high-frequency review questions. Test your quick recall!</p>
+      </div>
+
+      <!-- Scoreboard -->
+      <div class="grid grid-cols-3 gap-4 bg-sepia-950/80 p-4 rounded-xl border border-sepia-900 text-center">
+        <div>
+          <div class="text-[10px] text-sepia-400 uppercase tracking-widest">Streak</div>
+          <div id="trivia-streak" class="text-xl font-bold text-sepia-200">0</div>
+        </div>
+        <div>
+          <div class="text-[10px] text-sepia-400 uppercase tracking-widest">Highest Streak</div>
+          <div id="trivia-best" class="text-xl font-bold text-sepia-300">0</div>
+        </div>
+        <div>
+          <div class="text-[10px] text-sepia-400 uppercase tracking-widest">Accuracy</div>
+          <div id="trivia-accuracy" class="text-xl font-bold text-sepia-200">0%</div>
+        </div>
+      </div>
+
+      <!-- Trivia Card Play Zone -->
+      <div class="glass border border-sepia-800 rounded-xl p-8 space-y-6 shadow-2xl relative">
+        <div class="flex justify-between items-center text-xs text-sepia-400 font-mono">
+          <span>Random Question</span>
+          <span id="trivia-q-num">Q-01</span>
+        </div>
+
+        <p id="trivia-question-text" class="text-lg font-lora text-sepia-100 font-medium">Loading trivia...</p>
+
+        <div class="grid grid-cols-1 gap-3" id="trivia-options-list">
+          <!-- Options injected by JS -->
+        </div>
+
+        <!-- Correct/Incorrect Overlay Notification -->
+        <div id="trivia-alert" class="hidden p-4 rounded-lg text-sm text-center font-semibold">
+          Result text
+        </div>
+
+        <div class="flex justify-end">
+          <button id="trivia-next-btn" onclick="loadNextTrivia()" class="hidden bg-sepia-700 hover:bg-sepia-600 text-white font-semibold px-5 py-2.5 rounded-lg text-xs uppercase tracking-wider">
+            Next Trivia <span class="ml-1">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-sepia-900/60 py-10 mt-20 glass">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+      <p class="text-xs text-sepia-400 font-serif">"I was the writer who couldn't write, the savior who couldn't save." - Octavia E. Butler, Kindred</p>
+      <div class="h-[1px] bg-sepia-900/40 w-1/4 mx-auto my-3"></div>
+      <p class="text-[10px] tracking-widest text-sepia-500 uppercase">Interactive Academic Study Tool &copy; 2026. Built with historical and literary reference standards.</p>
+    </div>
+  </footer>
+
+  <!-- Script State and Engine Logic -->
+  <script>
+    // GAME ENGINE AND DATABASE
+
+    // Chapters database corresponding to Journey Mode
+    const chapters = [
+      {
+        id: 0,
+        title: "The River",
+        year: "1815",
+        shortDesc: "Dana first saves young Rufus Weylin from drowning.",
+        questions: [
+          {
+            scenario: "Dana is suddenly pulled from her California home in 1976 to a river in 1815 Maryland, where a young Rufus is drowning. His mother Margaret is screaming and striking Dana in a panic.",
+            text: "What fundamental rule of the Antebellum South is instantly thrust upon Dana in this opening encounter with Tom Weylin (Rufus's father)?",
+            options: [
+              { text: "Enslaved black people are praised and financially compensated for physical labor.", correct: false },
+              { text: "Her humanitarian efforts are immediately met with fear, white hostility, and threats of extreme physical violence (a gun pointed at her).", correct: true, explain: "Correct! Even though Dana saves young Rufus's life, his father Tom responds immediately with extreme hostility, showcasing that a black woman in 1815 Maryland is assumed a threat or slave rather than a neighbor." },
+              { text: "The Weylin family recognizes her modern status and welcomes her with hospitality.", correct: false }
+            ],
+            insightReward: 15,
+            dangerPenalty: 35
+          },
+          {
+            scenario: "Dana returns back to 1976 when she faces absolute terror—Tom Weylin pointing a shotgun directly at her face.",
+            text: "What structural plot device does Butler establish with Dana's movement through space and time?",
+            options: [
+              { text: "Dana can travel back and forth at will using a magical amulet.", correct: false },
+              { text: "Dana's time travel is triggered solely by Rufus's life-threatening danger, and her return home is triggered by her own threat of imminent death.", correct: true, explain: "Correct. Dana does not control the travel. Rufus's distress pulls her back to protect his life (and her genetic bloodline), while her fear of death triggers her return to 1976." },
+              { text: "Dana only travels when she falls asleep.", correct: false }
+            ],
+            insightReward: 15,
+            dangerPenalty: 25
+          }
+        ]
+      },
+      {
+        id: 1,
+        title: "The Fire",
+        year: "1815 (Later)",
+        shortDesc: "Dana saves Rufus from burning his house down.",
+        questions: [
+          {
+            scenario: "Dana is summoned again; Rufus has set fire to the curtains in his bedroom to retaliate against his father.",
+            text: "What does Rufus's willingness to burn his own house down tell us about his character and development?",
+            options: [
+              { text: "He has a calculated political desire to destroy the plantation system.", correct: false },
+              { text: "He is already showing signs of petulance, high-strung rage, and a toxic sense of privilege where he destroys what he cannot control.", correct: true, explain: "Correct! Rufus's tantrums are destructive. Butler illustrates how the master-slave dynamic is nurtured in young white boys, allowing their anger to run unchecked." },
+              { text: "He is highly educated and acting out scientific experiments.", correct: false }
+            ],
+            insightReward: 20,
+            dangerPenalty: 30
+          },
+          {
+            scenario: "To blend in and avoid immediate capture by local slave patrols (patrollers), Dana must survive overnight in the woods.",
+            text: "Which of the following describes the 'patrollers' Dana encounters, illustrating a crucial historical element?",
+            options: [
+              { text: "Friendly local law enforcement trying to keep the peace safely.", correct: false },
+              { text: "Poor, working-class white men who brutalize black people with legal impunity to enforce slave laws.", correct: true, explain: "Correct! Patrollers were free to stop, search, and beat black people under the guise of security. Butler shows how class and race intersect, as poorer white men exercise absolute dominance over enslaved people." },
+              { text: "A volunteer abolitionist safety squad.", correct: false }
+            ],
+            insightReward: 20,
+            dangerPenalty: 40
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "The Fall",
+        year: "1819",
+        shortDesc: "Kevin travels back with Dana; they witness plantation hierarchy.",
+        questions: [
+          {
+            scenario: "Dana's husband Kevin, a white man from 1976, holds onto Dana during a time slip and is transported with her. They must play roles: master and slave.",
+            text: "How does Kevin's direct perception of 1819 Maryland differ from his previous intellectual understanding of history?",
+            options: [
+              { text: "He immediately finds plantation life exciting and easy to fit into.", correct: false },
+              { text: "He initially remains intellectually detached, failing to fully grasp the daily terror and physical threat Dana faces constantly.", correct: true, explain: "Correct! Kevin struggles to perceive the invisible borders of danger Dana must navigate. As a white man, he does not experience the physical horror of the environment in the same way, creating a disconnect between the spouses." },
+              { text: "He immediately organizes a violent slave revolt.", correct: false }
+            ],
+            insightReward: 25,
+            dangerPenalty: 30
+          },
+          {
+            scenario: "Dana begins teaching young Nigel, an enslaved boy, to read using a book in the Weylins' attic. Reading is strictly forbidden.",
+            text: "Why is slave literacy treated as a dangerous threat by slaveowners like Tom Weylin?",
+            options: [
+              { text: "It threatens the white monopoly on information and is a historical path toward rebellion, self-actualization, and forged freedom papers.", correct: true, explain: "Correct. Literacy allows enslaved people to read maps, forge travel passes, and organize. Weylin beats Dana when he catches her, illustrating the violent suppression of intellectual freedom." },
+              { text: "Weylin wanted Nigel to focus on learning Latin instead.", correct: false },
+              { text: "It costs the plantation too much money to purchase books.", correct: false }
+            ],
+            insightReward: 25,
+            dangerPenalty: 45
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "The Fight",
+        year: "1824",
+        shortDesc: "Dana returns years later. Kevin has been left behind.",
+        questions: [
+          {
+            scenario: "Dana returns and finds Rufus being beaten by a free black man named Isaac, Alice's husband. Rufus tried to force himself on Alice.",
+            text: "What complex reality about Rufus's feelings for Alice does Dana analyze?",
+            options: [
+              { text: "Rufus is a true romantic who respects Alice's independence and choices.", correct: false },
+              { text: "Rufus confuses absolute obsession and possessive ownership with genuine love, viewing Alice as a prize to control.", correct: true, explain: "Correct. Rufus cannot separate love from ownership. He uses his structural privilege to force Alice to submit, reflecting the broader reality of sexual exploitation under slavery." },
+              { text: "Rufus wants to help Alice escape to Canada.", correct: false }
+            ],
+            insightReward: 20,
+            dangerPenalty: 35
+          },
+          {
+            scenario: "Dana meets Kevin again after he has been trapped in the past for five years. He has been working with the underground railroad.",
+            text: "How has Kevin's long stay in the Antebellum South affected his relationship with Dana?",
+            options: [
+              { text: "He has become a slaveholder himself and no longer wants to go back to 1976.", correct: false },
+              { text: "He is physically and emotionally scarred, and has developed a slight accent and distance, showcasing the corruptive, warping power of the past.", correct: true, explain: "Correct! The historical past has physically and mentally aged Kevin, complicating their partnership and showing that nobody escapes the toxic infection of the slaveholding era." },
+              { text: "He has forgotten who Dana is completely.", correct: false }
+            ],
+            insightReward: 25,
+            dangerPenalty: 20
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "The Storm",
+        year: "1831",
+        shortDesc: "Dana faces the agonizing choices of survival vs compliance.",
+        questions: [
+          {
+            scenario: "Rufus forces Dana to write letters to his creditors. He is increasingly demanding, holding Alice's and Dana's fates in his hands.",
+            text: "How does Dana's modern background create a survival conflict in 'The Storm'?",
+            options: [
+              { text: "She struggles between her moral outrage as a 1976 free woman and the submissive compliance necessary to avoid physical torture and maintain Rufus's trust.", correct: true, explain: "Correct! Dana faces a constant moral battle: remaining compliant is a key survival strategy, yet it feels like betraying her identity and acting as a tool of the plantation's daily operations." },
+              { text: "She wants to buy the plantation to free everyone.", correct: false },
+              { text: "She easily forgets about her life in California and adapts cleanly.", correct: false }
+            ],
+            insightReward: 30,
+            dangerPenalty: 40
+          },
+          {
+            scenario: "Alice is forced to bear Rufus's children, including Hagar, Dana's direct ancestor.",
+            text: "What represents the agonizing dynamic between Dana and Alice?",
+            options: [
+              { text: "Alice hates Dana because she thinks Dana is a favorite of Rufus, while Dana must protect Alice to ensure her own eventual birth.", correct: true, explain: "Correct! Alice often sees Dana as Rufus's accomplice, while Dana must keep Rufus and Alice together and alive so that Hagar is born. It is a terrible conflict of moral compromise." },
+              { text: "They fight for the affection of Rufus constantly.", correct: false },
+              { text: "They are sisters who planned to escape together.", correct: false }
+            ],
+            insightReward: 30,
+            dangerPenalty: 30
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "The Rope",
+        year: "1838",
+        shortDesc: "The tragic climax and resolution.",
+        questions: [
+          {
+            scenario: "Alice commits suicide after Rufus lies to her, saying he sold her children away to punish her.",
+            text: "What does Alice's suicide symbolize in the novel's thematic framework?",
+            options: [
+              { text: "An impulsive act of madness unrelated to Rufus's manipulation.", correct: false },
+              { text: "The ultimate tragic reclamation of autonomy—taking control of her own body and fate when all other choices were stripped away.", correct: true, explain: "Correct! Alice's tragic end is a searing demonstration of the extreme, systemic violence of slavery, where self-destruction becomes the only absolute form of self-possession." },
+              { text: "A failed attempt to fake her death.", correct: false }
+            ],
+            insightReward: 35,
+            dangerPenalty: 50
+          },
+          {
+            scenario: "In the ultimate confrontation, Rufus attempts to rape/consume Dana as a replacement for Alice. Dana stabs him to death and is pulled back to 1976, but her arm is fused in the wall.",
+            text: "What is the primary literary symbol of Dana losing her left arm in the location where Rufus held her?",
+            options: [
+              { text: "The permanent physical scar and extraction of history; you cannot touch or survive the horrors of the past without leaving part of yourself behind.", correct: true, explain: "Correct! The loss of her arm is a profound physical symbol. It indicates that the scars of history and slavery are permanent—society and individuals cannot simply walk away uninjured." },
+              { text: "That time travel machines are highly dangerous to limbs.", correct: false },
+              { text: "A minor accident of timing with no thematic significance.", correct: false }
+            ],
+            insightReward: 40,
+            dangerPenalty: 60
+          }
+        ]
+      }
+    ];
+
+    // Quick Trivia Database
+    const triviaPool = [
+      {
+        q: "Who is the author of Kindred?",
+        options: ["Octavia E. Butler", "Toni Morrison", "Alice Walker", "Maya Angelou"],
+        correct: 0
+      },
+      {
+        q: "What year is Dana's present-day timeline?",
+        options: ["1968", "1976", "1984", "1999"],
+        correct: 1
+      },
+      {
+        q: "Where is the Weylin Plantation located?",
+        options: ["Virginia", "Georgia", "Maryland", "South Carolina"],
+        correct: 2
+      },
+      {
+        q: "Who is Rufus's father?",
+        options: ["Kevin Franklin", "Nigel Weylin", "Tom Weylin", "Luke"],
+        correct: 2
+      },
+      {
+        q: "How are Dana and Rufus related?",
+        options: ["They are distant cousins", "Rufus is Dana's direct ancestor", "They are not genetically related", "Dana is Rufus's aunt"],
+        correct: 1
+      },
+      {
+        q: "Who is the cook on the Weylin plantation?",
+        options: ["Sarah", "Tess", "Carrie", "Alice"],
+        correct: 0
+      },
+      {
+        q: "What physical loss does Dana suffer at the end of the novel?",
+        options: ["Her left leg", "Her right hand", "Her left arm", "Her sight"],
+        correct: 2
+      },
+      {
+        q: "Why does Dana cut her wrists in 'The Storm'?",
+        options: ["To try to commit suicide", "To trigger her immediate time-travel survival return to 1976", "To escape a whipped punishment", "As a medical cure"],
+        correct: 1
+      },
+      {
+        q: "What genre is Kindred often categorized as?",
+        options: ["Fairy Tale", "Grimms Folk Lore", "Neo-Slave Narrative / Science Fiction", "Traditional Autobiography"],
+        correct: 2
+      },
+      {
+        q: "Who does Alice marry?",
+        options: ["Nigel", "Rufus", "Isaac", "Luke"],
+        correct: 2
+      },
+      {
+        q: "Which book of the Bible matches the first chapter title of Kindred?",
+        options: ["Genesis", "Exodus", "Leviticus", "None - it's 'The River'"],
+        correct: 3
+      },
+      {
+        q: "What is Kevin Franklin's profession in 1976?",
+        options: ["A history professor", "A writer", "A lawyer", "A doctor"],
+        correct: 1
+      }
+    ];
+
+    // Study Suite cards data
+    const studyCards = [
+      {
+        category: "character",
+        title: "Dana Franklin",
+        frontDesc: "The protagonist and narrator of Kindred. An African American writer living in 1976.",
+        backDesc: "Dana represents modern perspective and agency clashing with the brutal historical parameters of slavery. Her survival relies on intellect, literacy, moral compromise, and psychological adaptability. Her missing arm at the end symbolizes that historical trauma leaves a permanent physical cost."
+      },
+      {
+        category: "character",
+        title: "Rufus Weylin",
+        frontDesc: "Dana's white slaveholder ancestor in antebellum Maryland.",
+        backDesc: "Rufus is a complex antagonist; he is not just a monster but a product of his society. Butler shows how white supremacy and privilege warp an otherwise sympathetic child into a manipulative, abusive, and possessive master who confuses ownership with love."
+      },
+      {
+        category: "character",
+        title: "Kevin Franklin",
+        frontDesc: "Dana's white husband in 1976, who gets stranded in the 19th century with her.",
+        backDesc: "Kevin reflects progressive white allyship. His experiences demonstrate the difference between intellectual opposition to racism and the lived reality of it. Stranded for 5 years, he becomes traumatized, illustrating that no one is immune to the corruptive, warping atmosphere of the past."
+      },
+      {
+        category: "character",
+        title: "Alice Greenwood",
+        frontDesc: "A free black woman forced into enslavement and sexual concubinage by Rufus.",
+        backDesc: "Alice serves as Dana's historic double. While Dana negotiates and survives, Alice resists fiercely until her choices are fully exhausted. Her suicide represents the ultimate, tragic reclaiming of personal autonomy when bodily freedom is completely stripped away."
+      },
+      {
+        category: "theme",
+        title: "The Power of Literacy",
+        frontDesc: "How reading and writing function as weapons of resistance.",
+        backDesc: "In Kindred, literacy is equated with freedom and danger. Enslaved people who can read can forge travel papers, navigate maps, and resist psychological subjugation. This is why Tom Weylin brutally beats Dana when she teaches young Nigel to read."
+      },
+      {
+        category: "theme",
+        title: "Race, Class, and Gender",
+        frontDesc: "The intersections of structural inequality in the antebellum South.",
+        backDesc: "Butler models intersectionality. Enslaved women like Alice and Tess face unique double jeopardy: forced labor and absolute lack of bodily autonomy. Class is highlighted through the 'poor white' patrollers who utilize racial violence to feel a sense of class superiority."
+      },
+      {
+        category: "theme",
+        title: "Double Consciousness",
+        frontDesc: "The psychological struggle of navigating two contrasting realities.",
+        backDesc: "Dana lives Du Boisian Double Consciousness. In 1976, she is a free, equal citizen. In 1815, she must mask her intelligence, speak with mock servility, and suppress her values to stay alive. The conflict between who she is and who she must pretend to be is the central mental struggle."
+      },
+      {
+        category: "context",
+        title: "Antebellum Maryland",
+        frontDesc: "The historical setting of the Weylin Plantation.",
+        backDesc: "Unlike the Deep South (like Mississippi), Maryland was a border state. This meant escape to the North (Pennsylvania) was physically closer but heavily policed. It highlights the constant friction between the free states and slaveholding regions, and the terrifying existence of slave catchers."
+      },
+      {
+        category: "context",
+        title: "The Neo-Slave Narrative",
+        frontDesc: "A modern genre exploring the legacy of historical slavery.",
+        backDesc: "Kindred is a landmark Neo-Slave Narrative. By using science fiction (time travel), Butler forces modern readers to experience the day-to-day horrors of slavery firsthand. This eliminates historical distance and shows how the past remains tethered to modern racial dynamics."
+      }
+    ];
+
+    // Achievements Tracker
+    const achievements = [
+      { id: "first-step", title: "Time Traveler", desc: "Start Journey Mode", unlocked: false, emoji: "🌀" },
+      { id: "survivor-half", title: "Halfway Home", desc: "Reach Chapter 4", unlocked: false, emoji: "⛺" },
+      { id: "scholar", title: "Literary Expert", desc: "Gain 150 Chapter Insights", unlocked: false, emoji: "🎓" },
+      { id: "perfectionist", title: "Perfect Memory", desc: "Get a Trivia streak of 5+", unlocked: false, emoji: "✨" }
+    ];
+
+    // Core Game State
+    let gameState = {
+      globalInsights: 0,
+      activeTab: "home",
+      
+      // Journey Mode state
+      activeChapterIdx: 0,
+      activeQuestionIdx: 0,
+      chapterInsight: 0,
+      dangerMeter: 0,
+      completedChapters: [], // indices of completed chapters
+      
+      // Trivia State
+      triviaStreak: 0,
+      triviaBestStreak: 0,
+      triviaTotalPlayed: 0,
+      triviaTotalCorrect: 0,
+      currentTriviaObj: null
+    };
+
+    // INIT FUNCTIONS
+    window.onload = function() {
+      // Setup Initial State
+      loadAchievements();
+      renderTimeline();
+      updateGlobalInsightsDisplay();
+      
+      // Load initial trivia
+      setRandomTrivia();
+    };
+
+    // TAB MANAGEMENT
+    function changeTab(tabId) {
+      // Hide all tabs
+      document.getElementById("tab-home").classList.add("hidden");
+      document.getElementById("tab-journey").classList.add("hidden");
+      document.getElementById("tab-study").classList.add("hidden");
+      document.getElementById("tab-trivia").classList.add("hidden");
+      
+      // Remove active class from buttons
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("text-white", "border-b-2", "border-sepia-400");
+        btn.classList.add("text-sepia-400");
+      });
+
+      // Show active tab
+      document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+      
+      // Set state
+      gameState.activeTab = tabId;
+
+      // Update achievements check on action
+      checkAchievements();
+    }
+
+    // UPDATE STATS DISPLAYS
+    function updateGlobalInsightsDisplay() {
+      document.getElementById("global-insights").innerText = gameState.globalInsights;
+    }
+
+    // JOURNEY MODE LOGIC
+    function renderTimeline() {
+      const container = document.getElementById("timeline-chapters-list");
+      container.innerHTML = "";
+
+      chapters.forEach((ch, idx) => {
+        const isUnlocked = idx === 0 || gameState.completedChapters.includes(idx - 1);
+        const isCompleted = gameState.completedChapters.includes(idx);
+        
+        // Node element
+        const node = document.createElement("div");
+        node.className = `flex flex-col items-center text-center p-4 rounded-xl border transition-all ${
+          isUnlocked 
+            ? 'cursor-pointer hover:border-sepia-500 bg-sepia-900/40 border-sepia-800' 
+            : 'opacity-40 cursor-not-allowed border-sepia-950 bg-transparent'
+        } ${isCompleted ? 'border-sepia-500/80 bg-sepia-900/60' : ''}`;
+        
+        node.onclick = function() {
+          if (isUnlocked) startChapter(idx);
+        };
+
+        node.innerHTML = `
+          <div class="w-12 h-12 rounded-full flex items-center justify-center font-cinzel text-sm font-bold mb-3 ${
+            isCompleted 
+              ? 'bg-sepia-500 text-sepia-950' 
+              : isUnlocked 
+                ? 'bg-sepia-800 text-sepia-300 ring-2 ring-sepia-600' 
+                : 'bg-sepia-950 text-sepia-600'
+          }">
+            ${isCompleted ? '✓' : idx + 1}
+          </div>
+          <h4 class="font-cinzel text-xs font-bold text-sepia-200">${ch.title}</h4>
+          <span class="text-[10px] text-sepia-500 font-mono mt-1">${ch.year}</span>
+        `;
+        container.appendChild(node);
+      });
+    }
+
+    function startChapter(idx) {
+      gameState.activeChapterIdx = idx;
+      gameState.activeQuestionIdx = 0;
+      gameState.chapterInsight = 0;
+      gameState.dangerMeter = 0;
+      
+      // Close feedback if open
+      document.getElementById("feedback-box").classList.add("hidden");
+
+      // Update displays
+      updateJourneyDashboard();
+      
+      // Show play zone
+      document.getElementById("play-zone").classList.remove("hidden");
+      
+      // Render question
+      renderChapterQuestion();
+      
+      // Scroll smoothly to active zone
+      document.getElementById("play-zone").scrollIntoView({ behavior: 'smooth' });
+
+      // Unlock "Time Traveler" achievement
+      unlockAchievement("first-step");
+    }
+
+    function updateJourneyDashboard() {
+      // Danger elements
+      document.getElementById("danger-text").innerText = `${gameState.dangerMeter}%`;
+      document.getElementById("danger-bar").style.width = `${gameState.dangerMeter}%`;
+      
+      // Insight score
+      document.getElementById("chapter-insight-val").innerText = gameState.chapterInsight;
+    }
+
+    function renderChapterQuestion() {
+      const chapter = chapters[gameState.activeChapterIdx];
+      const question = chapter.questions[gameState.activeQuestionIdx];
+      
+      document.getElementById("active-chapter-num").innerText = `Chapter ${chapter.id + 1} • Part ${gameState.activeQuestionIdx + 1}/${chapter.questions.length}`;
+      document.getElementById("active-chapter-year").innerText = `Maryland, ${chapter.year}`;
+      document.getElementById("active-chapter-title").innerText = chapter.title.toUpperCase();
+      document.getElementById("active-scenario-text").innerText = question.scenario;
+      document.getElementById("active-question-text").innerText = question.text;
+      
+      // Render choices
+      const optionsBox = document.getElementById("active-options-list");
+      optionsBox.innerHTML = "";
+      
+      question.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "w-full text-left p-4 rounded-lg bg-sepia-950/60 hover:bg-sepia-900 border border-sepia-900 hover:border-sepia-700 transition duration-200 text-sm font-medium text-sepia-200 flex items-start space-x-3";
+        btn.onclick = () => selectOption(idx);
+        
+        btn.innerHTML = `
+          <span class="font-mono text-sepia-500 bg-sepia-900 border border-sepia-800 px-1.5 py-0.5 rounded text-xs">${String.fromCharCode(65 + idx)}</span>
+          <span class="flex-1">${opt.text}</span>
+        `;
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    function selectOption(optIdx) {
+      const chapter = chapters[gameState.activeChapterIdx];
+      const question = chapter.questions[gameState.activeQuestionIdx];
+      const option = question.options[optIdx];
+      
+      // Disable further clicks on current buttons
+      document.getElementById("active-options-list").style.pointerEvents = "none";
+
+      const feedbackBox = document.getElementById("feedback-box");
+      const title = document.getElementById("feedback-title");
+      const text = document.getElementById("feedback-text");
+      const icon = document.getElementById("feedback-icon");
+
+      feedbackBox.classList.remove("hidden");
+
+      if (option.correct) {
+        // Correct Action
+        gameState.chapterInsight += question.insightReward;
+        gameState.globalInsights += question.insightReward;
+        
+        // Visual Correct setup
+        feedbackBox.className = "p-5 rounded-lg border bg-emerald-950/30 border-emerald-800/60 text-emerald-100 transition-all duration-300";
+        title.innerText = "Insight Gained!";
+        icon.innerText = "🔍";
+        text.innerText = option.explain;
+      } else {
+        // Wrong Action - Increase danger
+        gameState.dangerMeter += question.dangerPenalty;
+        if (gameState.dangerMeter > 100) gameState.dangerMeter = 100;
+
+        // Visual Incorrect setup
+        feedbackBox.className = "p-5 rounded-lg border bg-rose-950/30 border-rose-900/60 text-rose-100 transition-all duration-300";
+        title.innerText = "Severe Danger!";
+        icon.innerText = "⚠️";
+        text.innerText = "Incorrect Choice. The strict power hierarchies of 1800s Maryland do not tolerate mistakes. Remember: Dana has to blend in and comply or face physical retaliation.";
+      }
+
+      updateJourneyDashboard();
+      updateGlobalInsightsDisplay();
+      checkAchievements();
+
+      // Check for Loss State
+      if (gameState.dangerMeter >= 100) {
+        document.getElementById("feedback-next-btn").classList.add("hidden");
+        // Trigger defeat modal shortly
+        setTimeout(() => {
+          document.getElementById("timeslip-modal").classList.remove("hidden");
+        }, 1500);
+      } else {
+        document.getElementById("feedback-next-btn").classList.remove("hidden");
+      }
+    }
+
+    function nextStep() {
+      // Re-enable clicks
+      document.getElementById("active-options-list").style.pointerEvents = "auto";
+      
+      // Hide feedback
+      document.getElementById("feedback-box").classList.add("hidden");
+
+      const chapter = chapters[gameState.activeChapterIdx];
+      if (gameState.activeQuestionIdx + 1 < chapter.questions.length) {
+        // Go to next question
+        gameState.activeQuestionIdx++;
+        renderChapterQuestion();
+      } else {
+        // Finished Chapter!
+        completeChapter();
+      }
+    }
+
+    function completeChapter() {
+      if (!gameState.completedChapters.includes(gameState.activeChapterIdx)) {
+        gameState.completedChapters.push(gameState.activeChapterIdx);
+      }
+      
+      // Check Halfway milestone
+      if (gameState.completedChapters.includes(2)) {
+        unlockAchievement("survivor-half");
+      }
+
+      // Hide active play zone
+      document.getElementById("play-zone").classList.add("hidden");
+
+      // Redraw Timeline
+      renderTimeline();
+      
+      // Update displays
+      updateJourneyDashboard();
+      
+      // Scroll back up to the timeline
+      document.getElementById("timeline-map").scrollIntoView({ behavior: 'smooth' });
+
+      // Custom notification message
+      showBannerNotification("Chapter Complete!", "You successfully completed this chapter of Dana's timeline. Your Insight is saved!");
+    }
+
+    function restartActiveChapter() {
+      document.getElementById("timeslip-modal").classList.add("hidden");
+      document.getElementById("active-options-list").style.pointerEvents = "auto";
+      startChapter(gameState.activeChapterIdx);
+    }
+
+    // STUDY SUITE LOGIC
+    function filterStudy(category) {
+      // Toggle button active classes
+      document.querySelectorAll(".study-filter-btn").forEach(btn => {
+        btn.className = "study-filter-btn px-4 py-2 text-xs uppercase tracking-wider rounded-lg border border-sepia-900 text-sepia-400 hover:text-white font-semibold";
+      });
+      event.target.className = "study-filter-btn px-4 py-2 text-xs uppercase tracking-wider rounded-lg border border-sepia-800 bg-sepia-900 text-white font-semibold";
+
+      const deck = document.getElementById("flashcards-deck");
+      deck.innerHTML = "";
+
+      const filtered = category === 'all' 
+        ? studyCards 
+        : studyCards.filter(c => c.category === category);
+
+      filtered.forEach((card, idx) => {
+        const item = document.createElement("div");
+        item.className = "card-flip h-80 group cursor-pointer";
+        item.onclick = function() {
+          this.classList.toggle("is-flipped");
+        };
+
+        item.innerHTML = `
+          <div class="card-inner w-full h-full relative duration-700 ease-out">
+            <!-- Front of Card -->
+            <div class="card-front absolute inset-0 glass border border-sepia-800 rounded-xl p-6 flex flex-col justify-between shadow-lg">
+              <div class="space-y-4">
+                <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-sepia-400 px-2 py-1 bg-sepia-900/60 border border-sepia-800 rounded-full w-max">
+                  ${card.category.toUpperCase()}
+                </span>
+                <h3 class="font-cinzel text-xl font-bold text-sepia-200 group-hover:text-sepia-100 transition-colors">${card.title}</h3>
+                <p class="font-lora text-sepia-300 text-sm leading-relaxed">${card.frontDesc}</p>
+              </div>
+              <div class="text-[10px] text-sepia-500 font-mono text-right uppercase tracking-widest">
+                Click to Flip ↺
+              </div>
+            </div>
+            <!-- Back of Card -->
+            <div class="card-back absolute inset-0 bg-[#351c14] border border-sepia-600 rounded-xl p-6 flex flex-col justify-between shadow-lg text-sepia-50">
+              <div class="space-y-3">
+                <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-sepia-400">Analysis</span>
+                <p class="font-lora text-sm leading-relaxed">${card.backDesc}</p>
+              </div>
+              <div class="text-[10px] text-sepia-400 font-mono text-right uppercase tracking-widest">
+                Click to Return ↺
+              </div>
+            </div>
+          </div>
+        `;
+        deck.appendChild(item);
+      });
+    }
+
+    // Default load all cards on entry
+    document.addEventListener("DOMContentLoaded", () => {
+      filterStudy('all');
+    });
+
+    // TRIVIA LOGIC
+    function setRandomTrivia() {
+      // Pick random
+      const randIdx = Math.floor(Math.random() * triviaPool.length);
+      gameState.currentTriviaObj = triviaPool[randIdx];
+
+      document.getElementById("trivia-q-num").innerText = `Q-0${randIdx + 1}`;
+      document.getElementById("trivia-question-text").innerText = gameState.currentTriviaObj.q;
+
+      // Options
+      const list = document.getElementById("trivia-options-list");
+      list.innerHTML = "";
+      list.style.pointerEvents = "auto";
+
+      // Hide overlay and next button
+      document.getElementById("trivia-alert").className = "hidden p-4 rounded-lg text-sm text-center font-semibold";
+      document.getElementById("trivia-next-btn").classList.add("hidden");
+
+      gameState.currentTriviaObj.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "trivia-opt-btn w-full text-left p-4 rounded-lg bg-sepia-950/60 hover:bg-sepia-900 border border-sepia-900 hover:border-sepia-700 transition duration-150 text-sm font-medium text-sepia-200 flex items-start space-x-3";
+        btn.onclick = () => selectTriviaOption(idx);
+        btn.innerHTML = `
+          <span class="font-mono text-sepia-500 bg-sepia-900 border border-sepia-800 px-1.5 py-0.5 rounded text-xs">${idx + 1}</span>
+          <span>${opt}</span>
+        `;
+        list.appendChild(btn);
+      });
+    }
+
+    function selectTriviaOption(optIdx) {
+      const isCorrect = optIdx === gameState.currentTriviaObj.correct;
+      const list = document.getElementById("trivia-options-list");
+      list.style.pointerEvents = "none"; // block edits
+
+      gameState.triviaTotalPlayed++;
+
+      const alertBox = document.getElementById("trivia-alert");
+      alertBox.classList.remove("hidden");
+
+      // Highlight the correct one green, incorrect red
+      const buttons = list.querySelectorAll(".trivia-opt-btn");
+      buttons.forEach((btn, i) => {
+        if (i === gameState.currentTriviaObj.correct) {
+          btn.className = "w-full text-left p-4 rounded-lg bg-emerald-950/40 border-emerald-500 text-emerald-100 transition duration-150 text-sm font-medium flex items-start space-x-3 border-2";
+        } else if (i === optIdx) {
+          btn.className = "w-full text-left p-4 rounded-lg bg-rose-950/40 border-rose-500 text-rose-100 transition duration-150 text-sm font-medium flex items-start space-x-3 border-2";
+        }
+      });
+
+      if (isCorrect) {
+        gameState.triviaStreak++;
+        gameState.triviaTotalCorrect++;
+        if (gameState.triviaStreak > gameState.triviaBestStreak) {
+          gameState.triviaBestStreak = gameState.triviaStreak;
+        }
+
+        alertBox.className = "p-4 rounded-lg text-sm text-center font-semibold bg-emerald-950/30 border border-emerald-800/60 text-emerald-200";
+        alertBox.innerText = "Correct! Great understanding of the novel.";
+      } else {
+        gameState.triviaStreak = 0;
+        alertBox.className = "p-4 rounded-lg text-sm text-center font-semibold bg-rose-950/30 border border-rose-900/60 text-rose-200";
+        alertBox.innerText = `Incorrect. The correct answer was: "${gameState.currentTriviaObj.options[gameState.currentTriviaObj.correct]}".`;
+      }
+
+      // Update trivia metrics
+      document.getElementById("trivia-streak").innerText = gameState.triviaStreak;
+      document.getElementById("trivia-best").innerText = gameState.triviaBestStreak;
+      
+      const acc = Math.round((gameState.triviaTotalCorrect / gameState.triviaTotalPlayed) * 100);
+      document.getElementById("trivia-accuracy").innerText = `${acc}%`;
+
+      // Show Next button
+      document.getElementById("trivia-next-btn").classList.remove("hidden");
+
+      checkAchievements();
+    }
+
+    function loadNextTrivia() {
+      setRandomTrivia();
+    }
+
+    // ACHIEVEMENT SYSTEM
+    function loadAchievements() {
+      const cont = document.getElementById("achievements-container");
+      cont.innerHTML = "";
+
+      achievements.forEach(ach => {
+        const card = document.createElement("div");
+        card.className = `flex flex-col items-center justify-center p-4 rounded-lg border text-center transition duration-300 ${
+          ach.unlocked 
+            ? 'glass border-sepia-600 bg-sepia-900/20' 
+            : 'border-sepia-950 bg-black/40 opacity-50'
+        }`;
+
+        card.innerHTML = `
+          <span class="text-2xl mb-1">${ach.emoji}</span>
+          <h4 class="font-cinzel text-xs font-bold ${ach.unlocked ? 'text-sepia-200' : 'text-sepia-500'}">${ach.title}</h4>
+          <p class="text-[9px] text-sepia-400 mt-1">${ach.desc}</p>
+          <span class="text-[8px] font-mono tracking-widest mt-2 uppercase ${ach.unlocked ? 'text-sepia-300' : 'text-sepia-600'}">
+            ${ach.unlocked ? '✓ Unlocked' : 'Locked'}
+          </span>
+        `;
+        cont.appendChild(card);
+      });
+    }
+
+    function unlockAchievement(id) {
+      const ach = achievements.find(a => a.id === id);
+      if (ach && !ach.unlocked) {
+        ach.unlocked = true;
+        loadAchievements();
+        showBannerNotification("Achievement Unlocked!", `${ach.emoji} ${ach.title}: ${ach.desc}`);
+      }
+    }
+
+    function checkAchievements() {
+      // Scholar check (150 total Insights)
+      if (gameState.globalInsights >= 150) {
+        unlockAchievement("scholar");
+      }
+      // Perfectionist check (Trivia Streak of 5+)
+      if (gameState.triviaBestStreak >= 5) {
+        unlockAchievement("perfectionist");
+      }
+    }
+
+    // BANNER NOTIFICATIONS
+    function showBannerNotification(title, message) {
+      const notif = document.createElement("div");
+      notif.className = "fixed bottom-5 right-5 z-[200] glass border border-sepia-600 rounded-xl p-5 shadow-2xl max-w-sm transition-transform transform translate-y-10 opacity-0 duration-300 flex items-start space-x-3";
+      
+      notif.innerHTML = `
+        <div class="text-xl">🏆</div>
+        <div>
+          <h4 class="font-cinzel text-sm font-bold text-sepia-200">${title}</h4>
+          <p class="font-lora text-xs text-sepia-300 mt-1">${message}</p>
+        </div>
+      `;
+
+      document.body.appendChild(notif);
+
+      // Animate In
+      setTimeout(() => {
+        notif.classList.remove("translate-y-10", "opacity-0");
+      }, 100);
+
+      // Dismiss after 4s
+      setTimeout(() => {
+        notif.classList.add("translate-y-10", "opacity-0");
+        setTimeout(() => notif.remove(), 300);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
+

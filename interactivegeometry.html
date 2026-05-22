@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State Capital Dash!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Outfit:wght@300..900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top, #1e1b4b, #0f172a);
+            overflow-x: hidden;
+        }
+        .fun-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 4px;
+        }
+        /* Card flip effect */
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        /* Pop animations */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop {
+            animation: pop 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- Sparkle Canvas for Background Particles -->
+    <canvas id="particleCanvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Top Navigation / Header -->
+    <header class="relative z-10 px-6 py-4 border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goToMenu()">
+                <div class="bg-gradient-to-tr from-indigo-500 to-pink-500 p-2.5 rounded-2xl shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-map-location-dot text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight fun-font bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">CAPITAL DASH</h1>
+                    <p class="text-xs text-slate-400 font-medium tracking-widest uppercase">The Ultimate US Map Adventure</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Sound Toggle -->
+                <button id="soundToggleBtn" onclick="toggleSound()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white p-3 rounded-xl transition duration-200 border border-slate-700/50">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+                <!-- Stats Toggle -->
+                <button onclick="openStatsModal()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2.5 rounded-xl transition duration-200 border border-slate-700/50 flex items-center gap-2 font-semibold">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span class="hidden sm:inline">Stats & Badges</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 flex-grow max-w-6xl w-full mx-auto px-4 py-8 flex items-center justify-center">
+        
+        <!-- ================= MAIN MENU ================= -->
+        <section id="menuSection" class="w-full max-w-5xl grid lg:grid-cols-12 gap-8 items-center animate-fade-in">
+            <!-- Left Side Hero -->
+            <div class="lg:col-span-5 space-y-6 text-center lg:text-left">
+                <span class="px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-300 text-sm font-semibold border border-indigo-500/20 inline-block">🇺🇸 Interactive Geography Arcade</span>
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight fun-font">
+                    Master the <span class="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">States & Capitals</span> with 4 fun games!
+                </h2>
+                <p class="text-slate-400 text-base md:text-lg">
+                    Train your brain, build epic speed streaks, unlock trophies, and learn every single United States capital through multiple fun gameplay styles.
+                </p>
+                <div class="flex flex-wrap gap-4 justify-center lg:justify-start pt-2">
+                    <div class="flex items-center gap-2 bg-slate-800/40 px-3 py-1.5 rounded-lg border border-slate-700/30">
+                        <i class="fa-solid fa-bolt text-amber-400"></i>
+                        <span class="text-xs text-slate-300 font-medium">Fast Paced</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800/40 px-3 py-1.5 rounded-lg border border-slate-700/30">
+                        <i class="fa-solid fa-spell-check text-cyan-400"></i>
+                        <span class="text-xs text-slate-300 font-medium">Spelling Focus</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-800/40 px-3 py-1.5 rounded-lg border border-slate-700/30">
+                        <i class="fa-solid fa-shield-heart text-emerald-400"></i>
+                        <span class="text-xs text-slate-300 font-medium">100% Kid Safe</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - 4 Game Modes Grid -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-3xl backdrop-blur-md space-y-4">
+                    <h3 class="text-xl font-bold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-indigo-400"></i> Choose a Game Mode
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <!-- Mode 1 Card (Speed Quiz) -->
+                        <button onclick="startDashMode()" class="text-left group relative bg-gradient-to-br from-indigo-950/40 to-indigo-900/20 hover:from-indigo-900/50 hover:to-indigo-800/40 border border-indigo-500/20 hover:border-indigo-500/50 p-5 rounded-2xl transition duration-300 flex flex-col justify-between h-44 shadow-lg">
+                            <div class="bg-indigo-500/20 group-hover:bg-indigo-500/30 p-2.5 rounded-xl transition duration-300 text-indigo-400 w-fit">
+                                <i class="fa-solid fa-stopwatch text-xl animate-pulse"></i>
+                            </div>
+                            <div class="mt-4">
+                                <h4 class="text-base font-bold text-indigo-200 group-hover:text-white fun-font">Capital Dash</h4>
+                                <p class="text-xs text-indigo-300/60 mt-1">Answer multiple choice questions under time pressure.</p>
+                            </div>
+                        </button>
+
+                        <!-- Mode 2 Card (Grid Connector) -->
+                        <button onclick="startMatchMode()" class="text-left group relative bg-gradient-to-br from-pink-950/40 to-pink-900/20 hover:from-pink-900/50 hover:to-pink-800/40 border border-pink-500/20 hover:border-pink-500/50 p-5 rounded-2xl transition duration-300 flex flex-col justify-between h-44 shadow-lg">
+                            <div class="bg-pink-500/20 group-hover:bg-pink-500/30 p-2.5 rounded-xl transition duration-300 text-pink-400 w-fit">
+                                <i class="fa-solid fa-grip text-xl"></i>
+                            </div>
+                            <div class="mt-4">
+                                <h4 class="text-base font-bold text-pink-200 group-hover:text-white fun-font">Grid Connector</h4>
+                                <p class="text-xs text-pink-300/60 mt-1">Match state tiles with capital tiles in a memory-style grid.</p>
+                            </div>
+                        </button>
+
+                        <!-- Mode 3 Card (Spell Scramble) -->
+                        <button onclick="startScrambleMode()" class="text-left group relative bg-gradient-to-br from-cyan-950/40 to-cyan-900/20 hover:from-cyan-900/50 hover:to-cyan-800/40 border border-cyan-500/20 hover:border-cyan-500/50 p-5 rounded-2xl transition duration-300 flex flex-col justify-between h-44 shadow-lg">
+                            <div class="bg-cyan-500/20 group-hover:bg-cyan-500/30 p-2.5 rounded-xl transition duration-300 text-cyan-400 w-fit">
+                                <i class="fa-solid fa-keyboard text-xl"></i>
+                            </div>
+                            <div class="mt-4">
+                                <h4 class="text-base font-bold text-cyan-200 group-hover:text-white fun-font">Spell Rush</h4>
+                                <p class="text-xs text-cyan-300/60 mt-1">Tap scrambled letters in the correct order to spell the capital!</p>
+                            </div>
+                        </button>
+
+                        <!-- Mode 4 Card (True or False Blitz) -->
+                        <button onclick="startTrueFalseMode()" class="text-left group relative bg-gradient-to-br from-emerald-950/40 to-emerald-900/20 hover:from-emerald-900/50 hover:to-emerald-800/40 border border-emerald-500/20 hover:border-emerald-500/50 p-5 rounded-2xl transition duration-300 flex flex-col justify-between h-44 shadow-lg">
+                            <div class="bg-emerald-500/20 group-hover:bg-emerald-500/30 p-2.5 rounded-xl transition duration-300 text-emerald-400 w-fit">
+                                <i class="fa-solid fa-circle-question text-xl"></i>
+                            </div>
+                            <div class="mt-4">
+                                <h4 class="text-base font-bold text-emerald-200 group-hover:text-white fun-font">True / False Blitz</h4>
+                                <p class="text-xs text-emerald-300/60 mt-1">Rapid fire! Is the statement true or false? Think fast!</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fun Fact Widget -->
+                <div class="bg-slate-800/30 border border-slate-700/20 rounded-2xl p-4 flex gap-4 items-center">
+                    <span class="text-2xl animate-bounce">💡</span>
+                    <div>
+                        <h5 class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Did you know?</h5>
+                        <p id="funFactText" class="text-sm text-slate-300 italic mt-0.5">Honolulu, Hawaii has the only royal palace in the United States!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SPEED DASH MODE ================= -->
+        <section id="dashModeSection" class="hidden w-full max-w-2xl space-y-6 animate-fade-in">
+            <!-- Score & Progress Bar -->
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between backdrop-blur-md">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-500/20 px-3 py-1.5 rounded-xl border border-indigo-500/30">
+                        <span class="text-xs text-slate-400 block uppercase font-bold">Score</span>
+                        <span id="dashScore" class="text-xl font-bold text-indigo-300 fun-font">0</span>
+                    </div>
+                    <div class="bg-emerald-500/20 px-3 py-1.5 rounded-xl border border-emerald-500/30">
+                        <span class="text-xs text-slate-400 block uppercase font-bold">Streak</span>
+                        <span id="dashStreak" class="text-xl font-bold text-emerald-400 fun-font">0 🔥</span>
+                    </div>
+                </div>
+
+                <!-- Timer Ring/Box -->
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 uppercase font-bold block">Time Left</span>
+                        <span id="dashTimerText" class="text-xl font-black text-rose-400 fun-font">60s</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-full border-4 border-slate-800 flex items-center justify-center relative overflow-hidden">
+                        <div id="timerProgress" class="absolute inset-0 bg-rose-500/20 origin-bottom scale-y-100 transition-all duration-1000"></div>
+                        <i class="fa-regular fa-clock text-rose-400 relative z-10"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Main Panel -->
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800/80 rounded-3xl p-8 text-center space-y-8 shadow-2xl relative overflow-hidden">
+                <!-- Streak Floating Indicator -->
+                <div id="streakBadge" class="absolute top-4 right-4 bg-amber-500 text-slate-950 text-xs font-black px-2.5 py-1 rounded-full scale-0 transition-transform duration-300">
+                    2x MULTIPLIER
+                </div>
+
+                <!-- Question Prompt -->
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">What is the capital of</span>
+                    <h3 id="dashQuestionState" class="text-4xl md:text-5xl font-black fun-font tracking-tight text-white animate-pop">
+                        California
+                    </h3>
+                </div>
+
+                <!-- Progress Dots -->
+                <div id="dashProgressContainer" class="flex justify-center gap-1.5">
+                    <!-- Dots will be generated here -->
+                </div>
+
+                <!-- Interactive Choices Grid -->
+                <div id="dashOptionsGrid" class="grid sm:grid-cols-2 gap-4">
+                    <!-- Options injected dynamically -->
+                </div>
+            </div>
+
+            <!-- Dashboard Control Buttons -->
+            <div class="flex justify-between items-center">
+                <button onclick="quitGame()" class="text-slate-400 hover:text-rose-400 flex items-center gap-2 font-medium transition duration-200">
+                    <i class="fa-solid fa-arrow-left"></i> Quit Game
+                </button>
+                <div class="text-xs text-slate-500 italic">
+                    Answer quickly to keep your multiplier active! Use keys A, B, C, D as shortcuts.
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= GRID CONNECTOR MODE ================= -->
+        <section id="matchModeSection" class="hidden w-full max-w-4xl space-y-6 animate-fade-in">
+            <!-- Grid Stats Header -->
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center justify-between backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <div class="bg-pink-500/20 px-3.5 py-1.5 rounded-xl border border-pink-500/30">
+                        <span class="text-xs text-slate-400 block uppercase font-bold">Matches Made</span>
+                        <span id="matchProgress" class="text-xl font-bold text-pink-300 fun-font">0 / 8</span>
+                    </div>
+                    <div class="bg-slate-800 px-3.5 py-1.5 rounded-xl border border-slate-700/50">
+                        <span class="text-xs text-slate-400 block uppercase font-bold">Total Clicks</span>
+                        <span id="matchClicks" class="text-xl font-bold text-slate-200 fun-font">0</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button onclick="resetMatchGrid()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-xl border border-slate-700 transition duration-200 flex items-center gap-2 font-semibold">
+                        <i class="fa-solid fa-arrow-rotate-left text-sm"></i>
+                        <span>Shuffle</span>
+                    </button>
+                    <button onclick="quitGame()" class="bg-slate-800/40 hover:bg-rose-950/40 hover:text-rose-400 text-slate-400 px-4 py-2 rounded-xl border border-slate-700/30 transition duration-200 flex items-center gap-2 font-semibold">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Quit</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tip -->
+            <p class="text-center text-xs text-slate-400">Match a state card (blue borders) with its capital card (pink borders) to connect them!</p>
+
+            <!-- Grid Container -->
+            <div id="gridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <!-- Cards will be injected here -->
+            </div>
+        </section>
+
+        <!-- ================= SPELL RUSH MODE (NEW!) ================= -->
+        <section id="scrambleModeSection" class="hidden w-full max-w-2xl space-y-6 animate-fade-in">
+            <!-- Header Info -->
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center justify-between backdrop-blur-md">
+                <div class="flex items-center gap-3">
+                    <div class="bg-cyan-500/20 px-3.5 py-1.5 rounded-xl border border-cyan-500/30">
+                        <span class="text-xs text-slate-400 block uppercase font-bold">Score</span>
+                        <span id="scrambleScore" class="text-xl font-bold text-cyan-300 fun-font">0</span>
+                    </div>
+                    <div class="bg-slate-800 px-3.5 py-1.5 rounded-xl border border-slate-700/50">
+                        <span class="text-xs text-slate-400 block uppercase font-bold">Solved</span>
+                        <span id="scrambleSolvedCount" class="text-xl font-bold text-slate-200 fun-font">0 / 5</span>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 uppercase font-bold block">Round Time</span>
+                    <span id="scrambleTimerText" class="text-xl font-black text-rose-400 fun-font">45s</span>
+                </div>
+            </div>
+
+            <!-- Scramble Board -->
+            <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800/80 rounded-3xl p-6 md:p-8 text-center space-y-6 shadow-2xl relative overflow-hidden">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">SPELL THE CAPITAL OF</span>
+                    <h3 id="scrambleState" class="text-3xl md:text-4xl font-black fun-font text-white">Florida</h3>
+                </div>
+
+                <!-- Target Build Slots -->
+                <div class="min-h-16 flex flex-wrap justify-center items-center gap-2 bg-slate-950/60 p-4 rounded-2xl border border-slate-850">
+                    <div id="builtWordContainer" class="flex flex-wrap justify-center gap-1.5">
+                        <!-- Placed letters go here -->
+                    </div>
+                </div>
+
+                <!-- Scrambled Letter Source Tiles -->
+                <div class="space-y-3">
+                    <p class="text-xs text-slate-400">Tap letters in correct order:</p>
+                    <div id="sourceLettersContainer" class="flex flex-wrap justify-center gap-2 md:gap-3">
+                        <!-- Letters to click will go here -->
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex justify-center gap-3 pt-2">
+                    <button onclick="clearBuiltWord()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-700">
+                        <i class="fa-solid fa-trash-can"></i> Clear All
+                    </button>
+                    <button onclick="backspaceBuiltWord()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-700">
+                        <i class="fa-solid fa-delete-left"></i> Delete
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quit and Helper Info -->
+            <div class="flex justify-between items-center">
+                <button onclick="quitGame()" class="text-slate-400 hover:text-rose-400 flex items-center gap-2 font-medium transition duration-200">
+                    <i class="fa-solid fa-arrow-left"></i> Quit Game
+                </button>
+                <div class="text-xs text-slate-500 italic">
+                    Letters are case-sensitive. Press Keyboard keys to type them directly!
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TRUE OR FALSE BLITZ MODE (NEW!) ================= -->
+        <section id="trueFalseSection" class="hidden w-full max-w-xl space-y-6 animate-fade-in">
+            <!-- Header Stats -->
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center justify-between backdrop-blur-md">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500/20 px-3.5 py-1.5 rounded-xl border border-emerald-500/30">
+                        <span class="text-xs text-slate-400 block uppercase font-bold">Combo Score</span>
+                        <span id="tfScore" class="text-xl font-bold text-emerald-300 fun-font">0</span>
+                    </div>
+                    <div class="bg-amber-500/20 px-3.5 py-1.5 rounded-xl border border-amber-500/30">
+                        <span id="tfStreak" class="text-base font-bold text-amber-300 fun-font">0 🔥</span>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 uppercase font-bold block">Blitz Clock</span>
+                    <span id="tfTimerText" class="text-xl font-black text-rose-400 fun-font">30s</span>
+                </div>
+            </div>
+
+            <!-- Rapid Statement Card -->
+            <div id="tfCard" class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800/80 rounded-3xl p-8 text-center space-y-8 shadow-2xl relative overflow-hidden transition-all duration-200">
+                <div class="space-y-3">
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest block">Fact Check Blitz</span>
+                    <h4 class="text-xl font-medium text-slate-300">Is this statement true?</h4>
+                </div>
+
+                <div class="py-4 px-6 bg-slate-950/40 rounded-2xl border border-slate-850">
+                    <p id="tfStatementText" class="text-2xl md:text-3xl font-bold fun-font text-white leading-relaxed">
+                        The capital of <span class="text-indigo-400">California</span> is <span class="text-amber-400">Sacramento</span>.
+                    </p>
+                </div>
+
+                <!-- Yes/No Action Grid -->
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <button onclick="submitTrueFalseAnswer(true)" class="bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold py-5 rounded-2xl text-xl shadow-lg hover:shadow-emerald-500/20 transition-all active:scale-95 flex flex-col items-center justify-center gap-1">
+                        <i class="fa-regular fa-circle-check text-2xl"></i>
+                        <span class="fun-font text-lg font-black tracking-wide">TRUE</span>
+                        <span class="text-[10px] opacity-75 font-normal">(Left Arrow)</span>
+                    </button>
+                    <button onclick="submitTrueFalseAnswer(false)" class="bg-rose-600/90 hover:bg-rose-500 text-white font-bold py-5 rounded-2xl text-xl shadow-lg hover:shadow-rose-500/20 transition-all active:scale-95 flex flex-col items-center justify-center gap-1">
+                        <i class="fa-regular fa-circle-xmark text-2xl"></i>
+                        <span class="fun-font text-lg font-black tracking-wide">FALSE</span>
+                        <span class="text-[10px] opacity-75 font-normal">(Right Arrow)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Control Buttons -->
+            <div class="flex justify-between items-center">
+                <button onclick="quitGame()" class="text-slate-400 hover:text-rose-400 flex items-center gap-2 font-medium transition duration-200">
+                    <i class="fa-solid fa-arrow-left"></i> Quit Game
+                </button>
+                <div class="text-xs text-slate-500 italic">
+                    Use your keyboard's <b>Left</b> and <b>Right</b> Arrow keys to answer instantly!
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-6 border-t border-slate-900/80 text-center text-sm text-slate-500">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 Capital Dash. Designed for learning through pure play.</p>
+            <div class="flex gap-4">
+                <a href="#" onclick="openStatsModal(); return false;" class="hover:text-slate-300 transition">View Stats</a>
+                <span>•</span>
+                <a href="#" onclick="showRandomFact(); return false;" class="hover:text-slate-300 transition">New Fact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= MODAL: GAME OVER ================= -->
+    <div id="gameOverModal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-8 text-center space-y-6 shadow-2xl animate-pop">
+            <div class="w-20 h-20 bg-gradient-to-tr from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-amber-500/20">
+                <i class="fa-solid fa-flag-usa text-slate-950 text-3xl"></i>
+            </div>
+            
+            <div class="space-y-2">
+                <h3 class="text-3xl font-black fun-font bg-gradient-to-r from-amber-400 to-amber-200 bg-clip-text text-transparent">Challenge Complete!</h3>
+                <p class="text-slate-400 text-sm">Outstanding exploration. Let's inspect your score!</p>
+            </div>
+
+            <!-- Score readout box -->
+            <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800 grid grid-cols-2 gap-4">
+                <div>
+                    <span class="text-xs text-slate-500 uppercase block font-bold">Total Points / Score</span>
+                    <span id="modalScoreText" class="text-2xl font-black text-indigo-400 fun-font">0</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-500 uppercase block font-bold">Streak reached</span>
+                    <span id="modalStreakText" class="text-2xl font-black text-emerald-400 fun-font">0</span>
+                </div>
+                <div class="col-span-2 pt-2 border-t border-slate-800/80">
+                    <span class="text-xs text-slate-500 uppercase block font-bold">Accuracy Rating</span>
+                    <span id="modalAccuracyText" class="text-lg font-black text-amber-400 fun-font">0%</span>
+                </div>
+            </div>
+
+            <!-- New High Score Banner -->
+            <div id="highScoreBanner" class="hidden bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 py-2 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-crown text-amber-400"></i> New Personal High Score!
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="replayCurrentMode()" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-600/30 transition duration-200 flex items-center justify-center gap-2 text-lg">
+                    <i class="fa-solid fa-gamepad"></i> Play Again
+                </button>
+                <button onclick="goToMenu()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3.5 rounded-xl border border-slate-700 transition duration-200">
+                    Back to Main Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: STATS / TROPHY ROOM ================= -->
+    <div id="statsModal" class="fixed inset-0 bg-slate-950/90 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl relative">
+            <button onclick="closeStatsModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white p-2 rounded-lg bg-slate-800/55 hover:bg-slate-800 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-500/20 p-2.5 rounded-xl text-amber-400 border border-amber-500/30">
+                    <i class="fa-solid fa-trophy text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black fun-font text-white">Your Hall of Fame</h3>
+                    <p class="text-xs text-slate-400">Achievements and records from your practice sessions.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="bg-slate-950/40 p-3.5 rounded-2xl border border-slate-800/80">
+                    <span class="text-xs text-slate-400 block uppercase font-bold">Speed Run Record</span>
+                    <span id="statsSpeedHighScore" class="text-xl font-black text-indigo-400 fun-font">0 pts</span>
+                </div>
+                <div class="bg-slate-950/40 p-3.5 rounded-2xl border border-slate-800/80">
+                    <span class="text-xs text-slate-400 block uppercase font-bold">Grid Conn. Record</span>
+                    <span id="statsGridHighScore" class="text-xl font-black text-pink-400 fun-font">---</span>
+                </div>
+                <div class="bg-slate-950/40 p-3.5 rounded-2xl border border-slate-800/80">
+                    <span class="text-xs text-slate-400 block uppercase font-bold">Spell Rush Record</span>
+                    <span id="statsScrambleHighScore" class="text-xl font-black text-cyan-400 fun-font">0 pts</span>
+                </div>
+                <div class="bg-slate-950/40 p-3.5 rounded-2xl border border-slate-800/80">
+                    <span class="text-xs text-slate-400 block uppercase font-bold">True/False Record</span>
+                    <span id="statsTFHighScore" class="text-xl font-black text-emerald-400 fun-font">0 pts</span>
+                </div>
+                <div class="bg-slate-950/40 p-3.5 rounded-2xl border border-slate-800/80">
+                    <span class="text-xs text-slate-400 block uppercase font-bold">Total Games Played</span>
+                    <span id="statsGamesCount" class="text-xl font-black text-slate-200 fun-font">0</span>
+                </div>
+                <div class="bg-slate-950/40 p-3.5 rounded-2xl border border-slate-800/80">
+                    <span class="text-xs text-slate-400 block uppercase font-bold">Overall Accuracy</span>
+                    <span id="statsMastery" class="text-xl font-black text-emerald-400 fun-font">0%</span>
+                </div>
+            </div>
+
+            <!-- Achievement / Badges Area -->
+            <div class="space-y-3">
+                <h4 class="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-award text-indigo-400"></i> Earned Badges
+                </h4>
+                <div class="grid grid-cols-3 gap-3">
+                    <div id="badge-novice" class="bg-slate-800/40 opacity-40 border border-slate-700/30 p-3 rounded-2xl text-center transition duration-300">
+                        <span class="text-2xl block mb-1">🥉</span>
+                        <span class="text-[10px] block font-bold text-slate-300">Explorer</span>
+                        <span class="text-[8px] text-slate-400 block leading-tight">Play 1st Game</span>
+                    </div>
+                    <div id="badge-streak" class="bg-slate-800/40 opacity-40 border border-slate-700/30 p-3 rounded-2xl text-center transition duration-300">
+                        <span class="text-2xl block mb-1">🔥</span>
+                        <span class="text-[10px] block font-bold text-slate-300">Super Streak</span>
+                        <span class="text-[8px] text-slate-400 block leading-tight">Score 1000+ points</span>
+                    </div>
+                    <div id="badge-genius" class="bg-slate-800/40 opacity-40 border border-slate-700/30 p-3 rounded-2xl text-center transition duration-300">
+                        <span class="text-2xl block mb-1">🎓</span>
+                        <span class="text-[10px] block font-bold text-slate-300">Brainiac</span>
+                        <span class="text-[8px] text-slate-400 block leading-tight">90%+ Accuracy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Storage Upgrades Notice -->
+            <div class="bg-slate-950/50 p-3.5 rounded-2xl border border-slate-800/80 text-center">
+                <p class="text-xs text-slate-400">
+                    Want to save your high scores in the cloud to access on multiple devices, or challenge your friends?
+                </p>
+                <button onclick="requestCloudUpgrade()" class="mt-2.5 text-xs bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-bold px-4 py-2 rounded-xl border border-indigo-500/30 transition">
+                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Enable Cloud Save Progress
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Audio & Core Game Engine -->
+    <script>
+        // --- DATA SECTION: ALL 50 STATES AND CAPITALS ---
+        const US_STATES = [
+            { name: "Alabama", capital: "Montgomery" },
+            { name: "Alaska", capital: "Juneau" },
+            { name: "Arizona", capital: "Phoenix" },
+            { name: "Arkansas", capital: "Little Rock" },
+            { name: "California", capital: "Sacramento" },
+            { name: "Colorado", capital: "Denver" },
+            { name: "Connecticut", capital: "Hartford" },
+            { name: "Delaware", capital: "Dover" },
+            { name: "Florida", capital: "Tallahassee" },
+            { name: "Georgia", capital: "Atlanta" },
+            { name: "Hawaii", capital: "Honolulu" },
+            { name: "Idaho", capital: "Boise" },
+            { name: "Illinois", capital: "Springfield" },
+            { name: "Indiana", capital: "Indianapolis" },
+            { name: "Iowa", capital: "Des Moines" },
+            { name: "Kansas", capital: "Topeka" },
+            { name: "Kentucky", capital: "Frankfort" },
+            { name: "Louisiana", capital: "Baton Rouge" },
+            { name: "Maine", capital: "Augusta" },
+            { name: "Maryland", capital: "Annapolis" },
+            { name: "Massachusetts", capital: "Boston" },
+            { name: "Michigan", capital: "Lansing" },
+            { name: "Minnesota", capital: "Saint Paul" },
+            { name: "Mississippi", capital: "Jackson" },
+            { name: "Missouri", capital: "Jefferson City" },
+            { name: "Montana", capital: "Helena" },
+            { name: "Nebraska", capital: "Lincoln" },
+            { name: "Nevada", capital: "Carson City" },
+            { name: "New Hampshire", capital: "Concord" },
+            { name: "New Jersey", capital: "Trenton" },
+            { name: "New Mexico", capital: "Santa Fe" },
+            { name: "New York", capital: "Albany" },
+            { name: "North Carolina", capital: "Raleigh" },
+            { name: "North Dakota", capital: "Bismarck" },
+            { name: "Ohio", capital: "Columbus" },
+            { name: "Oklahoma", capital: "Oklahoma City" },
+            { name: "Oregon", capital: "Salem" },
+            { name: "Pennsylvania", capital: "Harrisburg" },
+            { name: "Rhode Island", capital: "Providence" },
+            { name: "South Carolina", capital: "Columbia" },
+            { name: "South Dakota", capital: "Pierre" },
+            { name: "Tennessee", capital: "Nashville" },
+            { name: "Texas", capital: "Austin" },
+            { name: "Utah", capital: "Salt Lake City" },
+            { name: "Vermont", capital: "Montpelier" },
+            { name: "Virginia", capital: "Richmond" },
+            { name: "Washington", capital: "Olympia" },
+            { name: "West Virginia", capital: "Charleston" },
+            { name: "Wisconsin", capital: "Madison" },
+            { name: "Wyoming", capital: "Cheyenne" }
+        ];
+
+        const FUN_FACTS = [
+            "Honolulu, Hawaii features the only official royal palace in the United States.",
+            "Juneau, Alaska is the largest US state capital by physical land size—it is larger than Rhode Island!",
+            "Montpelier, Vermont has the smallest population of any US state capital (around 8,000 residents).",
+            "Atlanta, Georgia was burnt to the ground during the Civil War, hence the symbol of the phoenix rising from its ashes.",
+            "Santa Fe, New Mexico is the highest-altitude capital city in the United States, at 7,199 feet above sea level.",
+            "Boston, Massachusetts claims the first public school, subway system, and public park in America.",
+            "Sacramento, California was once a gold rush town and became the western terminal of the First Transcontinental Railroad."
+        ];
+
+        // --- GLOBAL SOUND SETTINGS ---
+        let soundEnabled = true;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playBeep(frequency, type, duration) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type; 
+                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (err) {
+                console.warn("Audio Context blocked or failed.", err);
+            }
+        }
+
+        function playSuccessSound() {
+            playBeep(440, 'triangle', 0.15);
+            setTimeout(() => playBeep(554.37, 'triangle', 0.15), 100);
+            setTimeout(() => playBeep(659.25, 'triangle', 0.25), 200);
+        }
+
+        function playFailSound() {
+            playBeep(220, 'sawtooth', 0.2);
+            setTimeout(() => playBeep(180, 'sawtooth', 0.25), 150);
+        }
+
+        function playClickSound() {
+            playBeep(600, 'sine', 0.08);
+        }
+
+        function playStreakSound() {
+            playBeep(523.25, 'sine', 0.1);
+            setTimeout(() => playBeep(659.25, 'sine', 0.1), 80);
+            setTimeout(() => playBeep(783.99, 'sine', 0.1), 160);
+            setTimeout(() => playBeep(1046.50, 'sine', 0.3), 240);
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const soundIcon = document.getElementById('soundIcon');
+            if (soundEnabled) {
+                soundIcon.className = "fa-solid fa-volume-high text-lg";
+                playClickSound();
+            } else {
+                soundIcon.className = "fa-solid fa-volume-xmark text-lg text-slate-500";
+            }
+        }
+
+        // --- BACKGROUND CANVAS PARTICLES ---
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color = null) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 1;
+                this.speedX = Math.random() * 1.5 - 0.75;
+                this.speedY = Math.random() * -1.5 - 0.5;
+                this.color = color || `rgba(${Math.floor(Math.random() * 100) + 155}, ${Math.floor(Math.random() * 100) + 155}, 255, ${Math.random() * 0.4 + 0.2})`;
+                this.life = 100;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 0.6;
+                if (this.size > 0.1) this.size -= 0.01;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function triggerParticleExplosion(x, y, isSuccess = true) {
+            const count = 30;
+            const color = isSuccess ? 'rgba(52, 211, 153, 0.8)' : 'rgba(248, 113, 113, 0.8)';
+            for (let i = 0; i < count; i++) {
+                const p = new Particle(x, y, color);
+                p.speedX = (Math.random() - 0.5) * 8;
+                p.speedY = (Math.random() - 0.5) * 8;
+                p.size = Math.random() * 4 + 2;
+                particles.push(p);
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (particles.length < 40 && Math.random() < 0.15) {
+                particles.push(new Particle());
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0 || particles[i].size <= 0.2) {
+                    particles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // --- CORE GAME STATE ---
+        let currentGameMode = 'menu'; // 'menu', 'dash', 'grid', 'scramble', 'truefalse'
+        let speedRunTimer = null;
+        let speedRunTimeLeft = 60;
+        let speedRunScore = 0;
+        let speedRunStreak = 0;
+        let speedRunAccuracy = { correct: 0, total: 0 };
+        let speedRunCurrentQuestion = null;
+        
+        // Grid Connector variables
+        let gridPairsCount = 8; 
+        let selectedFirstCard = null;
+        let gridMatchesMade = 0;
+        let gridTotalClicks = 0;
+
+        // Spell Rush (Scramble Solver) variables
+        let scrambleScore = 0;
+        let scrambleRoundIndex = 0;
+        let scrambleCurrentState = null;
+        let scrambleCurrentCapital = "";
+        let scrambleTimer = null;
+        let scrambleTimeLeft = 45;
+        let scrambleBuiltWord = [];
+        let scrambleSourceLetters = [];
+        let scrambleAccuracy = { correct: 0, total: 0 };
+
+        // True or False variables
+        let tfScore = 0;
+        let tfStreak = 0;
+        let tfTimeLeft = 30;
+        let tfTimer = null;
+        let tfCurrentItem = null;
+        let tfCurrentCorrectAnswer = true;
+        let tfAccuracy = { correct: 0, total: 0 };
+
+        // Stats tracking
+        let statsData = {
+            speedHighScore: 0,
+            gridHighScore: null,
+            scrambleHighScore: 0,
+            tfHighScore: 0,
+            gamesPlayed: 0,
+            accuracyStats: { correct: 0, total: 0 }
+        };
+
+        // Initialize and load storage
+        function loadStatsFromStorage() {
+            const saved = localStorage.getItem('state_capital_dash_stats_v2');
+            if (saved) {
+                try {
+                    statsData = JSON.parse(saved);
+                } catch (e) {
+                    console.error("Failed to parse storage stats", e);
+                }
+            } else {
+                // Try migrating v1 stats if they exist
+                const legacy = localStorage.getItem('state_capital_dash_stats');
+                if (legacy) {
+                    try {
+                        const legacyData = JSON.parse(legacy);
+                        statsData.speedHighScore = legacyData.speedHighScore || 0;
+                        statsData.gridHighScore = legacyData.gridHighScore || null;
+                        statsData.gamesPlayed = legacyData.gamesPlayed || 0;
+                        statsData.accuracyStats = legacyData.accuracyStats || { correct: 0, total: 0 };
+                    } catch(e) {}
+                }
+            }
+            updateStatsUI();
+        }
+
+        function saveStatsToStorage() {
+            localStorage.setItem('state_capital_dash_stats_v2', JSON.stringify(statsData));
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            document.getElementById('statsSpeedHighScore').textContent = (statsData.speedHighScore || 0) + " pts";
+            document.getElementById('statsGridHighScore').textContent = statsData.gridHighScore ? statsData.gridHighScore + " moves" : "---";
+            document.getElementById('statsScrambleHighScore').textContent = (statsData.scrambleHighScore || 0) + " pts";
+            document.getElementById('statsTFHighScore').textContent = (statsData.tfHighScore || 0) + " pts";
+            document.getElementById('statsGamesCount').textContent = statsData.gamesPlayed || 0;
+            
+            let rate = 0;
+            if (statsData.accuracyStats && statsData.accuracyStats.total > 0) {
+                rate = Math.round((statsData.accuracyStats.correct / statsData.accuracyStats.total) * 100);
+            }
+            document.getElementById('statsMastery').textContent = rate + "%";
+
+            // Update badge cards style opacity
+            if (statsData.gamesPlayed > 0) {
+                document.getElementById('badge-novice').classList.remove('opacity-40');
+                document.getElementById('badge-novice').classList.add('border-indigo-500/50', 'bg-indigo-500/10');
+            }
+            if (statsData.speedHighScore >= 1000 || statsData.scrambleHighScore >= 500 || statsData.tfHighScore >= 800) {
+                document.getElementById('badge-streak').classList.remove('opacity-40');
+                document.getElementById('badge-streak').classList.add('border-amber-500/50', 'bg-amber-500/10');
+            }
+            if (rate >= 90 && statsData.gamesPlayed >= 3) {
+                document.getElementById('badge-genius').classList.remove('opacity-40');
+                document.getElementById('badge-genius').classList.add('border-emerald-500/50', 'bg-emerald-500/10');
+            }
+        }
+
+        // --- NAVIGATION CONTROLLER ---
+        function goToMenu() {
+            playClickSound();
+            // Clear any running timers
+            clearInterval(speedRunTimer);
+            clearInterval(scrambleTimer);
+            clearInterval(tfTimer);
+            
+            document.getElementById('menuSection').classList.remove('hidden');
+            document.getElementById('dashModeSection').classList.add('hidden');
+            document.getElementById('matchModeSection').classList.add('hidden');
+            document.getElementById('scrambleModeSection').classList.add('hidden');
+            document.getElementById('trueFalseSection').classList.add('hidden');
+            document.getElementById('gameOverModal').classList.add('hidden');
+            
+            currentGameMode = 'menu';
+            showRandomFact();
+        }
+
+        function quitGame() {
+            goToMenu();
+        }
+
+        function showRandomFact() {
+            const textElement = document.getElementById('funFactText');
+            const randomFact = FUN_FACTS[Math.floor(Math.random() * FUN_FACTS.length)];
+            textElement.textContent = randomFact;
+        }
+
+        // --- DASH MODE (SPEED RUN) IMPLEMENTATION ---
+        function startDashMode() {
+            playClickSound();
+            currentGameMode = 'dash';
+            document.getElementById('menuSection').classList.add('hidden');
+            document.getElementById('dashModeSection').classList.remove('hidden');
+
+            // Reset States
+            speedRunScore = 0;
+            speedRunStreak = 0;
+            speedRunTimeLeft = 60;
+            speedRunAccuracy = { correct: 0, total: 0 };
+            
+            document.getElementById('dashScore').textContent = '0';
+            document.getElementById('dashStreak').textContent = '0 🔥';
+            document.getElementById('streakBadge').style.transform = 'scale(0)';
+
+            // Setup timer progress
+            const progress = document.getElementById('timerProgress');
+            progress.style.transform = 'scaleY(1)';
+
+            clearInterval(speedRunTimer);
+            speedRunTimer = setInterval(() => {
+                speedRunTimeLeft--;
+                document.getElementById('dashTimerText').textContent = speedRunTimeLeft + "s";
+                
+                const ratio = speedRunTimeLeft / 60;
+                progress.style.transform = `scaleY(${ratio})`;
+
+                if (speedRunTimeLeft <= 10) {
+                    document.getElementById('dashTimerText').className = "text-xl font-black text-red-500 fun-font animate-pulse";
+                    playBeep(330, 'sine', 0.05);
+                } else {
+                    document.getElementById('dashTimerText').className = "text-xl font-black text-rose-400 fun-font";
+                }
+
+                if (speedRunTimeLeft <= 0) {
+                    endSpeedRun();
+                }
+            }, 1000);
+
+            nextDashQuestion();
+        }
+
+        function nextDashQuestion() {
+            const container = document.getElementById('dashProgressContainer');
+            container.innerHTML = "";
+            for (let i = 0; i < 5; i++) {
+                const dot = document.createElement('div');
+                dot.className = `w-2.5 h-2.5 rounded-full ${i < (speedRunStreak % 5) ? 'bg-indigo-400' : 'bg-slate-800 border border-slate-700'}`;
+                container.appendChild(dot);
+            }
+
+            const targetState = US_STATES[Math.floor(Math.random() * US_STATES.length)];
+            speedRunCurrentQuestion = targetState;
+
+            document.getElementById('dashQuestionState').textContent = targetState.name;
+            const stateHeader = document.getElementById('dashQuestionState');
+            stateHeader.classList.remove('animate-pop');
+            void stateHeader.offsetWidth; 
+            stateHeader.classList.add('animate-pop');
+
+            let wrongCapitals = US_STATES
+                .filter(s => s.capital !== targetState.capital)
+                .map(s => s.capital);
+            
+            wrongCapitals.sort(() => Math.random() - 0.5);
+            const chosenWrong = wrongCapitals.slice(0, 3);
+
+            const allOptions = [targetState.capital, ...chosenWrong];
+            allOptions.sort(() => Math.random() - 0.5);
+
+            const optionsGrid = document.getElementById('dashOptionsGrid');
+            optionsGrid.innerHTML = "";
+
+            allOptions.forEach((optionText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-5 rounded-2xl bg-slate-900 border-2 border-slate-800 hover:border-indigo-500 hover:bg-indigo-950/20 active:scale-98 transition duration-150 flex items-center justify-between group";
+                btn.onclick = (e) => selectDashOption(optionText, btn, e);
+                
+                const shortcutStr = ['A', 'B', 'C', 'D'][idx];
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="w-8 h-8 rounded-lg bg-slate-800 group-hover:bg-indigo-500/20 group-hover:text-indigo-300 text-slate-400 flex items-center justify-center text-xs font-black border border-slate-700 transition">
+                            ${shortcutStr}
+                        </span>
+                        <span class="text-slate-200 group-hover:text-white font-semibold text-lg">${optionText}</span>
+                    </div>
+                    <i class="fa-solid fa-circle text-slate-800 group-hover:text-indigo-900 text-sm transition"></i>
+                `;
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function selectDashOption(chosenCapital, buttonElement, event) {
+            speedRunAccuracy.total++;
+            const isCorrect = (chosenCapital === speedRunCurrentQuestion.capital);
+
+            const rect = buttonElement.getBoundingClientRect();
+            const clickX = rect.left + rect.width / 2;
+            const clickY = rect.top + rect.height / 2;
+
+            if (isCorrect) {
+                speedRunAccuracy.correct++;
+                speedRunStreak++;
+                
+                let multiplier = 1;
+                if (speedRunStreak >= 10) {
+                    multiplier = 3;
+                    document.getElementById('streakBadge').textContent = '🔥 3x MULTIPLIER';
+                    document.getElementById('streakBadge').style.transform = 'scale(1)';
+                } else if (speedRunStreak >= 5) {
+                    multiplier = 2;
+                    document.getElementById('streakBadge').textContent = '🔥 2x MULTIPLIER';
+                    document.getElementById('streakBadge').style.transform = 'scale(1)';
+                } else {
+                    document.getElementById('streakBadge').style.transform = 'scale(0)';
+                }
+
+                if (speedRunStreak % 5 === 0) {
+                    playStreakSound();
+                } else {
+                    playBeep(523.25, 'triangle', 0.12);
+                }
+
+                const basePoints = 100;
+                const pointsEarned = basePoints * multiplier;
+                speedRunScore += pointsEarned;
+
+                buttonElement.className = "w-full text-left p-5 rounded-2xl bg-emerald-950/40 border-2 border-emerald-500/80 text-white flex items-center justify-between transition duration-150 animate-pop";
+                buttonElement.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xs font-black border border-emerald-500/30">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span class="font-bold text-lg text-emerald-100">${chosenCapital}</span>
+                    </div>
+                    <span class="text-xs font-bold bg-emerald-500 text-slate-950 px-2 py-1 rounded-md">+${pointsEarned}</span>
+                `;
+
+                triggerParticleExplosion(clickX, clickY, true);
+                speedRunTimeLeft = Math.min(60, speedRunTimeLeft + 2);
+            } else {
+                speedRunStreak = 0;
+                document.getElementById('streakBadge').style.transform = 'scale(0)';
+                playFailSound();
+
+                buttonElement.className = "w-full text-left p-5 rounded-2xl bg-rose-950/40 border-2 border-rose-500/80 text-white flex items-center justify-between transition duration-150";
+                buttonElement.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-xs font-black border border-rose-500/30">
+                            <i class="fa-solid fa-xmark"></i>
+                        </span>
+                        <span class="font-bold text-lg text-rose-200">${chosenCapital}</span>
+                    </div>
+                    <span class="text-xs font-bold text-rose-300 italic">Incorrect</span>
+                `;
+
+                triggerParticleExplosion(clickX, clickY, false);
+
+                const optionsGrid = document.getElementById('dashOptionsGrid');
+                Array.from(optionsGrid.children).forEach(child => {
+                    const textSpan = child.querySelector('span.text-slate-200, span.text-white');
+                    if (textSpan && textSpan.textContent.trim() === speedRunCurrentQuestion.capital) {
+                        child.className = "w-full text-left p-5 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 flex items-center justify-between";
+                    }
+                });
+
+                speedRunTimeLeft = Math.max(0, speedRunTimeLeft - 5);
+            }
+
+            document.getElementById('dashScore').textContent = speedRunScore;
+            document.getElementById('dashStreak').textContent = speedRunStreak + ' 🔥';
+
+            setTimeout(() => {
+                if (speedRunTimeLeft > 0 && currentGameMode === 'dash') {
+                    nextDashQuestion();
+                }
+            }, 600);
+        }
+
+        function endSpeedRun() {
+            clearInterval(speedRunTimer);
+            const accuracy = speedRunAccuracy.total > 0 
+                ? Math.round((speedRunAccuracy.correct / speedRunAccuracy.total) * 100)
+                : 0;
+
+            let isNewHigh = false;
+            if (speedRunScore > statsData.speedHighScore) {
+                statsData.speedHighScore = speedRunScore;
+                isNewHigh = true;
+            }
+
+            statsData.gamesPlayed++;
+            statsData.accuracyStats.correct += speedRunAccuracy.correct;
+            statsData.accuracyStats.total += speedRunAccuracy.total;
+            saveStatsToStorage();
+
+            document.getElementById('modalScoreText').textContent = speedRunScore;
+            document.getElementById('modalStreakText').textContent = speedRunStreak;
+            document.getElementById('modalAccuracyText').textContent = accuracy + "%";
+            
+            const banner = document.getElementById('highScoreBanner');
+            if (isNewHigh) banner.classList.remove('hidden');
+            else banner.classList.add('hidden');
+
+            document.getElementById('gameOverModal').classList.remove('hidden');
+        }
+
+        // --- GRID MATCH MODE IMPLEMENTATION ---
+        function startMatchMode() {
+            playClickSound();
+            currentGameMode = 'grid';
+            document.getElementById('menuSection').classList.add('hidden');
+            document.getElementById('matchModeSection').classList.remove('hidden');
+
+            resetMatchGrid();
+        }
+
+        function resetMatchGrid() {
+            gridMatchesMade = 0;
+            gridTotalClicks = 0;
+            selectedFirstCard = null;
+
+            document.getElementById('matchProgress').textContent = `0 / ${gridPairsCount}`;
+            document.getElementById('matchClicks').textContent = '0';
+
+            const shuffledPool = [...US_STATES].sort(() => Math.random() - 0.5);
+            const chosenPool = shuffledPool.slice(0, gridPairsCount);
+
+            let cardItems = [];
+            chosenPool.forEach((item, originalIndex) => {
+                cardItems.push({
+                    id: `state-${originalIndex}`,
+                    text: item.name,
+                    pairId: originalIndex,
+                    type: 'state'
+                });
+                cardItems.push({
+                    id: `capital-${originalIndex}`,
+                    text: item.capital,
+                    pairId: originalIndex,
+                    type: 'capital'
+                });
+            });
+
+            cardItems.sort(() => Math.random() - 0.5);
+
+            const gridContainer = document.getElementById('gridContainer');
+            gridContainer.innerHTML = "";
+
+            cardItems.forEach(card => {
+                const flipCard = document.createElement('div');
+                const isStateType = card.type === 'state';
+                const cardBorderColor = isStateType ? 'hover:border-indigo-400 border-indigo-500/20' : 'hover:border-pink-400 border-pink-500/20';
+                
+                flipCard.className = `flip-card relative h-28 cursor-pointer group`;
+                flipCard.id = card.id;
+                flipCard.dataset.pairId = card.pairId;
+                flipCard.dataset.type = card.type;
+
+                flipCard.innerHTML = `
+                    <div class="flip-card-inner relative w-full h-full text-center transition-all rounded-2xl">
+                        <div class="flip-card-front absolute inset-0 w-full h-full bg-slate-900 border ${cardBorderColor} rounded-2xl flex flex-col justify-center items-center p-3 transition duration-200 hover:bg-slate-850 shadow-md">
+                            <span class="text-xs font-semibold ${isStateType ? 'text-indigo-400' : 'text-pink-400'} uppercase tracking-widest">${card.type}</span>
+                            <p class="text-slate-100 font-bold text-sm sm:text-base mt-1.5 leading-snug break-words max-w-full">${card.text}</p>
+                        </div>
+                    </div>
+                `;
+
+                flipCard.onclick = (e) => handleGridCardSelection(flipCard, e);
+                gridContainer.appendChild(flipCard);
+            });
+        }
+
+        function handleGridCardSelection(cardElement, event) {
+            if (cardElement.classList.contains('matched') || cardElement.classList.contains('active-select')) {
+                return;
+            }
+
+            playClickSound();
+            gridTotalClicks++;
+            document.getElementById('matchClicks').textContent = gridTotalClicks;
+
+            const clickX = event.clientX;
+            const clickY = event.clientY;
+
+            cardElement.classList.add('active-select');
+            const innerBack = cardElement.querySelector('.flip-card-front');
+            innerBack.classList.remove('border-indigo-500/20', 'border-pink-500/20');
+            innerBack.classList.add('bg-slate-800', 'border-amber-400', 'scale-95');
+
+            if (!selectedFirstCard) {
+                selectedFirstCard = cardElement;
+            } else {
+                const firstPairId = selectedFirstCard.dataset.pairId;
+                const secondPairId = cardElement.dataset.pairId;
+                const firstType = selectedFirstCard.dataset.type;
+                const secondType = cardElement.dataset.type;
+
+                if (firstPairId === secondPairId && firstType !== secondType) {
+                    playSuccessSound();
+                    gridMatchesMade++;
+                    document.getElementById('matchProgress').textContent = `${gridMatchesMade} / ${gridPairsCount}`;
+
+                    const firstCard = selectedFirstCard;
+                    const secondCard = cardElement;
+
+                    [firstCard, secondCard].forEach(card => {
+                        card.classList.add('matched');
+                        card.classList.remove('active-select');
+                        
+                        const front = card.querySelector('.flip-card-front');
+                        front.classList.remove('bg-slate-800', 'scale-95', 'border-amber-400');
+                        front.classList.add('bg-emerald-950/30', 'border-emerald-500/60', 'opacity-50', 'pointer-events-none');
+                        front.style.filter = "grayscale(30%)";
+                    });
+
+                    triggerParticleExplosion(clickX, clickY, true);
+                    selectedFirstCard = null;
+
+                    if (gridMatchesMade === gridPairsCount) {
+                        setTimeout(endGridGame, 600);
+                    }
+                } else {
+                    playFailSound();
+                    triggerParticleExplosion(clickX, clickY, false);
+
+                    const firstCard = selectedFirstCard;
+                    const secondCard = cardElement;
+
+                    [firstCard, secondCard].forEach(card => {
+                        const front = card.querySelector('.flip-card-front');
+                        front.classList.remove('border-amber-400');
+                        front.classList.add('border-rose-500/80', 'bg-rose-950/10');
+                    });
+
+                    setTimeout(() => {
+                        [firstCard, secondCard].forEach(card => {
+                            card.classList.remove('active-select');
+                            const front = card.querySelector('.flip-card-front');
+                            front.classList.remove('border-rose-500/80', 'bg-rose-950/10', 'bg-slate-800', 'scale-95');
+                            
+                            const isState = card.dataset.type === 'state';
+                            if (isState) {
+                                front.classList.add('border-indigo-500/20');
+                            } else {
+                                front.classList.add('border-pink-500/20');
+                            }
+                        });
+                    }, 600);
+
+                    selectedFirstCard = null;
+                }
+            }
+        }
+
+        function endGridGame() {
+            let isNewHigh = false;
+            if (!statsData.gridHighScore || gridTotalClicks < statsData.gridHighScore) {
+                statsData.gridHighScore = gridTotalClicks;
+                isNewHigh = true;
+            }
+
+            statsData.gamesPlayed++;
+            statsData.accuracyStats.correct += gridPairsCount;
+            statsData.accuracyStats.total += gridTotalClicks / 2;
+            saveStatsToStorage();
+
+            document.getElementById('modalScoreText').textContent = gridTotalClicks + " clicks";
+            document.getElementById('modalStreakText').textContent = "Completed Grid";
+            document.getElementById('modalAccuracyText').textContent = Math.round((gridPairsCount / (gridTotalClicks/2)) * 100) + "%";
+            
+            const banner = document.getElementById('highScoreBanner');
+            if (isNewHigh) banner.classList.remove('hidden');
+            else banner.classList.add('hidden');
+
+            document.getElementById('gameOverModal').classList.remove('hidden');
+        }
+
+
+        // ================= SPELL RUSH (SCRAMBLE SOLVER) GAME LOGIC =================
+        function startScrambleMode() {
+            playClickSound();
+            currentGameMode = 'scramble';
+            document.getElementById('menuSection').classList.add('hidden');
+            document.getElementById('scrambleModeSection').classList.remove('hidden');
+
+            scrambleScore = 0;
+            scrambleRoundIndex = 0;
+            scrambleTimeLeft = 45;
+            scrambleAccuracy = { correct: 0, total: 0 };
+
+            document.getElementById('scrambleScore').textContent = '0';
+            document.getElementById('scrambleSolvedCount').textContent = '0 / 5';
+
+            clearInterval(scrambleTimer);
+            scrambleTimer = setInterval(() => {
+                scrambleTimeLeft--;
+                document.getElementById('scrambleTimerText').textContent = scrambleTimeLeft + "s";
+                if (scrambleTimeLeft <= 10) {
+                    document.getElementById('scrambleTimerText').className = "text-xl font-black text-red-500 fun-font animate-pulse";
+                    playBeep(330, 'sine', 0.05);
+                } else {
+                    document.getElementById('scrambleTimerText').className = "text-xl font-black text-rose-400 fun-font";
+                }
+
+                if (scrambleTimeLeft <= 0) {
+                    endScrambleGame();
+                }
+            }, 1000);
+
+            nextScrambleQuestion();
+        }
+
+        function nextScrambleQuestion() {
+            if (scrambleRoundIndex >= 5) {
+                endScrambleGame();
+                return;
+            }
+
+            scrambleCurrentState = US_STATES[Math.floor(Math.random() * US_STATES.length)];
+            scrambleCurrentCapital = scrambleCurrentState.capital;
+            scrambleBuiltWord = [];
+
+            document.getElementById('scrambleState').textContent = scrambleCurrentState.name;
+            document.getElementById('scrambleSolvedCount').textContent = `${scrambleRoundIndex} / 5`;
+
+            // Prepare letter pool. We scramble the letters.
+            // Split by characters, preserving spaces (represented elegantly)
+            const chars = scrambleCurrentCapital.split("");
+            
+            // To make it fun, we map each letter with a unique ID so we can toggle state
+            scrambleSourceLetters = chars.map((char, index) => ({
+                id: `scramble-letter-${index}`,
+                char: char,
+                used: false
+            }));
+
+            // Shuffle pool
+            scrambleSourceLetters.sort(() => Math.random() - 0.5);
+
+            renderScrambleUI();
+        }
+
+        function renderScrambleUI() {
+            // Render Target slots built so far
+            const builtContainer = document.getElementById('builtWordContainer');
+            builtContainer.innerHTML = "";
+
+            if (scrambleBuiltWord.length === 0) {
+                const placeholder = document.createElement('span');
+                placeholder.className = "text-slate-500 text-sm italic py-2 font-medium";
+                placeholder.textContent = "Tap letters below to spell...";
+                builtContainer.appendChild(placeholder);
+            } else {
+                scrambleBuiltWord.forEach(letterObj => {
+                    const box = document.createElement('div');
+                    box.className = "w-10 h-11 md:w-11 md:h-12 bg-indigo-950/80 border-2 border-indigo-500 text-white font-black text-xl flex items-center justify-center rounded-xl shadow-md animate-pop cursor-pointer";
+                    box.textContent = letterObj.char === " " ? "␣" : letterObj.char;
+                    // Tapping slot can remove it
+                    box.onclick = () => removeLetterFromBuilt(letterObj);
+                    builtContainer.appendChild(box);
+                });
+            }
+
+            // Render Source interactive tiles
+            const sourceContainer = document.getElementById('sourceLettersContainer');
+            sourceContainer.innerHTML = "";
+
+            scrambleSourceLetters.forEach(letterObj => {
+                const btn = document.createElement('button');
+                btn.className = `w-11 h-11 md:w-12 md:h-12 font-black text-lg md:text-xl rounded-xl transition duration-150 flex items-center justify-center border-2 shadow-lg active:scale-95 
+                    ${letterObj.used 
+                        ? 'bg-slate-950/40 border-slate-800 text-slate-700 pointer-events-none opacity-20' 
+                        : 'bg-slate-900 hover:bg-cyan-950/40 border-cyan-500/30 hover:border-cyan-400 text-slate-100'}`;
+                
+                // Show spaces nicely
+                btn.textContent = letterObj.char === " " ? "SPACE" : letterObj.char;
+                if (letterObj.char === " ") {
+                    btn.className += " px-4 w-auto";
+                }
+
+                btn.onclick = (e) => {
+                    playClickSound();
+                    addLetterToBuilt(letterObj, e);
+                };
+                sourceContainer.appendChild(btn);
+            });
+        }
+
+        function addLetterToBuilt(letterObj, event) {
+            letterObj.used = true;
+            scrambleBuiltWord.push(letterObj);
+            renderScrambleUI();
+
+            // Auto check if we have placed all letters
+            if (scrambleBuiltWord.length === scrambleCurrentCapital.length) {
+                checkScrambleAnswer(event);
+            }
+        }
+
+        function removeLetterFromBuilt(letterObj) {
+            playClickSound();
+            // find index in built word
+            const idx = scrambleBuiltWord.findIndex(item => item.id === letterObj.id);
+            if (idx !== -1) {
+                scrambleBuiltWord.splice(idx, 1);
+            }
+            // Mark letter as unused again
+            const sourceObj = scrambleSourceLetters.find(item => item.id === letterObj.id);
+            if (sourceObj) {
+                sourceObj.used = false;
+            }
+            renderScrambleUI();
+        }
+
+        function clearBuiltWord() {
+            playClickSound();
+            scrambleBuiltWord = [];
+            scrambleSourceLetters.forEach(l => l.used = false);
+            renderScrambleUI();
+        }
+
+        function backspaceBuiltWord() {
+            if (scrambleBuiltWord.length === 0) return;
+            playClickSound();
+            const last = scrambleBuiltWord.pop();
+            const sourceObj = scrambleSourceLetters.find(item => item.id === last.id);
+            if (sourceObj) {
+                sourceObj.used = false;
+            }
+            renderScrambleUI();
+        }
+
+        function checkScrambleAnswer(event) {
+            scrambleAccuracy.total++;
+            const guess = scrambleBuiltWord.map(l => l.char).join("");
+            
+            // Check spelling case-insensitively for safety, but ideal match is exact
+            if (guess.toLowerCase() === scrambleCurrentCapital.toLowerCase()) {
+                // Success!
+                scrambleAccuracy.correct++;
+                playSuccessSound();
+                scrambleRoundIndex++;
+                
+                // Award points
+                const bonus = scrambleTimeLeft > 25 ? 150 : 100;
+                scrambleScore += bonus;
+                document.getElementById('scrambleScore').textContent = scrambleScore;
+
+                // Fire fireworks/particles
+                const containerRect = document.getElementById('builtWordContainer').getBoundingClientRect();
+                triggerParticleExplosion(containerRect.left + containerRect.width / 2, containerRect.top + containerRect.height / 2, true);
+
+                // Flash Green board briefly
+                const buildBox = document.getElementById('builtWordContainer').parentElement;
+                buildBox.classList.add('border-emerald-500', 'bg-emerald-950/20');
+
+                setTimeout(() => {
+                    buildBox.classList.remove('border-emerald-500', 'bg-emerald-950/20');
+                    if (currentGameMode === 'scramble') {
+                        nextScrambleQuestion();
+                    }
+                }, 1000);
+
+            } else {
+                // Wrong assembly
+                playFailSound();
+                scrambleAccuracy.total++; // counted as wrong try
+
+                const buildBox = document.getElementById('builtWordContainer').parentElement;
+                buildBox.classList.add('border-rose-500', 'bg-rose-950/20', 'animate-shake');
+
+                const containerRect = document.getElementById('builtWordContainer').getBoundingClientRect();
+                triggerParticleExplosion(containerRect.left + containerRect.width / 2, containerRect.top + containerRect.height / 2, false);
+
+                setTimeout(() => {
+                    buildBox.classList.remove('border-rose-500', 'bg-rose-950/20', 'animate-shake');
+                    // Reset letters so kids can try again
+                    clearBuiltWord();
+                }, 1000);
+            }
+        }
+
+        // Keyboard support to type spelling directly!
+        document.addEventListener('keydown', (e) => {
+            if (currentGameMode !== 'scramble') return;
+
+            // Backspace/Delete keys
+            if (e.key === 'Backspace') {
+                backspaceBuiltWord();
+                return;
+            }
+            if (e.key === 'Escape') {
+                clearBuiltWord();
+                return;
+            }
+
+            // Find key in remaining source letters (case insensitive match)
+            const targetChar = e.key.toLowerCase();
+            const availableLetter = scrambleSourceLetters.find(item => !item.used && item.char.toLowerCase() === targetChar);
+            
+            if (availableLetter) {
+                playClickSound();
+                addLetterToBuilt(availableLetter, null);
+            }
+        });
+
+        function endScrambleGame() {
+            clearInterval(scrambleTimer);
+            const accuracy = scrambleAccuracy.total > 0 
+                ? Math.round((scrambleAccuracy.correct / scrambleAccuracy.total) * 100)
+                : 0;
+
+            let isNewHigh = false;
+            if (scrambleScore > statsData.scrambleHighScore) {
+                statsData.scrambleHighScore = scrambleScore;
+                isNewHigh = true;
+            }
+
+            statsData.gamesPlayed++;
+            statsData.accuracyStats.correct += scrambleAccuracy.correct;
+            statsData.accuracyStats.total += scrambleAccuracy.total;
+            saveStatsToStorage();
+
+            document.getElementById('modalScoreText').textContent = scrambleScore + " pts";
+            document.getElementById('modalStreakText').textContent = scrambleRoundIndex + " words solved";
+            document.getElementById('modalAccuracyText').textContent = accuracy + "%";
+
+            const banner = document.getElementById('highScoreBanner');
+            if (isNewHigh) banner.classList.remove('hidden');
+            else banner.classList.add('hidden');
+
+            document.getElementById('gameOverModal').classList.remove('hidden');
+        }
+
+
+        // ================= TRUE OR FALSE BLITZ GAME LOGIC =================
+        function startTrueFalseMode() {
+            playClickSound();
+            currentGameMode = 'truefalse';
+            document.getElementById('menuSection').classList.add('hidden');
+            document.getElementById('trueFalseSection').classList.remove('hidden');
+
+            tfScore = 0;
+            tfStreak = 0;
+            tfTimeLeft = 30;
+            tfAccuracy = { correct: 0, total: 0 };
+
+            document.getElementById('tfScore').textContent = '0';
+            document.getElementById('tfStreak').textContent = '0 🔥';
+
+            clearInterval(tfTimer);
+            tfTimer = setInterval(() => {
+                tfTimeLeft--;
+                document.getElementById('tfTimerText').textContent = tfTimeLeft + "s";
+                if (tfTimeLeft <= 10) {
+                    document.getElementById('tfTimerText').className = "text-xl font-black text-red-500 fun-font animate-pulse";
+                    playBeep(330, 'sine', 0.05);
+                } else {
+                    document.getElementById('tfTimerText').className = "text-xl font-black text-rose-400 fun-font";
+                }
+
+                if (tfTimeLeft <= 0) {
+                    endTrueFalseGame();
+                }
+            }, 1000);
+
+            nextTrueFalseQuestion();
+        }
+
+        function nextTrueFalseQuestion() {
+            // Pick a random state
+            const targetState = US_STATES[Math.floor(Math.random() * US_STATES.length)];
+            tfCurrentItem = targetState;
+
+            // 50% chance statement is Correct
+            tfCurrentCorrectAnswer = Math.random() < 0.5;
+
+            let displayedCapital = targetState.capital;
+            if (!tfCurrentCorrectAnswer) {
+                // Pick a wrong capital
+                const wrongPool = US_STATES.filter(s => s.capital !== targetState.capital);
+                displayedCapital = wrongPool[Math.floor(Math.random() * wrongPool.length)].capital;
+            }
+
+            const statementText = `The capital of <span class="text-indigo-400 font-extrabold">${targetState.name}</span> is <span class="text-amber-400 font-extrabold">${displayedCapital}</span>.`;
+            document.getElementById('tfStatementText').innerHTML = statementText;
+
+            // Trigger visual animation card pop
+            const tfCard = document.getElementById('tfCard');
+            tfCard.classList.remove('animate-pop');
+            void tfCard.offsetWidth;
+            tfCard.classList.add('animate-pop');
+        }
+
+        function submitTrueFalseAnswer(userChoice) {
+            tfAccuracy.total++;
+            const isCorrect = (userChoice === tfCurrentCorrectAnswer);
+
+            const card = document.getElementById('tfCard');
+            const rect = card.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            if (isCorrect) {
+                tfAccuracy.correct++;
+                tfStreak++;
+                
+                let pointsEarned = 100;
+                // Streak bonuses
+                if (tfStreak >= 10) {
+                    pointsEarned = 300;
+                    playStreakSound();
+                } else if (tfStreak >= 5) {
+                    pointsEarned = 200;
+                    playStreakSound();
+                } else {
+                    playBeep(523.25, 'triangle', 0.12);
+                }
+
+                tfScore += pointsEarned;
+                document.getElementById('tfScore').textContent = tfScore;
+                document.getElementById('tfStreak').textContent = tfStreak + " 🔥";
+
+                // Visual flash green
+                card.classList.add('border-emerald-500', 'bg-emerald-950/20');
+                triggerParticleExplosion(centerX, centerY, true);
+
+                setTimeout(() => {
+                    card.classList.remove('border-emerald-500', 'bg-emerald-950/20');
+                    if (currentGameMode === 'truefalse' && tfTimeLeft > 0) {
+                        nextTrueFalseQuestion();
+                    }
+                }, 400);
+
+            } else {
+                tfStreak = 0;
+                playFailSound();
+                document.getElementById('tfStreak').textContent = "0 🔥";
+
+                // Visual flash red
+                card.classList.add('border-rose-500', 'bg-rose-950/20');
+                triggerParticleExplosion(centerX, centerY, false);
+
+                // Time deduction penalty
+                tfTimeLeft = Math.max(0, tfTimeLeft - 4);
+
+                setTimeout(() => {
+                    card.classList.remove('border-rose-500', 'bg-rose-950/20');
+                    if (currentGameMode === 'truefalse' && tfTimeLeft > 0) {
+                        nextTrueFalseQuestion();
+                    }
+                }, 400);
+            }
+        }
+
+        // Left/Right Arrow keys trigger True/False respectively!
+        document.addEventListener('keydown', (e) => {
+            if (currentGameMode !== 'truefalse') return;
+            if (e.key === 'ArrowLeft') {
+                submitTrueFalseAnswer(true);
+            } else if (e.key === 'ArrowRight') {
+                submitTrueFalseAnswer(false);
+            }
+        });
+
+        function endTrueFalseGame() {
+            clearInterval(tfTimer);
+            const accuracy = tfAccuracy.total > 0 
+                ? Math.round((tfAccuracy.correct / tfAccuracy.total) * 100)
+                : 0;
+
+            let isNewHigh = false;
+            if (tfScore > statsData.tfHighScore) {
+                statsData.tfHighScore = tfScore;
+                isNewHigh = true;
+            }
+
+            statsData.gamesPlayed++;
+            statsData.accuracyStats.correct += tfAccuracy.correct;
+            statsData.accuracyStats.total += tfAccuracy.total;
+            saveStatsToStorage();
+
+            document.getElementById('modalScoreText').textContent = tfScore + " pts";
+            document.getElementById('modalStreakText').textContent = tfStreak + " max streak";
+            document.getElementById('modalAccuracyText').textContent = accuracy + "%";
+
+            const banner = document.getElementById('highScoreBanner');
+            if (isNewHigh) banner.classList.remove('hidden');
+            else banner.classList.add('hidden');
+
+            document.getElementById('gameOverModal').classList.remove('hidden');
+        }
+
+
+        // --- GENERAL HELPERS / OVERRIDES ---
+        function replayCurrentMode() {
+            document.getElementById('gameOverModal').classList.add('hidden');
+            if (currentGameMode === 'dash') {
+                startDashMode();
+            } else if (currentGameMode === 'grid') {
+                startMatchMode();
+            } else if (currentGameMode === 'scramble') {
+                startScrambleMode();
+            } else if (currentGameMode === 'truefalse') {
+                startTrueFalseMode();
+            }
+        }
+
+        function openStatsModal() {
+            playClickSound();
+            loadStatsFromStorage();
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+
+        function closeStatsModal() {
+            playClickSound();
+            document.getElementById('statsModal').classList.add('hidden');
+        }
+
+        function requestCloudUpgrade() {
+            playSuccessSound();
+            alert("Upgrade Feature: To connect your score to a real-time multiplayer leaderboard or backup your stats across all devices, cloud-save accounts can be implemented. Enjoy playing!");
+        }
+
+        window.onload = function() {
+            loadStatsFromStorage();
+            showRandomFact();
+        }
+    </script>
+</body>
+</html>
+

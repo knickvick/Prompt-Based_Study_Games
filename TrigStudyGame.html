@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trig Mastery: The Ultimate Trigonometry Study Game</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for beautiful math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #030712);
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        /* Keyframe animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Custom glassmorphism classes */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-button {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.2);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header Section -->
+    <header class="w-full py-4 px-6 border-b border-gray-800 glass-panel sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold heading-font tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
+                        TrigMastery
+                    </h1>
+                    <p class="text-xs text-gray-400">Trigonometric Ratios Study Game</p>
+                </div>
+            </div>
+
+            <!-- Global Score / Badges / Achievements Panel -->
+            <div class="flex items-center gap-4 text-sm">
+                <div class="bg-indigo-950/40 border border-indigo-800/50 rounded-lg px-3 py-1.5 flex items-center gap-2">
+                    <i class="fa-solid fa-crown text-amber-400"></i>
+                    <span class="text-gray-300 font-medium">Rank: <span id="rank-display" class="text-white font-semibold">Novice</span></span>
+                </div>
+                <div class="bg-purple-950/40 border border-purple-800/50 rounded-lg px-3 py-1.5 flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-orange-500 animate-pulse"></i>
+                    <span class="text-gray-300 font-medium">Streak: <span id="streak-display" class="text-white font-semibold">0</span></span>
+                </div>
+                <div class="bg-gray-900/60 border border-gray-800 rounded-lg px-3 py-1.5 flex items-center gap-2">
+                    <i class="fa-solid fa-star text-yellow-400"></i>
+                    <span class="text-gray-300 font-medium">XP: <span id="xp-display" class="text-white font-semibold">0</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 md:py-12">
+        
+        <!-- ================= HOME SCREEN ================= -->
+        <section id="screen-home" class="space-y-12">
+            <!-- Hero / Intro -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <span class="px-3 py-1 text-xs font-semibold text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 rounded-full inline-block">
+                        Ready for your Trigonometry Test?
+                    </span>
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-black heading-font tracking-tight leading-none text-white">
+                        Conquer Ratios, <br>
+                        <span class="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Own the Unit Circle</span>
+                    </h2>
+                    <p class="text-gray-400 text-lg max-w-xl mx-auto lg:mx-0">
+                        Stop memorizing blind equations. Play interactive games to visualize and master Sine, Cosine, Tangent, and their reciprocals for any angle or triangle.
+                    </p>
+                    
+                    <!-- Quick Reference Trigger -->
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
+                        <button onclick="openModal('cheatsheet-modal')" class="glass-button px-5 py-3 rounded-xl flex items-center gap-2 text-indigo-300 hover:text-white text-sm">
+                            <i class="fa-solid fa-book-open"></i> Quick Formula Sheet
+                        </button>
+                        <button onclick="resetProgress()" class="glass-button px-5 py-3 rounded-xl flex items-center gap-2 text-rose-400 hover:text-rose-300 text-sm">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Progress
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 flex justify-center">
+                    <!-- Rotating Visual Representation representing unit circle & triangles -->
+                    <div class="relative w-72 h-72 md:w-80 md:h-80 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                        <!-- Circle border -->
+                        <div class="absolute w-64 h-64 border-2 border-dashed border-indigo-500/20 rounded-full animate-[spin_40s_linear_infinite] flex items-center justify-center">
+                            <div class="w-4 h-4 rounded-full bg-indigo-400 absolute top-0"></div>
+                            <div class="w-4 h-4 rounded-full bg-purple-400 absolute bottom-0"></div>
+                        </div>
+                        <!-- Inner Triangle representation -->
+                        <div class="glass-panel w-48 h-48 rounded-2xl flex flex-col justify-center items-center gap-2 p-6 floating shadow-2xl relative border-indigo-500/30">
+                            <div class="absolute -top-3 -right-3 bg-indigo-500 text-xs px-2.5 py-1 rounded-md font-bold shadow-md">SOH CAH TOA</div>
+                            <svg width="100" height="80" viewBox="0 0 100 80" class="text-indigo-400 stroke-current fill-none stroke-2">
+                                <polygon points="10,70 90,70 90,10" class="stroke-indigo-400" />
+                                <rect x="82" y="62" width="8" height="8" class="stroke-indigo-400 fill-indigo-500/10" />
+                                <path d="M 22 70 A 12 12 0 0 0 18 62" />
+                            </svg>
+                            <span class="text-xs font-semibold text-gray-300">$$\sin(\theta) = \frac{\text{Opposite}}{\text{Hypotenuse}}$$</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Modes Cards Grid -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold heading-font text-white border-l-4 border-indigo-500 pl-3">Choose a Study Module</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- MODULE 1: TRIG RUSH -->
+                    <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-10 -mt-10 group-hover:scale-125 transition-transform"></div>
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-stopwatch"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-white heading-font">Trig Rush (Time Attack)</h4>
+                                <p class="text-sm text-gray-400 mt-2">
+                                    Beat the clock! Solve rapid-fire questions on values, ratios, and reciprocals. Build your mental accuracy.
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="startTrigRush()" class="mt-6 w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+                            Play Trig Rush <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- MODULE 2: UNIT CIRCLE EXPLORER -->
+                    <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between hover:border-purple-500/50 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full -mr-10 -mt-10 group-hover:scale-125 transition-transform"></div>
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-circle-dot"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-white heading-font">Unit Circle Explorer</h4>
+                                <p class="text-sm text-gray-400 mt-2">
+                                    Interactive visual playground. Move the angle to view coordinates $$(x, y)$$, degrees, radians, and all six trigonometric values in real time.
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="startUnitCircleExplorer()" class="mt-6 w-full py-3 px-4 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+                            Explore Circle <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- MODULE 3: TRIANGLE SOLVER -->
+                    <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500/50 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-10 -mt-10 group-hover:scale-125 transition-transform"></div>
+                        <div class="space-y-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-white heading-font">Right-Angle Quest</h4>
+                                <p class="text-sm text-gray-400 mt-2">
+                                    Analyze randomly generated triangles. Calculate the missing values and apply basic ratios to solve the mystery.
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="startTriangleSolver()" class="mt-6 w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
+                            Solve Triangles <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Conceptual Breakdown Section -->
+            <div class="glass-panel rounded-3xl p-8 space-y-6">
+                <h3 class="text-2xl font-bold text-white heading-font">Test Syllabus & Breakdown</h3>
+                <p class="text-gray-300">Our study companion tracks your expertise across all high school and pre-calculus test standards:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                    <div class="p-4 rounded-xl bg-gray-900/40 border border-gray-800 space-y-2">
+                        <span class="text-indigo-400 font-bold">Standard 1</span>
+                        <h4 class="font-semibold text-white">SOH CAH TOA Basics</h4>
+                        <p class="text-gray-400 text-xs">$$\sin(\theta) = O/H$$, $$\cos(\theta) = A/H$$, $$\tan(\theta) = O/A$$. Understand definitions relative to reference angles.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-900/40 border border-gray-800 space-y-2">
+                        <span class="text-purple-400 font-bold">Standard 2</span>
+                        <h4 class="font-semibold text-white">Reciprocal Ratios</h4>
+                        <p class="text-gray-400 text-xs">Cosecant ($$\csc = H/O$$), Secant ($$\sec = H/A$$), and Cotangent ($$\cot = A/O$$).</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-900/40 border border-gray-800 space-y-2">
+                        <span class="text-emerald-400 font-bold">Standard 3</span>
+                        <h4 class="font-semibold text-white">The Unit Circle</h4>
+                        <p class="text-gray-400 text-xs">Degrees to Radians, Quadrant signs (ASTC), and $$(x, y)$$ coordinates as $$(\cos \theta, \sin \theta)$$.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN: TRIG RUSH (TIME ATTACK) ================= -->
+        <section id="screen-rush" class="hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 border-b border-gray-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="showScreen('home')" class="p-2 rounded-lg bg-gray-900 text-gray-400 hover:text-white hover:bg-gray-800">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white heading-font">Trig Rush Mode</h2>
+                        <p class="text-xs text-gray-400">Answer as many as you can before the time expires!</p>
+                    </div>
+                </div>
+
+                <!-- Live Game Metrics -->
+                <div class="flex items-center gap-4">
+                    <div class="px-4 py-2 rounded-xl bg-indigo-950/50 border border-indigo-800 text-center min-w-[80px]">
+                        <p class="text-xs text-indigo-300">Score</p>
+                        <p id="rush-score" class="text-lg font-bold text-white">0</p>
+                    </div>
+                    <div class="px-4 py-2 rounded-xl bg-rose-950/50 border border-rose-800 text-center min-w-[80px]">
+                        <p class="text-xs text-rose-300">Time Left</p>
+                        <p id="rush-timer" class="text-lg font-bold text-white">60s</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Play Zone -->
+            <div id="rush-setup" class="max-w-md mx-auto text-center space-y-6 py-12">
+                <i class="fa-solid fa-stopwatch text-6xl text-indigo-500 animate-pulse"></i>
+                <div class="space-y-2">
+                    <h3 class="text-2xl font-bold text-white">Ready for the challenge?</h3>
+                    <p class="text-gray-400 text-sm">Select your difficulty level. Higher difficulty grants more XP per correct answer.</p>
+                </div>
+                
+                <div class="flex flex-col gap-3">
+                    <button onclick="startRushSession('easy')" class="p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-left hover:bg-emerald-950/40 transition-all flex justify-between items-center group">
+                        <div>
+                            <p class="font-bold text-white">Easy Mode</p>
+                            <p class="text-xs text-emerald-400">Basic ratios ($$\sin, \cos, \tan$$) of simple angles ($$0^\circ, 90^\circ$$, basic triangle sides)</p>
+                        </div>
+                        <span class="bg-emerald-500 text-black text-xs font-bold px-2 py-1 rounded">10 XP/item</span>
+                    </button>
+
+                    <button onclick="startRushSession('medium')" class="p-4 rounded-xl border border-yellow-500/30 bg-yellow-950/20 text-left hover:bg-yellow-950/40 transition-all flex justify-between items-center group">
+                        <div>
+                            <p class="font-bold text-white">Medium Mode</p>
+                            <p class="text-xs text-yellow-400">Includes reciprocals ($$\csc, \sec, \cot$$), key radian measures, and special values</p>
+                        </div>
+                        <span class="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">20 XP/item</span>
+                    </button>
+
+                    <button onclick="startRushSession('hard')" class="p-4 rounded-xl border border-rose-500/30 bg-rose-950/20 text-left hover:bg-rose-950/40 transition-all flex justify-between items-center group">
+                        <div>
+                            <p class="font-bold text-white">Hard Mode (All-Out)</p>
+                            <p class="text-xs text-rose-400">Negative angles, values above $$360^\circ$$, hard algebraic equivalents</p>
+                        </div>
+                        <span class="bg-rose-500 text-black text-xs font-bold px-2 py-1 rounded">40 XP/item</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Rush Session Arena -->
+            <div id="rush-arena" class="hidden max-w-xl mx-auto space-y-8 py-4">
+                <div class="glass-panel rounded-2xl p-8 space-y-6 text-center relative border-indigo-500/20 glow-blue">
+                    <!-- Progress Bar -->
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gray-800 rounded-t-2xl overflow-hidden">
+                        <div id="rush-progress" class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <span id="rush-badge" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-950/80 border border-indigo-800 text-indigo-300">Category: Standard</span>
+                        <div id="rush-question" class="text-3xl md:text-4xl font-bold tracking-tight text-white py-4 flex justify-center items-center">
+                            <!-- Injected question mathematically -->
+                        </div>
+                    </div>
+
+                    <!-- Multiple Choices -->
+                    <div id="rush-options" class="grid grid-cols-2 gap-4">
+                        <!-- Instantiated buttons dynamically -->
+                    </div>
+
+                    <div id="rush-feedback" class="h-6 text-sm font-semibold transition-all"></div>
+                </div>
+
+                <!-- Cheat Tip card below -->
+                <div class="bg-gray-900/60 border border-gray-800 p-4 rounded-xl text-xs flex gap-3 text-gray-400">
+                    <i class="fa-solid fa-lightbulb text-indigo-400 text-base flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <span class="font-semibold text-gray-200">Tip:</span> 
+                        Remember your special right triangle ratios. An angle of $$30^\circ$$ ($$\pi/6$$) has standard coordinate points $$(\frac{\sqrt{3}}{2}, \frac{1}{2})$$. Therefore, $$\sin(30^\circ) = 1/2$$ and $$\csc(30^\circ) = 2$$.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rush Complete Screen -->
+            <div id="rush-results" class="hidden max-w-md mx-auto text-center space-y-6 py-12 glass-panel rounded-2xl p-8 border-indigo-500/20">
+                <i class="fa-solid fa-trophy text-6xl text-amber-400 animate-bounce"></i>
+                <div class="space-y-2">
+                    <h3 class="text-3xl font-black heading-font text-white">Session Complete!</h3>
+                    <p class="text-gray-400 text-sm">Excellent effort on trying the trigonometric drills!</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 py-4">
+                    <div class="p-3 bg-indigo-950/40 border border-indigo-800/40 rounded-xl">
+                        <p class="text-xs text-indigo-300">Total Correct</p>
+                        <p id="results-correct" class="text-2xl font-bold text-white">0</p>
+                    </div>
+                    <div class="p-3 bg-purple-950/40 border border-purple-800/40 rounded-xl">
+                        <p class="text-xs text-purple-300">XP Earned</p>
+                        <p id="results-xp" class="text-2xl font-bold text-white">0</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <button onclick="startTrigRush()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl">
+                        Play Again
+                    </button>
+                    <button onclick="showScreen('home')" class="w-full py-3 glass-button text-gray-300 font-semibold rounded-xl">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN: UNIT CIRCLE EXPLORER ================= -->
+        <section id="screen-explorer" class="hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 border-b border-gray-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="showScreen('home')" class="p-2 rounded-lg bg-gray-900 text-gray-400 hover:text-white hover:bg-gray-800">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white heading-font">Interactive Unit Circle</h2>
+                        <p class="text-xs text-gray-400">Drag or use preset angles to visualize formulas, signs, and trig coordinates.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Interactive Canvas Unit Circle Column -->
+                <div class="lg:col-span-7 flex flex-col items-center gap-6 glass-panel p-6 rounded-2xl border-gray-800">
+                    
+                    <!-- Presets Selector -->
+                    <div class="w-full space-y-2">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 text-center lg:text-left">Quick Angle Presets</p>
+                        <div class="flex flex-wrap justify-center lg:justify-start gap-1.5" id="presets-container">
+                            <!-- Preset Buttons injected via JS -->
+                        </div>
+                    </div>
+
+                    <!-- SVG Canvas -->
+                    <div class="relative w-full max-w-[400px] aspect-square flex items-center justify-center bg-gray-950/60 rounded-xl border border-gray-800 p-4">
+                        <svg id="unit-circle-svg" viewBox="-120 -120 240 240" class="w-full h-full select-none cursor-pointer">
+                            <!-- Grid lines & Axes -->
+                            <line x1="-110" y1="0" x2="110" y2="0" class="stroke-gray-800 stroke-[1.5]" />
+                            <line x1="0" y1="-110" x2="0" y2="110" class="stroke-gray-800 stroke-[1.5]" />
+                            
+                            <!-- Origin ticks -->
+                            <circle cx="0" cy="0" r="1.5" class="fill-gray-400" />
+                            
+                            <!-- Unit Circle Outline -->
+                            <circle cx="0" cy="0" r="90" class="fill-none stroke-gray-700 stroke-2" />
+
+                            <!-- Angle fill pie -->
+                            <path id="svg-angle-pie" d="" class="fill-indigo-500/10" />
+
+                            <!-- Angle sector line -->
+                            <line id="svg-hypotenuse" x1="0" y1="0" x2="90" y2="0" class="stroke-indigo-400 stroke-[3]" />
+
+                            <!-- Trigonometric Projection components visually plotted -->
+                            <!-- Sine line (vertical, opposite) -->
+                            <line id="svg-sine-line" x1="90" y1="0" x2="90" y2="0" class="stroke-emerald-400 stroke-2" stroke-dasharray="2,2" />
+                            <!-- Cosine line (horizontal, adjacent) -->
+                            <line id="svg-cosine-line" x1="0" y1="0" x2="90" y2="0" class="stroke-blue-400 stroke-2" stroke-dasharray="2,2" />
+
+                            <!-- Active Drag Handle -->
+                            <circle id="svg-handle" cx="90" cy="0" r="7" class="fill-indigo-500 stroke-white stroke-2 cursor-pointer hover:scale-125 transition-transform" />
+
+                            <!-- Axis labels -->
+                            <text x="100" y="-4" class="fill-gray-500 text-[10px] font-bold">x</text>
+                            <text x="4" y="-100" class="fill-gray-500 text-[10px] font-bold">y</text>
+                        </svg>
+
+                        <!-- Absolute quadrants indicators -->
+                        <span class="absolute top-6 left-6 text-xs text-gray-600 font-bold tracking-widest">QII</span>
+                        <span class="absolute top-6 right-6 text-xs text-gray-600 font-bold tracking-widest">QI</span>
+                        <span class="absolute bottom-6 left-6 text-xs text-gray-600 font-bold tracking-widest">QIII</span>
+                        <span class="absolute bottom-6 right-6 text-xs text-gray-600 font-bold tracking-widest">QIV</span>
+                    </div>
+
+                    <!-- Slider fallback for accurate desktop/mobile control -->
+                    <div class="w-full space-y-2">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400 font-semibold">Slide to adjust angle:</span>
+                            <span id="slider-value-display" class="font-bold text-indigo-400 text-lg">0°</span>
+                        </div>
+                        <input type="range" id="angle-slider" min="0" max="360" value="0" step="1" class="w-full accent-indigo-500 h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Math breakdown side panel -->
+                <div class="lg:col-span-5 space-y-6">
+                    <!-- Basic Stats card -->
+                    <div class="glass-panel p-6 rounded-2xl border-gray-800 space-y-4">
+                        <h3 class="text-lg font-bold text-white heading-font border-b border-gray-800 pb-2">Angle Metrics</h3>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-gray-900/60 border border-gray-800 rounded-xl">
+                                <p class="text-xs text-gray-400">Degrees</p>
+                                <p id="metric-degrees" class="text-2xl font-bold text-white">0°</p>
+                            </div>
+                            <div class="p-3 bg-gray-900/60 border border-gray-800 rounded-xl">
+                                <p class="text-xs text-gray-400">Radians</p>
+                                <p id="metric-radians" class="text-lg font-bold text-indigo-400 pt-1">0</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-indigo-950/20 border border-indigo-900/40 rounded-xl">
+                            <p class="text-xs text-indigo-300">Coordinates on Circle $$(x, y) = (\cos \theta, \sin \theta)$$</p>
+                            <p id="metric-coordinates" class="text-base font-bold text-white font-mono pt-1">(1.000, 0.000)</p>
+                        </div>
+                    </div>
+
+                    <!-- All 6 trig function output values -->
+                    <div class="glass-panel p-6 rounded-2xl border-gray-800 space-y-3">
+                        <h3 class="text-lg font-bold text-white heading-font border-b border-gray-800 pb-2">Trigonometric Ratios</h3>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <!-- Sin -->
+                            <div class="p-2.5 rounded-lg bg-gray-900/40 border border-gray-800 flex justify-between items-center">
+                                <span class="font-bold text-blue-400">$$\sin(\theta)$$</span>
+                                <span id="val-sin" class="font-mono text-white">0.00</span>
+                            </div>
+                            <!-- Csc -->
+                            <div class="p-2.5 rounded-lg bg-gray-900/40 border border-gray-800 flex justify-between items-center">
+                                <span class="font-bold text-gray-400">$$\csc(\theta)$$</span>
+                                <span id="val-csc" class="font-mono text-white">Undefined</span>
+                            </div>
+
+                            <!-- Cos -->
+                            <div class="p-2.5 rounded-lg bg-gray-900/40 border border-gray-800 flex justify-between items-center">
+                                <span class="font-bold text-emerald-400">$$\cos(\theta)$$</span>
+                                <span id="val-cos" class="font-mono text-white">1.00</span>
+                            </div>
+                            <!-- Sec -->
+                            <div class="p-2.5 rounded-lg bg-gray-900/40 border border-gray-800 flex justify-between items-center">
+                                <span class="font-bold text-gray-400">$$\sec(\theta)$$</span>
+                                <span id="val-sec" class="font-mono text-white">1.00</span>
+                            </div>
+
+                            <!-- Tan -->
+                            <div class="p-2.5 rounded-lg bg-gray-900/40 border border-gray-800 flex justify-between items-center col-span-2">
+                                <span class="font-bold text-purple-400">$$\tan(\theta)$$</span>
+                                <span id="val-tan" class="font-mono text-white">0.00</span>
+                            </div>
+                            <!-- Cot -->
+                            <div class="p-2.5 rounded-lg bg-gray-900/40 border border-gray-800 flex justify-between items-center col-span-2">
+                                <span class="font-bold text-gray-400">$$\cot(\theta)$$</span>
+                                <span id="val-cot" class="font-mono text-white">Undefined</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN: RIGHT-ANGLE TRIANGLE QUEST ================= -->
+        <section id="screen-solver" class="hidden space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-4 border-b border-gray-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="showScreen('home')" class="p-2 rounded-lg bg-gray-900 text-gray-400 hover:text-white hover:bg-gray-800">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white heading-font">Right-Angle Quest</h2>
+                        <p class="text-xs text-gray-400">Calculate properties & ratios for the given geometric shape.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-400">Completed problems:</span>
+                    <span id="quest-completion-count" class="px-2.5 py-1 text-xs font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-800 rounded">0 solved</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Triangle Canvas Diagram visual -->
+                <div class="lg:col-span-7 glass-panel p-8 rounded-2xl border-gray-800 flex flex-col justify-center items-center gap-6 min-h-[300px]">
+                    <h3 class="text-lg font-bold text-white heading-font text-center w-full">Geometric Reference Diagram</h3>
+                    
+                    <!-- Triangle SVG Container -->
+                    <div class="relative w-full max-w-[340px] aspect-[4/3] flex items-center justify-center bg-gray-950/30 rounded-xl border border-gray-800">
+                        <svg viewBox="0 0 200 150" class="w-full h-full p-6">
+                            <!-- Draw right angle triangle using coordinates -->
+                            <!-- Coordinates: A(30,120) bottom left, B(170,120) bottom right (right angle), C(170,30) top right -->
+                            <polygon points="30,120 170,120 170,30" class="stroke-white stroke-[2.5] fill-indigo-500/10" />
+                            
+                            <!-- Right Angle Indicator Box -->
+                            <rect x="158" y="108" width="12" height="12" class="stroke-white stroke-[1.5] fill-none" />
+                            
+                            <!-- Reference Angle Theta marker at Vertex A -->
+                            <path d="M 50 120 A 20 20 0 0 0 46 108" class="stroke-amber-400 stroke-2 fill-none" />
+                            <text x="52" y="114" class="fill-amber-400 text-[10px] font-bold">θ</text>
+
+                            <!-- Labels dynamically configured -->
+                            <!-- Side a (vertical: Opp) -->
+                            <text x="180" y="80" id="tri-lbl-opp" class="fill-indigo-300 text-[11px] font-bold">Opposite = ?</text>
+                            
+                            <!-- Side b (horizontal: Adj) -->
+                            <text x="90" y="135" id="tri-lbl-adj" class="fill-blue-300 text-[11px] font-bold">Adjacent = ?</text>
+                            
+                            <!-- Side c (hypotenuse) -->
+                            <text x="80" y="65" id="tri-lbl-hyp" class="fill-purple-300 text-[11px] font-bold">Hypotenuse = ?</text>
+                        </svg>
+                    </div>
+
+                    <div class="p-3 bg-gray-900/60 rounded-xl text-center max-w-sm w-full">
+                        <span class="text-xs text-gray-400">Remember standard ratio mappings:</span>
+                        <p class="text-sm font-semibold text-white">$$\sin(\theta) = \frac{\text{Opp}}{\text{Hyp}} \quad \cos(\theta) = \frac{\text{Adj}}{\text{Hyp}} \quad \tan(\theta) = \frac{\text{Opp}}{\text{Adj}}$$</p>
+                    </div>
+                </div>
+
+                <!-- Interactive solve workspace -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-6 rounded-2xl border-gray-800 space-y-6">
+                        <div class="space-y-1">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-amber-400">Challenge Details</span>
+                            <h3 id="quest-task-prompt" class="text-xl font-bold text-white heading-font">
+                                What is the exact value of $$\sin(\theta)$$?
+                            </h3>
+                        </div>
+
+                        <!-- Triangle side information -->
+                        <div class="p-4 bg-gray-900/60 border border-gray-800 rounded-xl space-y-2 text-sm text-gray-300">
+                            <p class="font-semibold text-white">Given triangle values:</p>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                                <li>Opposite Side length = <span id="given-opp-val" class="text-white font-bold">3</span></li>
+                                <li>Adjacent Side length = <span id="given-adj-val" class="text-white font-bold">4</span></li>
+                                <li>Hypotenuse Side length = <span id="given-hyp-val" class="text-white font-bold">5</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- Answer input -->
+                        <div class="space-y-3">
+                            <label class="text-sm text-gray-400 font-semibold block">Select the correct choice:</label>
+                            <div id="quest-options" class="grid grid-cols-1 gap-3">
+                                <!-- Option list inserted dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Status indicator feedback -->
+                        <div id="quest-feedback-banner" class="hidden p-4 rounded-xl text-sm font-semibold text-center transition-all">
+                            <!-- Correct / Incorrect banner -->
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button id="quest-btn-submit" disabled class="hidden w-full py-3 bg-indigo-600 disabled:opacity-50 text-white font-semibold rounded-xl">
+                                Submit Answer
+                            </button>
+                            <button onclick="generateTriangleQuest()" class="w-full py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl">
+                                Next Triangle <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Formula Reference Modal Panel (Cheatsheet) -->
+    <div id="cheatsheet-modal" class="fixed inset-0 z-50 bg-black/75 hidden backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel max-w-2xl w-full rounded-2xl max-h-[85vh] overflow-y-auto border-gray-800 p-6 space-y-6">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 class="text-xl font-bold text-white heading-font">Trig Ratios Cheatsheet</h3>
+                <button onclick="closeModal('cheatsheet-modal')" class="p-1 rounded-lg text-gray-400 hover:text-white bg-gray-900 hover:bg-gray-800">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Content Area of Cheatsheet -->
+            <div class="space-y-6 text-sm">
+                <!-- Basic Ratios -->
+                <div class="space-y-2">
+                    <h4 class="font-bold text-indigo-400 border-b border-gray-800 pb-1">1. Primary Trigonometric Ratios (SOH-CAH-TOA)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Sine ($$\sin$$)</p>
+                            <p class="text-gray-300">$$\sin \theta = \frac{\text{Opposite}}{\text{Hypotenuse}}$$</p>
+                        </div>
+                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Cosine ($$\cos$$)</p>
+                            <p class="text-gray-300">$$\cos \theta = \frac{\text{Adjacent}}{\text{Hypotenuse}}$$</p>
+                        </div>
+                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Tangent ($$\tan$$)</p>
+                            <p class="text-gray-300">$$\tan \theta = \frac{\text{Opposite}}{\text{Adjacent}}$$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reciprocals -->
+                <div class="space-y-2">
+                    <h4 class="font-bold text-purple-400 border-b border-gray-800 pb-1">2. Reciprocal Trigonometric Ratios</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Cosecant ($$\csc$$)</p>
+                            <p class="text-gray-300">$$\csc \theta = \frac{\text{Hyp}}{\text{Opp}} = \frac{1}{\sin\theta}$$</p>
+                        </div>
+                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Secant ($$\sec$$)</p>
+                            <p class="text-gray-300">$$\sec \theta = \frac{\text{Hyp}}{\text{Adj}} = \frac{1}{\cos\theta}$$</p>
+                        </div>
+                        <div class="p-3 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Cotangent ($$\cot$$)</p>
+                            <p class="text-gray-300">$$\cot \theta = \frac{\text{Adj}}{\text{Opp}} = \frac{1}{\tan\theta}$$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quadrants & Sign standard -->
+                <div class="space-y-2">
+                    <h4 class="font-bold text-emerald-400 border-b border-gray-800 pb-1">3. Quadrant Signs: "All Students Take Calculus"</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        <div class="p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Quadrant I ($$0^\circ$$ to $$90^\circ$$)</p>
+                            <p class="text-emerald-400 font-semibold mt-1">All Positive</p>
+                        </div>
+                        <div class="p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Quadrant II ($$90^\circ$$ to $$180^\circ$$)</p>
+                            <p class="text-emerald-400 font-semibold mt-1">Sine ($$\csc$$) only</p>
+                        </div>
+                        <div class="p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Quadrant III ($$180^\circ$$ to $$270^\circ$$)</p>
+                            <p class="text-emerald-400 font-semibold mt-1">Tangent ($$\cot$$) only</p>
+                        </div>
+                        <div class="p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
+                            <p class="font-bold text-white">Quadrant IV ($$270^\circ$$ to $$360^\circ$$)</p>
+                            <p class="text-emerald-400 font-semibold mt-1">Cosine ($$\sec$$) only</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Special Triangles values table -->
+                <div class="space-y-2">
+                    <h4 class="font-bold text-amber-400 border-b border-gray-800 pb-1">4. Common Angles Reference</h4>
+                    <div class="overflow-x-auto rounded-lg border border-gray-800">
+                        <table class="w-full text-left text-xs bg-gray-900/40">
+                            <thead class="bg-gray-800/80 text-gray-300">
+                                <tr>
+                                    <th class="p-2 border-b border-gray-800">Degrees</th>
+                                    <th class="p-2 border-b border-gray-800">Radians</th>
+                                    <th class="p-2 border-b border-gray-800">$$\sin(\theta)$$</th>
+                                    <th class="p-2 border-b border-gray-800">$$\cos(\theta)$$</th>
+                                    <th class="p-2 border-b border-gray-800">$$\tan(\theta)$$</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800">
+                                <tr>
+                                    <td class="p-2">$$30^\circ$$</td>
+                                    <td class="p-2">$$\pi / 6$$</td>
+                                    <td class="p-2">$$1/2$$</td>
+                                    <td class="p-2">$$\sqrt{3}/2$$</td>
+                                    <td class="p-2">$$\sqrt{3}/3$$</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">$$45^\circ$$</td>
+                                    <td class="p-2">$$\pi / 4$$</td>
+                                    <td class="p-2">$$\sqrt{2}/2$$</td>
+                                    <td class="p-2">$$\sqrt{2}/2$$</td>
+                                    <td class="p-2">$$1$$</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2">$$60^\circ$$</td>
+                                    <td class="p-2">$$\pi / 3$$</td>
+                                    <td class="p-2">$$\sqrt{3}/2$$</td>
+                                    <td class="p-2">$$1/2$$</td>
+                                    <td class="p-2">$$\sqrt{3}$$</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="closeModal('cheatsheet-modal')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-center">
+                Got it, let's play!
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT APP STATE & LOGIC ================= -->
+    <script>
+        // --- Game System State ---
+        let playerState = {
+            xp: 0,
+            streak: 0,
+            rank: 'Novice',
+            trigRushScore: 0,
+            trianglesSolved: 0
+        };
+
+        // Local Storage Sync (simple in-memory default)
+        function loadProgress() {
+            const data = localStorage.getItem('trig_mastery_progress');
+            if (data) {
+                playerState = JSON.parse(data);
+                updateStatsPanel();
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('trig_mastery_progress', JSON.stringify(playerState));
+            updateStatsPanel();
+        }
+
+        function resetProgress() {
+            if (confirm("Are you sure you want to reset your score, rank, and study progress?")) {
+                playerState = {
+                    xp: 0,
+                    streak: 0,
+                    rank: 'Novice',
+                    trigRushScore: 0,
+                    trianglesSolved: 0
+                };
+                saveProgress();
+                alert("Progress reset completed.");
+            }
+        }
+
+        function addXp(amount) {
+            playerState.xp += amount;
+            playerState.streak += 1;
+            
+            // Recalculate Rank
+            if (playerState.xp < 100) playerState.rank = 'Novice';
+            else if (playerState.xp < 300) playerState.rank = 'Trig Apprentice';
+            else if (playerState.xp < 600) playerState.rank = 'SOH-CAH Master';
+            else if (playerState.xp < 1000) playerState.rank = 'Unit Circle Sage';
+            else playerState.rank = 'Trig Archmage';
+
+            saveProgress();
+        }
+
+        function breakStreak() {
+            playerState.streak = 0;
+            saveProgress();
+        }
+
+        function updateStatsPanel() {
+            document.getElementById('rank-display').innerText = playerState.rank;
+            document.getElementById('streak-display').innerText = playerState.streak;
+            document.getElementById('xp-display').innerText = playerState.xp;
+            document.getElementById('quest-completion-count').innerText = `${playerState.trianglesSolved} solved`;
+        }
+
+        // --- View Controller Navigation ---
+        function showScreen(screenId) {
+            // Hide all screen sections
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-rush').classList.add('hidden');
+            document.getElementById('screen-explorer').classList.add('hidden');
+            document.getElementById('screen-solver').classList.add('hidden');
+
+            // Show current
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+
+            // Trigger specific initialization logic if needed
+            if (screenId === 'explorer') {
+                initExplorer();
+            } else if (screenId === 'solver') {
+                generateTriangleQuest();
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // --- SCREEN ENTRY HANDLERS ---
+        function startUnitCircleExplorer() {
+            showScreen('explorer');
+        }
+
+        function startTriangleSolver() {
+            showScreen('solver');
+        }
+
+        // --- TRIG RUSH SESSION CONTROLLER ---
+        let rushTimerInterval = null;
+        let rushTimeLeft = 60;
+        let rushDifficulty = 'easy';
+        let currentQuestion = null;
+        let rushPointsThisSession = 0;
+        let rushCountCorrect = 0;
+
+        function startTrigRush() {
+            // Reset to setup views
+            document.getElementById('rush-setup').classList.remove('hidden');
+            document.getElementById('rush-arena').classList.add('hidden');
+            document.getElementById('rush-results').classList.add('hidden');
+            showScreen('rush');
+        }
+
+        function startRushSession(difficulty) {
+            rushDifficulty = difficulty;
+            rushTimeLeft = 60;
+            rushPointsThisSession = 0;
+            rushCountCorrect = 0;
+            
+            document.getElementById('rush-score').innerText = '0';
+            document.getElementById('rush-timer').innerText = '60s';
+            document.getElementById('rush-setup').classList.add('hidden');
+            document.getElementById('rush-arena').classList.remove('hidden');
+
+            generateRushQuestion();
+            
+            clearInterval(rushTimerInterval);
+            rushTimerInterval = setInterval(() => {
+                rushTimeLeft--;
+                document.getElementById('rush-timer').innerText = `${rushTimeLeft}s`;
+                
+                if (rushTimeLeft <= 0) {
+                    endRushSession();
+                }
+            }, 1000);
+        }
+
+        // Database pool generator for random study questions
+        const rushQuestionsPool = {
+            easy: [
+                { q: "\\sin(90^\\circ)", opt: ["0", "1", "-1", "\\frac{1}{2}"], ans: "1" },
+                { q: "\\cos(0^\\circ)", opt: ["0", "1", "\\frac{\\sqrt{3}}{2}", "-1"], ans: "1" },
+                { q: "\\tan(45^\\circ)", opt: ["0", "1", "\\sqrt{3}", "\\text{Undefined}"], ans: "1" },
+                { q: "\\sin(30^\\circ)", opt: ["\\frac{1}{2}", "\\frac{\\sqrt{3}}{2}", "\\frac{\\sqrt{2}}{2}", "1"], ans: "\\frac{1}{2}" },
+                { q: "\\cos(60^\\circ)", opt: ["1", "\\frac{\\sqrt{3}}{2}", "\\frac{1}{2}", "0"], ans: "\\frac{1}{2}" },
+                { q: "\\sin(0^\\circ)", opt: ["0", "1", "-1", "\\text{Undefined}"], ans: "0" },
+                { q: "\\cos(90^\\circ)", opt: ["1", "0", "-1", "\\frac{\\sqrt{2}}{2}"], ans: "0" },
+                { q: "\\sin(180^\\circ)", opt: ["1", "0", "-1", "\\frac{1}{2}"], ans: "0" },
+                { q: "\\cos(180^\\circ)", opt: ["1", "0", "-1", "\\text{Undefined}"], ans: "-1" }
+            ],
+            medium: [
+                { q: "\\csc(30^\\circ)", opt: ["2", "\\frac{1}{2}", "\\frac{2\\sqrt{3}}{3}", "1"], ans: "2" },
+                { q: "\\sec(45^\\circ)", opt: ["\\sqrt{2}", "\\frac{\\sqrt{2}}{2}", "2", "1"], ans: "\\sqrt{2}" },
+                { q: "\\tan(90^\\circ)", opt: ["0", "1", "\\text{Undefined}", "-1"], ans: "\\text{Undefined}" },
+                { q: "\\cot(45^\\circ)", opt: ["1", "0", "\\sqrt{3}", "\\text{Undefined}"], ans: "1" },
+                { q: "\\csc(90^\\circ)", opt: ["1", "0", "-1", "\\text{Undefined}"], ans: "1" },
+                { q: "\\sec(60^\\circ)", opt: ["\\frac{1}{2}", "2", "\\sqrt{2}", "\\frac{2\\sqrt{3}}{3}"], ans: "2" },
+                { q: "\\sin(\\pi / 4)", opt: ["\\frac{1}{2}", "\\frac{\\sqrt{3}}{2}", "\\frac{\\sqrt{2}}{2}", "1"], ans: "\\frac{\\sqrt{2}}{2}" },
+                { q: "\\cos(5\\pi / 6)", opt: ["-\\frac{\\sqrt{3}}{2}", "\\frac{\\sqrt{3}}{2}", "-\\frac{1}{2}", "\\frac{1}{2}"], ans: "-\\frac{\\sqrt{3}}{2}" },
+                { q: "\\tan(2\\pi / 3)", opt: ["-\\sqrt{3}", "\\sqrt{3}", "-\\frac{\\sqrt{3}}{3}", "1"], ans: "-\\sqrt{3}" }
+            ],
+            hard: [
+                { q: "\\sin(-30^\\circ)", opt: ["\\frac{1}{2}", "-\\frac{1}{2}", "\\frac{\\sqrt{3}}{2}", "-\\frac{\\sqrt{3}}{2}"], ans: "-\\frac{1}{2}" },
+                { q: "\\cos(420^\\circ)", opt: ["1", "\\frac{1}{2}", "\\frac{\\sqrt{3}}{2}", "-\\frac{1}{2}"], ans: "\\frac{1}{2}" },
+                { q: "\\csc(270^\\circ)", opt: ["1", "-1", "0", "\\text{Undefined}"], ans: "-1" },
+                { q: "\\cot(3\\pi / 2)", opt: ["0", "1", "\\text{Undefined}", "-1"], ans: "0" },
+                { q: "\\sec(-45^\\circ)", opt: ["\\sqrt{2}", "-\\sqrt{2}", "\\frac{\\sqrt{2}}{2}", "2"], ans: "\\sqrt{2}" },
+                { q: "\\sin(7\\pi / 6)", opt: ["\\frac{1}{2}", "-\\frac{1}{2}", "\\frac{\\sqrt{3}}{2}", "-\\frac{\\sqrt{3}}{2}"], ans: "-\\frac{1}{2}" },
+                { q: "\\tan(315^\\circ)", opt: ["1", "-1", "\\sqrt{3}", "-\\sqrt{3}"], ans: "-1" },
+                { q: "\\cot(-60^\\circ)", opt: ["-\\sqrt{3}", "-\\frac{\\sqrt{3}}{3}", "\\sqrt{3}", "\\frac{\\sqrt{3}}{3}"], ans: "-\\frac{\\sqrt{3}}{3}" }
+            ]
+        };
+
+        function generateRushQuestion() {
+            const list = rushQuestionsPool[rushDifficulty];
+            // Select random unique question
+            const item = list[Math.floor(Math.random() * list.length)];
+            currentQuestion = item;
+
+            // Render using KaTeX
+            const container = document.getElementById('rush-question');
+            container.innerHTML = '';
+            const mathSpan = document.createElement('span');
+            container.appendChild(mathSpan);
+            katex.render(item.q, mathSpan, { throwOnError: false });
+
+            // Set Category Tag
+            document.getElementById('rush-badge').innerText = `Difficulty: ${rushDifficulty.toUpperCase()}`;
+
+            // Set Options
+            const optionsBox = document.getElementById('rush-options');
+            optionsBox.innerHTML = '';
+            
+            // Randomly shuffle options slightly to prevent fixed layouts
+            const shuffledOptions = [...item.opt].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach(optVal => {
+                const btn = document.createElement('button');
+                btn.className = "p-4 glass-button text-base font-bold rounded-xl text-gray-200 text-center flex items-center justify-center min-h-[60px]";
+                
+                const span = document.createElement('span');
+                btn.appendChild(span);
+                katex.render(optVal, span, { throwOnError: false });
+
+                btn.onclick = () => checkRushAnswer(optVal, btn);
+                optionsBox.appendChild(btn);
+            });
+
+            // Clear feedback banner
+            document.getElementById('rush-feedback').innerText = '';
+        }
+
+        function checkRushAnswer(selectedAnswer, buttonElement) {
+            const optionsBox = document.getElementById('rush-options');
+            // Disable further option clicks immediately
+            Array.from(optionsBox.children).forEach(child => child.disabled = true);
+
+            const isCorrect = (selectedAnswer === currentQuestion.ans);
+            const feedback = document.getElementById('rush-feedback');
+
+            if (isCorrect) {
+                buttonElement.classList.remove('glass-button');
+                buttonElement.classList.add('bg-emerald-600', 'text-white', 'border-emerald-500');
+                feedback.innerHTML = '<span class="text-emerald-400"><i class="fa-solid fa-circle-check"></i> Correct!</span>';
+                
+                rushCountCorrect++;
+                const xpForDif = { easy: 10, medium: 20, hard: 40 }[rushDifficulty];
+                rushPointsThisSession += xpForDif;
+                document.getElementById('rush-score').innerText = rushPointsThisSession;
+                
+                addXp(xpForDif);
+            } else {
+                buttonElement.classList.remove('glass-button');
+                buttonElement.classList.add('bg-rose-600/80', 'text-white', 'border-rose-500');
+                feedback.innerHTML = '<span class="text-rose-400"><i class="fa-solid fa-circle-xmark"></i> Incorrect</span>';
+                
+                breakStreak();
+            }
+
+            // Quick delay to move to next item
+            setTimeout(() => {
+                if (rushTimeLeft > 0) {
+                    generateRushQuestion();
+                }
+            }, 1000);
+        }
+
+        function endRushSession() {
+            clearInterval(rushTimerInterval);
+            document.getElementById('rush-arena').classList.add('hidden');
+            document.getElementById('rush-results').classList.remove('hidden');
+
+            document.getElementById('results-correct').innerText = rushCountCorrect;
+            document.getElementById('results-xp').innerText = `+${rushPointsThisSession} XP`;
+        }
+
+
+        // --- MODULE 2: INTERACTIVE UNIT CIRCLE CONTROLLER ---
+        let isDraggingCircle = false;
+        const presetAngles = [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330, 360];
+
+        function initExplorer() {
+            const container = document.getElementById('presets-container');
+            container.innerHTML = '';
+            
+            // Generate nice compact clickable badges for pre-sets
+            presetAngles.forEach(deg => {
+                const btn = document.createElement('button');
+                btn.className = "px-2.5 py-1.5 text-xs font-semibold rounded bg-gray-900 border border-gray-800 text-gray-300 hover:text-white hover:bg-indigo-600/20 hover:border-indigo-500 transition-colors";
+                btn.innerText = `${deg}°`;
+                btn.onclick = () => {
+                    document.getElementById('angle-slider').value = deg;
+                    updateUnitCircle(deg);
+                };
+                container.appendChild(btn);
+            });
+
+            // Standard Event handlers
+            const slider = document.getElementById('angle-slider');
+            slider.addEventListener('input', (e) => {
+                updateUnitCircle(parseFloat(e.target.value));
+            });
+
+            // Interactive dragging directly on Circle SVG container
+            const svg = document.getElementById('unit-circle-svg');
+            const handle = document.getElementById('svg-handle');
+
+            const startDrag = (e) => {
+                isDraggingCircle = true;
+                e.preventDefault();
+            };
+
+            const doDrag = (e) => {
+                if (!isDraggingCircle) return;
+                const rect = svg.getBoundingClientRect();
+                
+                // Get absolute mouse/touch coords relative to center of circle
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+
+                const dx = clientX - cx;
+                const dy = clientY - cy;
+
+                // Calculate angle in radians: positive values clock-wise, flip Y-axis to match trigonometry standards
+                let rad = Math.atan2(-dy, dx);
+                if (rad < 0) rad += 2 * Math.PI;
+
+                let deg = Math.round(rad * (180 / Math.PI));
+                if (deg === 360) deg = 0;
+
+                slider.value = deg;
+                updateUnitCircle(deg);
+            };
+
+            const stopDrag = () => {
+                isDraggingCircle = false;
+            };
+
+            // Touch events supporting mobile devices
+            handle.addEventListener('mousedown', startDrag);
+            svg.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+
+            handle.addEventListener('touchstart', startDrag, { passive: false });
+            svg.addEventListener('touchmove', doDrag, { passive: false });
+            window.addEventListener('touchend', stopDrag);
+
+            // Initial view state mapping
+            updateUnitCircle(45);
+        }
+
+        function updateUnitCircle(deg) {
+            document.getElementById('slider-value-display').innerText = `${deg}°`;
+            document.getElementById('metric-degrees').innerText = `${deg}°`;
+
+            // Radians convert
+            const rad = deg * (Math.PI / 180);
+            
+            // Radians representation mapping
+            let radStr = (rad / Math.PI).toFixed(3) + " π rad";
+            // Map typical exact fractions to look premium
+            const radFractions = {
+                0: "0",
+                30: "\\pi / 6",
+                45: "\\pi / 4",
+                60: "\\pi / 3",
+                90: "\\pi / 2",
+                120: "2\\pi / 3",
+                135: "3\\pi / 4",
+                150: "5\\pi / 6",
+                180: "\\pi",
+                210: "7\\pi / 6",
+                225: "5\\pi / 4",
+                240: "4\\pi / 3",
+                270: "3\\pi / 2",
+                300: "5\\pi / 3",
+                315: "7\\pi / 4",
+                330: "11\\pi / 6",
+                360: "2\\pi"
+            };
+            if (radFractions[deg]) {
+                const tempSpan = document.createElement('span');
+                katex.render(radFractions[deg], tempSpan, { throwOnError: false });
+                document.getElementById('metric-radians').innerHTML = '';
+                document.getElementById('metric-radians').appendChild(tempSpan);
+            } else {
+                document.getElementById('metric-radians').innerText = `${(rad / Math.PI).toFixed(2)}π`;
+            }
+
+            // Trig Values
+            const cosVal = Math.cos(rad);
+            const sinVal = Math.sin(rad);
+            const tanVal = Math.sin(rad) / Math.cos(rad);
+
+            // Set coordinates
+            document.getElementById('metric-coordinates').innerText = `(${cosVal.toFixed(3)}, ${sinVal.toFixed(3)})`;
+
+            // Draw visual paths in SVG
+            // In SVG, positive Y coordinates are downwards, so we negate sine for the visual height.
+            const visualRadius = 90;
+            const x = cosVal * visualRadius;
+            const y = -sinVal * visualRadius;
+
+            document.getElementById('svg-hypotenuse').setAttribute('x2', x);
+            document.getElementById('svg-hypotenuse').setAttribute('y2', y);
+
+            document.getElementById('svg-handle').setAttribute('cx', x);
+            document.getElementById('svg-handle').setAttribute('cy', y);
+
+            // Project lines
+            document.getElementById('svg-sine-line').setAttribute('x1', x);
+            document.getElementById('svg-sine-line').setAttribute('y1', 0);
+            document.getElementById('svg-sine-line').setAttribute('x2', x);
+            document.getElementById('svg-sine-line').setAttribute('y2', y);
+
+            document.getElementById('svg-cosine-line').setAttribute('x1', 0);
+            document.getElementById('svg-cosine-line').setAttribute('y1', 0);
+            document.getElementById('svg-cosine-line').setAttribute('x2', x);
+            document.getElementById('svg-cosine-line').setAttribute('y2', 0);
+
+            // Update angle pie shading segment
+            const largeArcFlag = deg > 180 ? 1 : 0;
+            const sweepFlag = 0; // standard mathematical counter-clockwise relative mapping (flipped visually to keep standard trig coordinates positive up)
+            
+            let dPath = `M 0 0 L 15 0 `;
+            if (deg > 0) {
+                const arcX = 15 * Math.cos(rad);
+                const arcY = -15 * Math.sin(rad);
+                dPath += `A 15 15 0 ${largeArcFlag} ${sweepFlag} ${arcX} ${arcY} Z`;
+            } else {
+                dPath = "";
+            }
+            document.getElementById('svg-angle-pie').setAttribute('d', dPath);
+
+            // Populate all metrics in sidebar
+            const checkUndefined = (val, reciprocal = false) => {
+                if (Math.abs(val) > 1e10 || isNaN(val) || !isFinite(val)) return "Undefined";
+                // Cap small values near 0
+                if (Math.abs(val) < 1e-10) return "0.00";
+                return val.toFixed(2);
+            };
+
+            const sinStr = checkUndefined(sinVal);
+            const cosStr = checkUndefined(cosVal);
+            const tanStr = Math.abs(cosVal) < 1e-10 ? "Undefined" : checkUndefined(tanVal);
+
+            const cscStr = Math.abs(sinVal) < 1e-10 ? "Undefined" : (1 / sinVal).toFixed(2);
+            const secStr = Math.abs(cosVal) < 1e-10 ? "Undefined" : (1 / cosVal).toFixed(2);
+            const cotStr = Math.abs(sinVal) < 1e-10 ? "Undefined" : (1 / tanVal).toFixed(2);
+
+            document.getElementById('val-sin').innerText = sinStr;
+            document.getElementById('val-cos').innerText = cosStr;
+            document.getElementById('val-tan').innerText = tanStr;
+            document.getElementById('val-csc').innerText = cscStr;
+            document.getElementById('val-sec').innerText = secStr;
+            document.getElementById('val-cot').innerText = cotStr;
+        }
+
+
+        // --- MODULE 3: GEOMETRIC RIGHT-ANGLE QUESTS ---
+        let currentTriangle = {};
+        let selectedQuestOption = null;
+
+        function generateTriangleQuest() {
+            // Generate standard Pythagorean Triple sides to keep ratios clean (e.g., 3-4-5, 5-12-13, 8-15-17)
+            const triples = [
+                { opp: 3, adj: 4, hyp: 5 },
+                { opp: 5, adj: 12, hyp: 13 },
+                { opp: 8, adj: 15, hyp: 17 },
+                { opp: 6, adj: 8, hyp: 10 }
+            ];
+
+            const chosen = triples[Math.floor(Math.random() * triples.length)];
+            
+            // Randomly pick a trigonometric question type (Sine, Cosine, Tangent, Csc, Sec, Cot)
+            const questionTypes = [
+                { type: "sin", text: "\\text{Find } \\sin(\\theta)", ratio: `${chosen.opp}/${chosen.hyp}` },
+                { type: "cos", text: "\\text{Find } \\cos(\\theta)", ratio: `${chosen.adj}/${chosen.hyp}` },
+                { type: "tan", text: "\\text{Find } \\tan(\\theta)", ratio: `${chosen.opp}/${chosen.adj}` },
+                { type: "csc", text: "\\text{Find } \\csc(\\theta)", ratio: `${chosen.hyp}/${chosen.opp}` },
+                { type: "sec", text: "\\text{Find } \\sec(\\theta)", ratio: `${chosen.hyp}/${chosen.adj}` },
+                { type: "cot", text: "\\text{Find } \\cot(\\theta)", ratio: `${chosen.adj}/${chosen.opp}` }
+            ];
+
+            const chosenQuest = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+
+            currentTriangle = {
+                opp: chosen.opp,
+                adj: chosen.adj,
+                hyp: chosen.hyp,
+                correctRatio: chosenQuest.ratio,
+                correctType: chosenQuest.type
+            };
+
+            // Update UI elements
+            document.getElementById('given-opp-val').innerText = chosen.opp;
+            document.getElementById('given-adj-val').innerText = chosen.adj;
+            document.getElementById('given-hyp-val').innerText = chosen.hyp;
+
+            // Update labels in SVG diagram helper
+            document.getElementById('tri-lbl-opp').textContent = `Opposite = ${chosen.opp}`;
+            document.getElementById('tri-lbl-adj').textContent = `Adjacent = ${chosen.adj}`;
+            document.getElementById('tri-lbl-hyp').textContent = `Hypotenuse = ${chosen.hyp}`;
+
+            // Render Task Text
+            const promptContainer = document.getElementById('quest-task-prompt');
+            promptContainer.innerHTML = '';
+            const mathSpan = document.createElement('span');
+            promptContainer.appendChild(mathSpan);
+            katex.render(chosenQuest.text, mathSpan, { throwOnError: false });
+
+            // Set up choice Options
+            // Generate some wrong distracting ratios
+            const distractionRatios = [
+                `${chosen.adj}/${chosen.opp}`,
+                `${chosen.hyp}/${chosen.opp}`,
+                `${chosen.hyp}/${chosen.adj}`,
+                `${chosen.opp}/${chosen.hyp}`,
+                `${chosen.adj}/${chosen.hyp}`,
+                `${chosen.opp}/${chosen.adj}`
+            ].filter(r => r !== chosenQuest.ratio);
+
+            // Deduplicate distractor options
+            const uniqueDistractors = [...new Set(distractionRatios)].slice(0, 3);
+            const allChoices = [chosenQuest.ratio, ...uniqueDistractors].sort(() => Math.random() - 0.5);
+
+            // Instatitate choices buttons
+            const optionsBox = document.getElementById('quest-options');
+            optionsBox.innerHTML = '';
+            selectedQuestOption = null;
+
+            // Reset submit button state
+            const submitBtn = document.getElementById('quest-btn-submit');
+            submitBtn.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            const feedbackBanner = document.getElementById('quest-feedback-banner');
+            feedbackBanner.classList.add('hidden');
+            feedbackBanner.className = "hidden p-4 rounded-xl text-sm font-semibold text-center transition-all";
+
+            allChoices.forEach(ratioStr => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-3.5 rounded-xl border border-gray-800 bg-gray-900/60 hover:border-indigo-500 hover:bg-gray-800 text-left transition-all text-white flex justify-between items-center group";
+                
+                // Formulate fractions beautifully via Katex
+                const leftLabel = document.createElement('span');
+                leftLabel.className = "font-medium text-gray-300 group-hover:text-white";
+                
+                const ratioDisplay = document.createElement('span');
+                katex.render(`\\frac{${ratioStr.split('/')[0]}}{${ratioStr.split('/')[1]}}`, ratioDisplay, { throwOnError: false });
+                
+                btn.appendChild(leftLabel);
+                btn.appendChild(ratioDisplay);
+
+                btn.onclick = () => {
+                    // Reset all other visual states
+                    Array.from(optionsBox.children).forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-950/20'));
+                    btn.classList.add('border-indigo-500', 'bg-indigo-950/20');
+                    selectedQuestOption = ratioStr;
+                    submitBtn.disabled = false;
+                };
+
+                optionsBox.appendChild(btn);
+            });
+
+            // Re-setup submit logic
+            submitBtn.onclick = () => {
+                submitTriangleQuestAnswer();
+            };
+        }
+
+        function submitTriangleQuestAnswer() {
+            const submitBtn = document.getElementById('quest-btn-submit');
+            submitBtn.classList.add('hidden'); // prevent multiple submissions
+
+            const feedbackBanner = document.getElementById('quest-feedback-banner');
+            feedbackBanner.classList.remove('hidden');
+
+            const isCorrect = (selectedQuestOption === currentTriangle.correctRatio);
+
+            if (isCorrect) {
+                feedbackBanner.classList.add('bg-emerald-950/50', 'border', 'border-emerald-800', 'text-emerald-400');
+                feedbackBanner.innerHTML = `<i class="fa-solid fa-circle-check"></i> Correct! You matched the exact trigonometric definition.`;
+                
+                playerState.trianglesSolved++;
+                addXp(30); // Triangle quests give generous study credits
+            } else {
+                feedbackBanner.classList.add('bg-rose-950/50', 'border', 'border-rose-800', 'text-rose-400');
+                feedbackBanner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Incorrect. Recall: the correct formula ratio is <strong>${currentTriangle.correctRatio}</strong>.`;
+                
+                breakStreak();
+            }
+        }
+
+
+        // Global setup on page load
+        window.onload = function() {
+            loadProgress();
+            showScreen('home');
+        };
+    </script>
+</body>
+</html>
+

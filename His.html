@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Honors History II Jeopardy 2026</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React and ReactDOM CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel CDN for compiling JSX in browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    /* Custom scrollbar styling for a cleaner dark mode look */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <div id="root"></div>
+
+  <!-- React Code with JSX -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // SVG Icons declared inline for reliable offline/standalone browser rendering
+    const TrophyIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-6 h-6"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"/><path d="M12 2a6 6 0 0 1 6 6v4H6V8a6 6 0 0 1 6-6Z"/></svg>
+    );
+
+    const UsersIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-5 h-5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    );
+
+    const RotateCcwIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-3 h-3"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    );
+
+    const HelpCircleIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    );
+
+    const BookOpenIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-3.5 h-3.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    );
+
+    const FlameIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-8 h-8 text-rose-500 animate-bounce"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+    );
+
+    const AwardIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+    );
+
+    const CheckCircleIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-4 h-4 text-emerald-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    );
+
+    const XCircleIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-4 h-4 text-rose-500"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    );
+
+    const ClockIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-3.5 h-3.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    );
+
+    const SparklesIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-5 h-5 text-amber-400"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+    );
+
+    const FileTextIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="w-5 h-5 text-amber-400"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+    );
+
+    const CATEGORIES = [
+      {
+        id: 'melian-ir',
+        name: 'Melian & IR Theories',
+        clues: [
+          {
+            value: 200,
+            question: "This foundational International Relations theory asserts that states exist in an anarchic world where they must prioritize power, national interest, and security above morality.",
+            answer: "Realism (as demonstrated in the Melian Dialogue).",
+            details: "Athens operated on pure Realist principles during the dialogue, arguing that power dictates international behavior rather than abstract concepts of justice."
+          },
+          {
+            value: 400,
+            question: "Who are the two historical combatants involved in the negotiations of the Melian Dialogue, and what is at stake for the weaker party?",
+            answer: "Athens and Melos; the survival of Melos (who wished to remain neutral, but faced total destruction/enslavement by Athens).",
+            details: "Athens demanded Melos submit to their empire. When Melos refused, the Athenians besieged the city, executed the men, and enslaved the women and children."
+          },
+          {
+            value: 600,
+            question: "This critical IR theory argues that international relations are not dictated by objective material forces, but are 'socially constructed' by shared ideas, identities, historical norms, and beliefs.",
+            answer: "Constructivism",
+            details: "Constructivists believe that concepts like 'anarchy' or 'threats' are what states make of them through social interaction and dialogue."
+          },
+          {
+            value: 800,
+            question: "Which IR theory analyzes global politics through the lens of economic exploitation, class struggle, and the divide between wealthy 'core' nations and exploited 'periphery' nations?",
+            answer: "Marxism",
+            details: "Marxist IR theory argues that capitalism drives imperialism, creating structural inequalities where powerful nations exploit resources of poorer states."
+          },
+          {
+            value: 1000,
+            question: "Explain the classic Athenian realist assertion about justice and power in the Melian Dialogue, which remains a cornerstone of realist literature.",
+            answer: "'The strong do what they can, and the weak suffer what they must.'",
+            details: "The Athenians told the Melians that justice is only a practical question between equals in power; otherwise, power rules."
+          }
+        ]
+      },
+      {
+        id: 'news-literacy',
+        name: 'News & Media Literacy',
+        clues: [
+          {
+            value: 200,
+            question: "This crucial piece of internet legislation protects online platforms (like TikTok or Reddit) from being held legally liable for content posted by their users.",
+            answer: "Section 230 (of the Communications Decency Act)",
+            details: "It is debated today because it keeps platforms free to host diverse content, but also shields them from accountability when harmful misinformation spreads."
+          },
+          {
+            value: 400,
+            question: "This specific technique involves opening multiple browser tabs to check other sources and verify the credibility of a claim, rather than staying only on the original webpage.",
+            answer: "Horizontal Reading",
+            details: "Fact-checkers use this to investigate who is behind a site, what their agenda is, and what other independent sources say about the claim."
+          },
+          {
+            value: 600,
+            question: "What is an algorithm in the context of the internet, and what is its primary business objective for modern social media platforms?",
+            answer: "A set of mathematical rules/instructions designed to maximize user engagement and keep users on the platform as long as possible.",
+            details: "By prioritizing engagement, algorithms often boost highly emotional, sensationalist, or polarizing content, inadvertently feeding fake news."
+          },
+          {
+            value: 800,
+            question: "Identify at least three red flags that should warn a reader that an online news source might be publishing biased or completely fake news.",
+            answer: "Acceptable options include: Overly emotional/sensational headlines (clickbait), lack of author credentials/bylines, unusual domain names (e.g., '.co'), lack of external sources, or extreme partisan language.",
+            details: "Recognizing these red flags is the first step in active news literacy before sharing articles online."
+          },
+          {
+            value: 1000,
+            question: "Explain why conspiracy theories can be highly dangerous to a democratic society, but also outline how some might argue they have a utility (usefulness).",
+            answer: "Dangers: They erode trust in democratic institutions, science, and shared reality. Utility: They can prompt citizens to question authority, demand government transparency, or reveal actual secret state operations.",
+            details: "Conspiracy theories often gain traction during crises when people seek simple explanations for complex, stressful events."
+          }
+        ]
+      },
+      {
+        id: 'vocab',
+        name: 'Core Honors Vocab',
+        clues: [
+          {
+            value: 200,
+            question: "Contrast the terms 'De Jure' and 'De Facto' regarding law and practical reality.",
+            answer: "De Jure means established by formal law/treaty; De Facto means existing in practice or reality, whether officially recognized by law or not.",
+            details: "For example, Transnistria is de facto independent with its own military and currency, but de jure it is recognized globally as part of Moldova."
+          },
+          {
+            value: 400,
+            question: "This term describes a conflict where two powerful states do not fight each other directly, but instead support opposing local factions or smaller nations that fight on their behalf.",
+            answer: "Proxy War",
+            details: "The Cold War featured numerous proxy wars (Korea, Vietnam, Angola) where the US and USSR fought indirectly."
+          },
+          {
+            value: 600,
+            question: "This term describes an online environment where a user only encounters information or opinions that reflect and reinforce their own, isolating them from opposing viewpoints.",
+            answer: "Echo Chamber",
+            details: "Echo chambers are heavily accelerated by social media algorithms that feed users content aligning with their established preferences."
+          },
+          {
+            value: 800,
+            question: "What does the military deterrence acronym 'M.A.D.' stand for, and what basic premise does it rely on to prevent conflict?",
+            answer: "Mutually Assured Destruction; it relies on the premise that a full-scale nuclear attack by one superpower would result in the complete annihilation of both.",
+            details: "This doctrine prevented direct military confrontation between the US and USSR during the Cold War."
+          },
+          {
+            value: 1000,
+            question: "This term refers to a sovereign state that is officially independent, but is heavily controlled, influenced, and dominated by a foreign superpower (common during the Cold War in Eastern Europe).",
+            answer: "Satellite State",
+            details: "Poland, Hungary, and East Germany were prominent satellite states of the Soviet Union under the Warsaw Pact."
+          }
+        ]
+      },
+      {
+        id: 'migration-rights',
+        name: 'Rights & Displacement',
+        clues: [
+          {
+            value: 200,
+            question: "What is the crucial legal and geographical difference between a 'Refugee' and an 'Internally Displaced Person' (IDP)?",
+            answer: "A refugee has crossed an international border to flee violence or persecution, whereas an IDP is forced to flee but remains inside their home country's borders.",
+            details: "IDPs do not enjoy the same international legal protections as refugees because they technically remain under the jurisdiction of their own state."
+          },
+          {
+            value: 400,
+            question: "Which primary agency of the United Nations is tasked with protecting and aiding refugees, IDPs, and stateless persons worldwide?",
+            answer: "UNHCR (United Nations High Commissioner for Refugees)",
+            details: "UNHCR provides critical shelter, clean water, medical aid, and legal assistance in active conflict zones and border camps."
+          },
+          {
+            value: 600,
+            question: "The 14th Amendment defines citizenship in the US. What controversial policy does it guarantee in its opening clause, and why is it debated between political sides?",
+            answer: "Birthright Citizenship; progressives argue it is an essential human right that welcomes immigrants, while some conservatives argue it encourages undocumented migration.",
+            details: "The amendment states: 'All persons born or naturalized in the United States... are citizens of the United States and of the State wherein they reside.'"
+          },
+          {
+            value: 800,
+            question: "Name the five core freedoms guaranteed under the First Amendment of the United States Constitution.",
+            answer: "Speech, Religion, Press, Assembly, and Petition.",
+            details: "These rights are vital for democratic participation, but face modern challenges regarding hate speech, disinformation, and state security."
+          },
+          {
+            value: 1000,
+            question: "How does an 'Economic Migrant' differ from a 'Refugee' in terms of international asylum laws?",
+            answer: "An economic migrant leaves voluntarily to seek better job opportunities and financial life, while a refugee is forced to flee due to a well-founded fear of persecution.",
+            details: "Economic migrants do not qualify for refugee status under international law (such as the 1951 Refugee Convention)."
+          }
+        ]
+      },
+      {
+        id: 'ukraine-nato',
+        name: 'Ukraine & NATO',
+        clues: [
+          {
+            value: 200,
+            question: "What is NATO, when was it formed, and what core military article guarantees that 'an attack against one is an attack against all'?",
+            answer: "North Atlantic Treaty Organization; formed in 1949; guaranteed by Article 5.",
+            details: "Article 5 has only been invoked once in history: by the United States following the September 11 terrorist attacks in 2001."
+          },
+          {
+            value: 400,
+            question: "What was the Warsaw Pact, who led it, and why did it eventually collapse in the early 1990s?",
+            answer: "A military alliance of communist Eastern European satellite states led by the Soviet Union; it collapsed due to economic crisis, democratic revolutions, and the fall of the USSR.",
+            details: "Formed in 1955 as a direct counter-weight to NATO's integration of West Germany."
+          },
+          {
+            style: "text-amber-400",
+            value: 600,
+            question: "This country, ruled by Alexander Lukashenko, acts as Russia's closest military ally, allowing Russian forces to launch invasions and station nuclear weapons within its borders.",
+            answer: "Belarus",
+            details: "Belarus acts as a key strategic bridge and de facto satellite buffer state for Moscow in Eastern Europe."
+          },
+          {
+            value: 800,
+            question: "Name the small, pro-Russian breakaway region of Moldova where Russian peacekeepers have remained stationed since a brief civil war in 1992.",
+            answer: "Transnistria",
+            details: "Transnistria represents a major security flashpoint as it borders southwestern Ukraine and hosts massive Soviet-era ammunition depots."
+          },
+          {
+            value: 1000,
+            question: "This NATO and EU member state, led by Prime Minister Viktor Orbán, has frequently broken Western consensus by maintaining close ties with Vladimir Putin and delaying military aid packages to Ukraine.",
+            answer: "Hungary",
+            details: "Hungary's stance highlights the internal diplomatic friction within NATO and the EU regarding the response to Russian actions."
+          }
+        ]
+      }
+    ];
+
+    const FINAL_JEOPARDY = {
+      category: "INTERNATIONAL RELATIONS AND GEOPOLITICS",
+      question: "Evaluate the geopolitical situation in Ukraine using two distinct IR theories. How would a REALIST and a LIBERAList view the conflict differently? (State the core mechanism for each).",
+      answer: "Realists see the war as a classic struggle for security and territorial balance of power (NATO expansion vs. Russian sphere of influence). Liberals see it as a breakdown of international law, international institutions (UN failure), and democratic norms.",
+      details: "Realists argue that states will always prioritize security in an anarchic system. Liberals emphasize that international agreements, democratic alliances, and trade interdependencies are key to maintaining lasting peace."
+    };
+
+    const STUDY_GUIDE_DATA = {
+      title: "Contemporary World History Honors II - Study Guide",
+      sections: [
+        {
+          title: "I. Socratic Seminars & Open-Ended Questions",
+          content: "Focus on why there is no 'one right way' to see historical and modern topics. Understand how two opposing viewpoints can both argue their version of 'correctness' using different source material. Practice formulating deep, open-ended research questions."
+        },
+        {
+          title: "II. Melian Dialogue",
+          content: "Between Athens (powerful empire) and Melos (small neutral island) during the Peloponnesian War. Explores concepts of pure power vs. justice. Melian argument: neutral rights, justice, gods will help. Athenian argument: power decides, the strong rule, justice is only between equals. Realist masterpiece."
+        },
+        {
+          title: "III. International Relations (IR) Theories",
+          content: "• Realism: World is anarchic, states seek power, survival, security.\n• Liberalism: Cooperation, international law, institutions (UN, WTO), democratic peace.\n• Marxism: Class struggle, capitalist imperialism, economic exploitation.\n• Constructivism: Global politics shaped by socially constructed ideas, values, identities.\n• Feminism: Gender structures, impacts of patriarchy on security and war.\n• Post-Structuralism: Power of discourse, language, and narrative in defining reality."
+        },
+        {
+          title: "IV. News Literacy & Tech",
+          content: "• Section 230: Shields hosts from user post liability. Sparks debates on moderation/free speech.\n• Horizontal Reading: Opening multiple tabs, searching across sources to confirm facts.\n• Echo Chambers: Feed loops confirming existing bias.\n• Algorithms: Code designed to keep attention, often amplifying emotional/fake content."
+        },
+        {
+          title: "V. Vocabulary Highlights",
+          content: "• De Jure: By law / De Facto: In reality.\n• Proxy: Fighting through third parties.\n• Satellite State: Country controlled by a foreign superpower.\n• MAD: Mutually Assured Destruction (nuclear peace doctrine).\n• Sanctions: Economic penalties to force compliance."
+        },
+        {
+          title: "VI. Migration & Rights",
+          content: "• Refugees: Crossed borders escaping danger. Evaluated under international conventions.\n• IDPs: Fled but stayed inside native border.\n• 1st Amendment: Religion, Speech, Press, Assembly, Petition.\n• 14th Amendment: Birthright citizenship, equal protection."
+        },
+        {
+          title: "VII. Ukraine, Russia & NATO",
+          content: "• NATO (1949): Defense alliance (Article 5 mutual defense).\n• Warsaw Pact: Communist alliance counterweight, collapsed in 1991.\n• Belarus: Main ally of Russia. Transnistria: Moldovan breakaway region.\n• Hungary: Troublesome NATO member keeping Russian ties."
+        }
+      ]
+    };
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('board');
+      const [teams, setTeams] = useState([
+        { id: 1, name: 'Team Alpha', score: 0 },
+        { id: 2, name: 'Team Beta', score: 0 },
+        { id: 3, name: 'Team Gamma', score: 0 }
+      ]);
+      const [cluesState, setCluesState] = useState(CATEGORIES);
+      const [selectedClue, setSelectedClue] = useState(null);
+      const [showAnswer, setShowAnswer] = useState(false);
+      const [toastMessage, setToastMessage] = useState('');
+      const [activeFlashcardIndex, setActiveFlashcardIndex] = useState(0);
+      const [flashcardFlipped, setFlashcardFlipped] = useState(false);
+      
+      const allFlashcards = CATEGORIES.flatMap(cat => 
+        cat.clues.map(clue => ({
+          category: cat.name,
+          value: clue.value,
+          question: clue.question,
+          answer: clue.answer,
+          details: clue.details
+        }))
+      );
+
+      const triggerToast = (msg) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(''), 3000);
+      };
+
+      const handleClueClick = (categoryIndex, clueIndex) => {
+        const clue = cluesState[categoryIndex].clues[clueIndex];
+        if (clue.visited) return;
+        
+        setSelectedClue({
+          ...clue,
+          categoryName: cluesState[categoryIndex].name,
+          categoryIndex,
+          clueIndex
+        });
+        setShowAnswer(false);
+      };
+
+      const handleRevealAnswer = () => {
+        setShowAnswer(true);
+      };
+
+      const handleScoreChange = (teamId, amount) => {
+        setTeams(prevTeams => 
+          prevTeams.map(t => t.id === teamId ? { ...t, score: t.score + amount } : t)
+        );
+        triggerToast(`Points adjusted!`);
+      };
+
+      const handleClueClose = (wasAnswered) => {
+        if (selectedClue) {
+          const { categoryIndex, clueIndex } = selectedClue;
+          const updatedClues = [...cluesState];
+          updatedClues[categoryIndex].clues[clueIndex].visited = true;
+          setCluesState(updatedClues);
+        }
+        setSelectedClue(null);
+        setShowAnswer(false);
+      };
+
+      const resetGame = () => {
+        if (window.confirm("Are you sure you want to reset the game and clear all scores?")) {
+          setTeams([
+            { id: 1, name: 'Team Alpha', score: 0 },
+            { id: 2, name: 'Team Beta', score: 0 },
+            { id: 3, name: 'Team Gamma', score: 0 }
+          ]);
+          const resetClues = cluesState.map(cat => ({
+            ...cat,
+            clues: cat.clues.map(clue => ({ ...clue, visited: false }))
+          }));
+          setCluesState(resetClues);
+          setActiveTab('board');
+          triggerToast("Game scores and board have been reset!");
+        }
+      };
+
+      const updateTeamName = (id, newName) => {
+        setTeams(prev => prev.map(t => t.id === id ? { ...t, name: newName } : t));
+      };
+
+      return (
+        <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-900">
+          <header className="bg-slate-950 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-amber-400 to-amber-600 p-2.5 rounded-xl text-slate-950 shadow-lg shadow-amber-500/20">
+                  <TrophyIcon />
+                </div>
+                <div>
+                  <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                    Honors History II <span className="text-amber-400 font-extrabold text-sm bg-slate-800 px-2 py-0.5 rounded-md border border-slate-700">Jeopardy 2026</span>
+                  </h1>
+                  <p className="text-xs text-slate-400">Kohlhagen Exam Prep • June 1 Exam Readiness</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 bg-slate-900 p-1.5 rounded-lg border border-slate-800">
+                <button 
+                  onClick={() => setActiveTab('board')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'board' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}
+                >
+                  <AwardIcon />
+                  Game Board
+                </button>
+                <button 
+                  onClick={() => setActiveTab('flashcards')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'flashcards' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}
+                >
+                  <ClockIcon />
+                  Flashcards
+                </button>
+                <button 
+                  onClick={() => setActiveTab('study-guide')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'study-guide' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}
+                >
+                  <BookOpenIcon />
+                  Study Guide View
+                </button>
+                <button 
+                  onClick={() => setActiveTab('final-jeopardy')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${activeTab === 'final-jeopardy' ? 'bg-rose-500 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}
+                >
+                  <FlameIcon />
+                  Final Jeopardy
+                </button>
+              </div>
+
+              <button 
+                onClick={resetGame}
+                className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 rounded-md border border-rose-500/20 flex items-center gap-1 transition-all"
+              >
+                <RotateCcwIcon />
+                Reset All
+              </button>
+            </div>
+          </header>
+
+          <main className="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 flex flex-col">
+              
+              {activeTab === 'board' && (
+                <div className="flex-1 flex flex-col gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 flex-1">
+                    {cluesState.map((category, catIndex) => (
+                      <div key={category.id} className="flex flex-col gap-3">
+                        <div className="bg-slate-800 border-b-2 border-amber-500 rounded-xl p-3 text-center min-h-[64px] flex items-center justify-center shadow-lg">
+                          <h3 className="text-xs md:text-sm font-extrabold text-amber-400 uppercase tracking-wide leading-tight">
+                            {category.name}
+                          </h3>
+                        </div>
+                        <div className="flex-1 flex flex-col gap-3">
+                          {category.clues.map((clue, clueIndex) => (
+                            <button
+                              key={clue.value}
+                              disabled={clue.visited}
+                              onClick={() => handleClueClick(catIndex, clueIndex)}
+                              className={`flex-1 min-h-[70px] md:min-h-[100px] rounded-xl flex flex-col items-center justify-center border transition-all relative overflow-hidden group ${
+                                clue.visited
+                                  ? 'bg-slate-950 border-slate-900 text-slate-700 cursor-not-allowed shadow-inner'
+                                  : 'bg-gradient-to-b from-slate-850 to-slate-900 border-slate-800 text-amber-400 hover:border-amber-400 hover:scale-[1.02] shadow-md hover:shadow-amber-500/10 active:scale-95'
+                              }`}
+                            >
+                              {!clue.visited && (
+                                <span className="text-xl md:text-3xl font-black tracking-wider font-mono">
+                                  ${clue.value}
+                                </span>
+                              )}
+                              {clue.visited && (
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                                  <CheckCircleIcon /> Complete
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-850 flex items-center justify-between text-xs text-slate-400">
+                    <p className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                      Click any active dollar card to launch a question. Direct your student teams in turns!
+                    </p>
+                    <span className="hidden sm:inline">Contemporary World History II Honors Exam • June 1</span>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'flashcards' && (
+                <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800 max-w-2xl mx-auto w-full flex flex-col items-center">
+                  <div className="flex items-center gap-2 mb-6">
+                    <SparklesIcon />
+                    <h2 className="text-lg font-bold text-white uppercase tracking-wider">Independent Study Card Desk</h2>
+                  </div>
+                  
+                  <div className="w-full bg-slate-900 h-1.5 rounded-full mb-8 overflow-hidden">
+                    <div 
+                      className="bg-amber-400 h-full transition-all duration-300"
+                      style={{ width: `${((activeFlashcardIndex + 1) / allFlashcards.length) * 100}%` }}
+                    ></div>
+                  </div>
+
+                  <div 
+                    onClick={() => setFlashcardFlipped(!flashcardFlipped)}
+                    className={`w-full min-h-[300px] bg-slate-900 hover:bg-slate-850 rounded-xl p-8 border border-slate-800 cursor-pointer flex flex-col justify-between transition-all duration-300 ${flashcardFlipped ? 'border-amber-500/50 shadow-lg shadow-amber-500/5' : ''}`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs font-bold text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        {allFlashcards[activeFlashcardIndex].category} (${allFlashcards[activeFlashcardIndex].value})
+                      </span>
+                      <span className="text-xs text-slate-500 font-mono">
+                        {activeFlashcardIndex + 1} / {allFlashcards.length}
+                      </span>
+                    </div>
+
+                    <div className="my-6 text-center">
+                      {!flashcardFlipped ? (
+                        <div>
+                          <span className="text-xs text-slate-500 block mb-2 uppercase tracking-widest font-semibold">Question Prompt</span>
+                          <p className="text-lg md:text-xl font-medium leading-relaxed text-white">
+                            {allFlashcards[activeFlashcardIndex].question}
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <span className="text-xs text-amber-400 block mb-2 uppercase tracking-widest font-semibold">Official Answer</span>
+                          <p className="text-lg md:text-xl font-bold text-amber-300 mb-4 leading-relaxed">
+                            {allFlashcards[activeFlashcardIndex].answer}
+                          </p>
+                          {allFlashcards[activeFlashcardIndex].details && (
+                            <p className="text-xs text-slate-400 italic mt-4 max-w-md mx-auto pt-4 border-t border-slate-800">
+                              {allFlashcards[activeFlashcardIndex].details}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="text-center text-xs text-slate-500 uppercase tracking-widest font-medium">
+                      Click/Tap anywhere to flip card
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between w-full mt-6 gap-4">
+                    <button 
+                      disabled={activeFlashcardIndex === 0}
+                      onClick={() => {
+                        setActiveFlashcardIndex(prev => prev - 1);
+                        setFlashcardFlipped(false);
+                      }}
+                      className="px-4 py-2 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center gap-1"
+                    >
+                      Previous
+                    </button>
+                    <button 
+                      onClick={() => setFlashcardFlipped(!flashcardFlipped)}
+                      className="px-6 py-2 bg-slate-800 text-amber-400 hover:text-amber-300 text-xs font-semibold rounded-lg hover:bg-slate-700 transition-all"
+                    >
+                      Flip Card
+                    </button>
+                    <button 
+                      disabled={activeFlashcardIndex === allFlashcards.length - 1}
+                      onClick={() => {
+                        setActiveFlashcardIndex(prev => prev + 1);
+                        setFlashcardFlipped(false);
+                      }}
+                      className="px-4 py-2 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center gap-1"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'final-jeopardy' && (
+                <div className="bg-gradient-to-b from-slate-950 to-slate-900 rounded-2xl p-6 border-2 border-rose-500/30 max-w-3xl mx-auto w-full flex flex-col items-center relative overflow-hidden shadow-2xl">
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-rose-500 via-amber-500 to-rose-500"></div>
+                  
+                  <div className="flex items-center gap-2 mb-6 mt-4">
+                    <FlameIcon />
+                    <h2 className="text-2xl font-black text-rose-400 tracking-wider text-center uppercase">
+                      Final Jeopardy Round
+                    </h2>
+                  </div>
+
+                  <div className="text-center mb-8 max-w-xl">
+                    <span className="text-xs text-amber-400 font-extrabold uppercase tracking-widest bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/20">
+                      Category: {FINAL_JEOPARDY.category}
+                    </span>
+                    <p className="text-slate-400 text-sm mt-3">
+                      Decide on wager amounts with your team sheets before displaying the final open-ended question.
+                    </p>
+                  </div>
+
+                  <div className="w-full bg-slate-950 border border-slate-850 rounded-xl p-8 mb-8 text-center shadow-inner">
+                    <p className="text-xl md:text-2xl font-semibold leading-relaxed text-slate-100">
+                      {FINAL_JEOPARDY.question}
+                    </p>
+
+                    {showAnswer && (
+                      <div className="mt-8 pt-8 border-t border-slate-800 text-left">
+                        <span className="text-xs text-rose-400 font-extrabold uppercase tracking-widest block mb-2">Ideal Honors Answer Guidelines</span>
+                        <p className="text-amber-400 text-lg font-bold mb-4">
+                          {FINAL_JEOPARDY.answer}
+                        </p>
+                        <p className="text-slate-400 text-xs leading-relaxed bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+                          <strong>Honors Detail Context:</strong> {FINAL_JEOPARDY.details}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4">
+                    {!showAnswer ? (
+                      <button 
+                        onClick={handleRevealAnswer}
+                        className="px-8 py-3 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-sm rounded-xl transition-all shadow-lg hover:scale-105"
+                      >
+                        Reveal Answer Prompt
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => setShowAnswer(false)}
+                        className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-extrabold text-sm rounded-xl transition-all"
+                      >
+                        Hide Answer
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'study-guide' && (
+                <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800 shadow-xl max-w-4xl mx-auto w-full">
+                  <div className="flex items-center gap-2 mb-6 border-b border-slate-800 pb-4">
+                    <FileTextIcon />
+                    <h2 className="text-xl font-bold text-white uppercase tracking-wider">{STUDY_GUIDE_DATA.title}</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {STUDY_GUIDE_DATA.sections.map((section, idx) => (
+                      <div key={idx} className="bg-slate-900 p-5 rounded-xl border border-slate-850 hover:border-slate-800 transition-all">
+                        <h3 className="text-sm font-extrabold text-amber-400 mb-3 uppercase tracking-wide flex items-center gap-2">
+                          <span className="bg-slate-850 w-6 h-6 flex items-center justify-center rounded-lg text-xs text-slate-400">{idx+1}</span>
+                          {section.title}
+                        </h3>
+                        <p className="text-slate-300 text-xs leading-relaxed whitespace-pre-wrap">{section.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            <div className="w-full lg:w-80 flex flex-col gap-6">
+              
+              <div className="bg-slate-950 rounded-2xl p-5 border border-slate-800 shadow-xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <UsersIcon />
+                  <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-200">Interactive Teams</h3>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  {teams.map((team) => (
+                    <div 
+                      key={team.id} 
+                      className="bg-slate-900 rounded-xl p-4 border border-slate-800 hover:border-slate-750 transition-all flex flex-col gap-3"
+                    >
+                      <div className="flex justify-between items-center">
+                        <input 
+                          type="text" 
+                          value={team.name}
+                          onChange={(e) => updateTeamName(team.id, e.target.value)}
+                          className="bg-transparent border-b border-dashed border-slate-700 hover:border-slate-500 focus:border-amber-400 focus:outline-none text-slate-200 text-sm font-semibold max-w-[120px] pb-0.5"
+                        />
+                        <span className={`text-xl font-black font-mono tracking-wider ${team.score >= 0 ? 'text-amber-400' : 'text-rose-500'}`}>
+                          ${team.score}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-1.5">
+                        <button 
+                          onClick={() => handleScoreChange(team.id, -200)}
+                          className="text-[10px] bg-slate-950 hover:bg-rose-950/20 text-rose-500 py-1 border border-slate-800 rounded font-bold"
+                        >
+                          -200
+                        </button>
+                        <button 
+                          onClick={() => handleScoreChange(team.id, -100)}
+                          className="text-[10px] bg-slate-950 hover:bg-rose-950/20 text-rose-500 py-1 border border-slate-800 rounded font-bold"
+                        >
+                          -100
+                        </button>
+                        <button 
+                          onClick={() => handleScoreChange(team.id, 100)}
+                          className="text-[10px] bg-slate-950 hover:bg-emerald-950/20 text-emerald-500 py-1 border border-slate-800 rounded font-bold"
+                        >
+                          +100
+                        </button>
+                        <button 
+                          onClick={() => handleScoreChange(team.id, 200)}
+                          className="text-[10px] bg-slate-950 hover:bg-emerald-950/20 text-emerald-500 py-1 border border-slate-800 rounded font-bold"
+                        >
+                          +200
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-slate-950 rounded-2xl p-5 border border-slate-800 shadow-xl flex-1 flex flex-col justify-between min-h-[250px]">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <HelpCircleIcon />
+                    <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-200">Socratic Seminar Corner</h3>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Remember: Your exam begins on June 1 at 9:00 AM. 10% of your grade involves defending why there is no 'one right way' to see class topics.
+                  </p>
+                  
+                  <div className="mt-4 bg-slate-900 rounded-lg p-3.5 border border-slate-850">
+                    <span className="text-[10px] font-extrabold text-amber-500 uppercase tracking-widest block mb-1">Guiding Prompt</span>
+                    <p className="text-slate-200 text-xs italic leading-snug">
+                      "Consider several topics discussed this year. How might it be argued that there are two differing yet simultaneously 'correct' ways to understand the same historical issue?"
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-slate-850 text-center">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Kohlhagen 2026 Honors Prep</span>
+                </div>
+              </div>
+
+            </div>
+          </main>
+
+          {selectedClue && (
+            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-150">
+                <div className="bg-slate-950 px-6 py-4 flex justify-between items-center border-b border-slate-850">
+                  <div>
+                    <span className="text-xs font-bold text-amber-400 tracking-wider uppercase">
+                      {selectedClue.categoryName}
+                    </span>
+                    <h4 className="text-xs text-slate-400 font-mono">Value: ${selectedClue.value} Clue Card</h4>
+                  </div>
+                  <button 
+                    onClick={() => handleClueClose(false)}
+                    className="text-slate-400 hover:text-slate-100 p-1.5 hover:bg-slate-850 rounded-lg transition-all"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="p-6 md:p-8 flex flex-col justify-between min-h-[220px]">
+                  <div>
+                    <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest block mb-2">Clue Statement:</span>
+                    <p className="text-slate-100 text-base md:text-xl font-medium leading-relaxed">
+                      {selectedClue.question}
+                    </p>
+                  </div>
+
+                  {showAnswer && (
+                    <div className="mt-6 pt-6 border-t border-slate-800">
+                      <span className="text-amber-400 text-[10px] font-bold uppercase tracking-widest block mb-2">Ideal Honors Student Answer:</span>
+                      <p className="text-amber-300 text-base md:text-lg font-bold leading-relaxed mb-3">
+                        {selectedClue.answer}
+                      </p>
+                      {selectedClue.details && (
+                        <div className="bg-slate-950 p-3.5 rounded-lg border border-slate-850 mt-3 text-xs text-slate-400 leading-relaxed">
+                          <strong>Historical Context / Detail:</strong> {selectedClue.details}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-slate-950 px-6 py-4 border-t border-slate-850 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex gap-2">
+                    {!showAnswer ? (
+                      <button 
+                        onClick={handleRevealAnswer}
+                        className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-lg uppercase tracking-wider transition-all"
+                      >
+                        Reveal Answer
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => setShowAnswer(false)}
+                        className="px-6 py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-extrabold text-xs rounded-lg uppercase tracking-wider transition-all"
+                      >
+                        Hide Answer
+                      </button>
+                    )}
+                  </div>
+
+                  {showAnswer && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mr-2">Award:</span>
+                      {teams.map(team => (
+                        <div key={team.id} className="flex gap-1 bg-slate-900 rounded-lg p-1 border border-slate-800">
+                          <span className="text-[10px] font-semibold text-slate-300 px-2 flex items-center">{team.name}:</span>
+                          <button 
+                            onClick={() => handleScoreChange(team.id, -selectedClue.value)}
+                            className="p-1 text-xs text-rose-500 hover:bg-rose-950/20 rounded"
+                            title="Deduct"
+                          >
+                            <XCircleIcon />
+                          </button>
+                          <button 
+                            onClick={() => handleScoreChange(team.id, selectedClue.value)}
+                            className="p-1 text-xs text-emerald-500 hover:bg-emerald-950/20 rounded"
+                            title="Award"
+                          >
+                            <CheckCircleIcon />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <button 
+                    onClick={() => handleClueClose(true)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold rounded-lg transition-all"
+                  >
+                    Mark Done & Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {toastMessage && (
+            <div className="fixed bottom-4 right-4 z-50 bg-slate-950 border border-amber-500/30 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-xs text-amber-400 animate-bounce">
+              <SparklesIcon />
+              <span>{toastMessage}</span>
+            </div>
+          )}
+
+          <footer className="bg-slate-950 border-t border-slate-850 py-4 mt-auto text-center text-xs text-slate-500">
+            <p>© 2026 Honors Contemporary World History II Jeopardy Dashboard. Designed for Kohlhagen Exam Review.</p>
+          </footer>
+        </div>
+      );
+    }
+
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
+  </script>
+</body>
+</html>

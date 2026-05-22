@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAT Spellbound Academy: Quest RPG</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for retro/fantasy look -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Plus+Jakarta+Sans:wght@400;600;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .fantasy-header {
+            font-family: 'Cinzel', serif;
+        }
+        .retro-text {
+            font-family: 'Press Start 2P', monospace;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 4px;
+        }
+        /* Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px) rotate(-1deg); }
+            75% { transform: translateX(6px) rotate(1deg); }
+        }
+        .animate-shake {
+            animation: shake 0.2s ease-in-out infinite;
+        }
+        /* Float Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        /* Cast spell effect animation */
+        @keyframes spellCast {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.5); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .spell-cast {
+            animation: spellCast 0.4s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+
+    <!-- TOP HEADER / HUD -->
+    <header class="border-b border-indigo-900/50 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-indigo-600/20 border border-indigo-500 rounded-xl shadow-lg shadow-indigo-500/10">
+                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="fantasy-header text-xl md:text-2xl font-black tracking-wider bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">SPELLBOUND</h1>
+                    <p class="text-xs text-indigo-300/80 uppercase tracking-widest font-bold">SAT Preparation RPG</p>
+                </div>
+            </div>
+
+            <!-- Global Player Quick Stats -->
+            <div id="quick-hud" class="hidden flex items-center space-x-6">
+                <!-- Level Badge -->
+                <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700/60 shadow-inner">
+                    <span class="text-xs font-bold text-indigo-400">LVL</span>
+                    <span id="hud-level" class="font-black text-white text-sm">1</span>
+                </div>
+                <!-- XP Bar -->
+                <div class="hidden md:flex flex-col w-28">
+                    <div class="flex justify-between text-[10px] text-slate-400 font-bold mb-0.5">
+                        <span>XP</span>
+                        <span id="hud-xp-ratio">0/100</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700/50">
+                        <div id="hud-xp-bar" class="bg-indigo-500 h-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                <!-- Health Shield Indicator -->
+                <div class="flex items-center space-x-1.5">
+                    <span class="text-rose-500">❤️</span>
+                    <span id="hud-hp" class="font-bold text-rose-400 text-sm">100/100</span>
+                    <span id="hud-shield" class="hidden bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-[10px] px-1.5 rounded-md font-bold uppercase ml-1 animate-pulse">🛡️ Shielded</span>
+                </div>
+                <!-- Gold Indicator -->
+                <div class="flex items-center space-x-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
+                    <span class="text-amber-400">🪙</span>
+                    <span id="hud-gold" class="font-black text-amber-300 text-sm">0</span>
+                </div>
+            </div>
+
+            <!-- Sound toggle and mute -->
+            <button id="sound-btn" onclick="toggleMute()" class="p-2 bg-slate-800/50 border border-slate-700/50 hover:bg-slate-700/50 rounded-xl transition text-slate-400" title="Toggle Sound Synth">
+                🔊 Audio ON
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN GAME CONTAINER -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <!-- Start Screen -->
+        <section id="start-screen" class="max-w-xl w-full bg-slate-900 border border-indigo-900/50 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="text-center space-y-6 relative z-10">
+                <div class="w-24 h-24 mx-auto bg-indigo-600/10 border border-indigo-500/30 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/5 animate-float">
+                    <span class="text-5xl">🔮</span>
+                </div>
+                <h2 class="fantasy-header text-3xl font-black text-slate-100">Welcome, Initiate Mage</h2>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    The Spellbound Academy is under siege by rogue linguistic anomalies and algebraic constructs! Harness your knowledge of math, writing mechanics, and context clues to cast powerful spells and purify the rogue elements.
+                </p>
+
+                <!-- Choose Specialization Theme -->
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-left">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 text-center">Select Your Class Style</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setTheme('wizard')" id="theme-wizard" class="theme-opt p-3 bg-indigo-600/20 border-2 border-indigo-500 rounded-xl text-center transition hover:border-indigo-400 flex flex-col items-center">
+                            <span class="text-2xl mb-1">🧙‍♂️</span>
+                            <span class="text-[10px] font-bold text-slate-200">Aether Mage</span>
+                        </button>
+                        <button onclick="setTheme('cyber')" id="theme-cyber" class="theme-opt p-3 bg-slate-900 border-2 border-slate-800 rounded-xl text-center transition hover:border-cyan-500 flex flex-col items-center">
+                            <span class="text-2xl mb-1">🧬</span>
+                            <span class="text-[10px] font-bold text-slate-400">Cyber Hacker</span>
+                        </button>
+                        <button onclick="setTheme('cosmic')" id="theme-cosmic" class="theme-opt p-3 bg-slate-900 border-2 border-slate-800 rounded-xl text-center transition hover:border-pink-500 flex flex-col items-center">
+                            <span class="text-2xl mb-1">☄️</span>
+                            <span class="text-[10px] font-bold text-slate-400">Stellar Druid</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button onclick="startGame()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-indigo-500/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-lg uppercase tracking-wider">
+                        Begin Entrance Trial
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Battle Screen -->
+        <section id="battle-screen" class="hidden w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
+            
+            <!-- LEFT COLUMN: Character HUD & Shop & Spellbook Log (lg:col-span-4) -->
+            <div class="lg:col-span-4 space-y-6 flex flex-col">
+                
+                <!-- Character Card -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl relative overflow-hidden">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <div id="player-avatar" class="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-700 border-2 border-indigo-400 rounded-2xl flex items-center justify-center text-3xl shadow-md">
+                                🧙‍♂️
+                            </div>
+                            <span id="player-lvl-badge" class="absolute -bottom-1 -right-1 bg-indigo-500 text-slate-950 font-black text-xs px-1.5 py-0.5 rounded-full border border-indigo-300">1</span>
+                        </div>
+                        <div>
+                            <h3 id="player-name-title" class="fantasy-header text-lg font-black text-slate-200">Aether Scholar</h3>
+                            <p class="text-xs text-indigo-400/80 font-bold uppercase tracking-widest">Academy Defender</p>
+                        </div>
+                    </div>
+
+                    <!-- Health Progress -->
+                    <div class="mt-5 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-bold">Health points (HP)</span>
+                            <span class="text-rose-400 font-black" id="battle-hp-text">100 / 100</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                            <div id="battle-hp-bar" class="bg-rose-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Shield state indicator -->
+                    <div id="shield-active-banner" class="hidden mt-3 bg-cyan-950 border border-cyan-800 text-cyan-400 text-xs py-2 px-3 rounded-xl flex items-center space-x-2 animate-pulse">
+                        <span>🛡️</span>
+                        <span class="font-semibold">Aegis Shield Active: Next error damage negated!</span>
+                    </div>
+                </div>
+
+                <!-- Academy Magic Shop -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex-grow flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <h4 class="fantasy-header font-black text-sm tracking-wider text-slate-300">🏛️ ACADEMY BOOSTER SHOP</h4>
+                            <div class="flex items-center space-x-1.5 bg-amber-500/10 px-2 py-1 rounded-md">
+                                <span class="text-sm">🪙</span>
+                                <span id="shop-gold" class="font-bold text-amber-300 text-xs">0</span>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-2 mb-4 leading-normal">
+                            Earn Gold from correctly solved anomalies. Boosters apply instantly!
+                        </p>
+                        
+                        <!-- Shop Item Grid -->
+                        <div class="space-y-3">
+                            <!-- Potion -->
+                            <button onclick="buyItem('potion')" class="w-full flex items-center justify-between p-2.5 bg-slate-950 border border-slate-800 hover:border-rose-500/50 rounded-xl transition group text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-rose-500/10 rounded-lg border border-rose-500/20 flex items-center justify-center text-xl group-hover:scale-105 transition">❤️</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-200">Elixir of Life</p>
+                                        <p class="text-[10px] text-slate-500">Restores 40 Health Points</p>
+                                    </div>
+                                </div>
+                                <span class="bg-amber-400/10 text-amber-300 border border-amber-400/30 font-bold text-xs px-2.5 py-1 rounded-lg">🪙 30</span>
+                            </button>
+
+                            <!-- Shield -->
+                            <button onclick="buyItem('shield')" class="w-full flex items-center justify-between p-2.5 bg-slate-950 border border-slate-800 hover:border-cyan-500/50 rounded-xl transition group text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-cyan-500/10 rounded-lg border border-cyan-500/20 flex items-center justify-center text-xl group-hover:scale-105 transition">🛡️</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-200">Aegis Ward</p>
+                                        <p class="text-[10px] text-slate-500">Absorbs 1 incorrect answer</p>
+                                    </div>
+                                </div>
+                                <span class="bg-amber-400/10 text-amber-300 border border-amber-400/30 font-bold text-xs px-2.5 py-1 rounded-lg">🪙 40</span>
+                            </button>
+
+                            <!-- 50/50 -->
+                            <button onclick="buyItem('scroll')" class="w-full flex items-center justify-between p-2.5 bg-slate-950 border border-slate-800 hover:border-indigo-500/50 rounded-xl transition group text-left">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-indigo-500/10 rounded-lg border border-indigo-500/20 flex items-center justify-center text-xl group-hover:scale-105 transition">📜</div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-200">Scroll of Clarity</p>
+                                        <p class="text-[10px] text-slate-500">Filters 2 incorrect answers</p>
+                                    </div>
+                                </div>
+                                <span class="bg-amber-400/10 text-amber-300 border border-amber-400/30 font-bold text-xs px-2.5 py-1 rounded-lg">🪙 50</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Audio volume status note -->
+                    <div class="text-[10px] text-slate-500 text-center mt-4">
+                        *Sound effects generated with synthesized Web Audio.
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Battle Theater & Questions Canvas (lg:col-span-8) -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- Battle Screen Canvas & Monster Status -->
+                <div id="battle-theater" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl relative overflow-hidden h-72 flex flex-col justify-between">
+                    <!-- Background aesthetic overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-indigo-950/20 pointer-events-none"></div>
+                    
+                    <!-- Top row: Stage Name & Combo -->
+                    <div class="flex justify-between items-center relative z-10">
+                        <span id="stage-badge" class="bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Anomaly Level 1</span>
+                        <div class="text-right">
+                            <span id="combo-badge" class="hidden bg-rose-500 text-slate-950 text-xs font-bold px-2 py-0.5 rounded-full animate-bounce">🔥 COMBO x2</span>
+                        </div>
+                    </div>
+
+                    <!-- Center row: Combatants -->
+                    <div class="grid grid-cols-2 items-center justify-items-center h-full relative z-10">
+                        <!-- Hero Avatar -->
+                        <div class="flex flex-col items-center">
+                            <div id="combat-hero-icon" class="text-5xl animate-float filter drop-shadow-[0_4px_12px_rgba(99,102,241,0.5)]">🧙‍♂️</div>
+                            <span class="text-xs text-indigo-300 font-bold mt-2">Scholar Mage</span>
+                        </div>
+
+                        <!-- VS Middle indicator -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-10 font-black text-6xl italic pointer-events-none">VS</div>
+
+                        <!-- Enemy Avatar -->
+                        <div class="flex flex-col items-center text-center">
+                            <div id="enemy-sprite" class="text-5xl animate-float filter drop-shadow-[0_4px_12px_rgba(239,68,68,0.5)]" style="animation-delay: 1.5s;">👾</div>
+                            <div class="mt-2 space-y-1">
+                                <span id="enemy-name" class="fantasy-header text-sm font-black text-rose-400">Quadratic Golem</span>
+                                <!-- Monster HP Bar -->
+                                <div class="w-32 bg-slate-950 border border-slate-800 h-2 rounded-full overflow-hidden p-0.5">
+                                    <div id="enemy-hp-bar" class="bg-rose-500 h-full rounded-full transition-all duration-300" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom row: Tactical Combat Logs -->
+                    <div class="bg-slate-950/80 border border-slate-800/80 rounded-xl p-2.5 z-10 text-xs text-slate-300 text-center relative max-h-16 overflow-y-auto" id="combat-log">
+                        ⚡ Anomaly spotted! Prepare your spell deck...
+                    </div>
+                </div>
+
+                <!-- SAT Question & Spell-casting Choices Panel -->
+                <div id="question-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl relative min-h-[350px] flex flex-col justify-between">
+                    
+                    <!-- Question Category -->
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-800/80">
+                        <span id="question-category" class="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full uppercase tracking-wider">Algebra</span>
+                        <span class="text-xs text-slate-400 font-medium" id="question-counter">Question 1 of 10</span>
+                    </div>
+
+                    <!-- Question Body -->
+                    <div class="my-6">
+                        <div id="question-text" class="text-slate-200 text-base md:text-lg font-medium leading-relaxed mb-4">
+                            <!-- Placeholder Question -->
+                        </div>
+                        
+                        <!-- Snippet or passage layout if required -->
+                        <div id="question-passage" class="hidden bg-slate-950 p-4 border border-slate-800 rounded-2xl text-xs md:text-sm text-slate-300 max-h-40 overflow-y-auto mb-4 italic leading-relaxed">
+                            <!-- Passage text goes here -->
+                        </div>
+                    </div>
+
+                    <!-- Options Grid (Spells) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="options-container">
+                        <!-- Option Buttons generated dynamically -->
+                    </div>
+
+                    <!-- Interactive bottom panel: Hint & Skip -->
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-800/80">
+                        <button onclick="revealHint()" id="hint-btn" class="flex items-center space-x-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold transition">
+                            <span>💡 Need a hint?</span>
+                        </button>
+                        <div id="hint-panel" class="hidden max-w-md bg-indigo-950/30 border border-indigo-900/40 rounded-xl p-3 text-xs text-indigo-300 italic transition-all">
+                            <!-- Hint goes here -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Final Win/Loss and Spellbook Review Screen -->
+        <section id="results-screen" class="hidden max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="text-center space-y-6">
+                <!-- Trophy/GameOver SVG Icon -->
+                <div id="result-icon" class="text-6xl animate-float">🏆</div>
+                <h2 id="result-title" class="fantasy-header text-3xl font-black text-emerald-400">TRIAL VICTORIOUS!</h2>
+                
+                <p id="result-desc" class="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
+                    You have purged the rogue grammatical constructs and linear systems. Your spell casting was top tier!
+                </p>
+
+                <!-- Final Stats breakdown -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto py-4">
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+                        <p class="text-slate-500 text-xs uppercase font-bold tracking-widest">Accuracy</p>
+                        <p id="res-accuracy" class="text-2xl font-black text-indigo-400">100%</p>
+                    </div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+                        <p class="text-slate-500 text-xs uppercase font-bold tracking-widest">XP Gained</p>
+                        <p id="res-xp" class="text-2xl font-black text-emerald-400">150</p>
+                    </div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+                        <p class="text-slate-500 text-xs uppercase font-bold tracking-widest">Gold Earned</p>
+                        <p id="res-gold" class="text-2xl font-black text-amber-400">120</p>
+                    </div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+                        <p class="text-slate-500 text-xs uppercase font-bold tracking-widest">Level Reached</p>
+                        <p id="res-level" class="text-2xl font-black text-purple-400">Level 3</p>
+                    </div>
+                </div>
+
+                <!-- REVIEW SPELLBOOK Section -->
+                <div class="text-left mt-8">
+                    <h3 class="fantasy-header text-lg font-black text-slate-300 mb-3 flex items-center space-x-2">
+                        <span>📖</span>
+                        <span>Spellbook Trial Review (Rationales)</span>
+                    </h3>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 max-h-72 overflow-y-auto space-y-4" id="spellbook-review">
+                        <!-- Dynamic list of answered questions -->
+                    </div>
+                </div>
+
+                <div class="pt-6 flex flex-col md:flex-row justify-center gap-4">
+                    <button onclick="restartGame()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg shadow-indigo-500/20 transition-all text-sm uppercase tracking-wider">
+                        Re-enter Trial Grounds
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 py-4 bg-slate-950 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2">
+            <p>Made with 💖 for SAT Champions. Self-contained Offline Engine.</p>
+            <p>© 2026 Spellbound Academy Study Labs</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE SCRIPTING AND DATABASE ENGINE -->
+    <script>
+        // Synthesizer Audio Context logic
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            // Resume audioCtx context if suspended
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'hit') {
+                // Success Retro Zap
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'hurt') {
+                // Fail Synth Buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 0.4);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'levelUp') {
+                // Level Up Chime melody
+                const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C
+                notes.forEach((freq, idx) => {
+                    const oscNote = audioCtx.createOscillator();
+                    const gainNote = audioCtx.createGain();
+                    oscNote.type = 'sine';
+                    oscNote.frequency.value = freq;
+                    oscNote.connect(gainNote);
+                    gainNote.connect(audioCtx.destination);
+                    gainNote.gain.setValueAtTime(0.15, now + idx * 0.1);
+                    gainNote.gain.linearRampToValueAtTime(0.01, now + idx * 0.1 + 0.15);
+                    oscNote.start(now + idx * 0.1);
+                    oscNote.stop(now + idx * 0.1 + 0.15);
+                });
+            } else if (type === 'shop') {
+                // Coin Register Jingle
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.setValueAtTime(1320, now + 0.08);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'gameover') {
+                // Sad minor chord cadence
+                const notes = [196.00, 164.81, 130.81]; // G, E, C lower
+                notes.forEach((freq, idx) => {
+                    const oscNote = audioCtx.createOscillator();
+                    const gainNote = audioCtx.createGain();
+                    oscNote.type = 'triangle';
+                    oscNote.frequency.value = freq;
+                    oscNote.connect(gainNote);
+                    gainNote.connect(audioCtx.destination);
+                    gainNote.gain.setValueAtTime(0.15, now + idx * 0.2);
+                    gainNote.gain.linearRampToValueAtTime(0.01, now + idx * 0.2 + 0.3);
+                    oscNote.start(now + idx * 0.2);
+                    oscNote.stop(now + idx * 0.2 + 0.3);
+                });
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('sound-btn');
+            if (isMuted) {
+                btn.innerText = '🔇 Audio OFF';
+                btn.classList.add('opacity-60');
+            } else {
+                btn.innerText = '🔊 Audio ON';
+                btn.classList.remove('opacity-60');
+                // Prime audio context
+                initAudio();
+            }
+        }
+
+        // --- SAT QUESTION DATABASE ---
+        // Carefully tailored actual SAT-style questions for high fidelity prep
+        const satQuestions = [
+            {
+                id: 1,
+                category: "Heart of Algebra",
+                type: "math",
+                passage: null,
+                question: "If $2x - y = 8$ and $x + 2y = 4$, what is the value of the algebraic coordinate sum $x + y$?",
+                options: [
+                    "2",
+                    "4",
+                    "6",
+                    "8"
+                ],
+                correctIndex: 1, // "4"
+                hint: "Solve for x by eliminating y, or substitute y = 2x - 8 into the second equation.",
+                explanation: "Substitute $y = 2x - 8$ from the first equation into the second: $x + 2(2x - 8) = 4 \\Rightarrow x + 4x - 16 = 4 \\Rightarrow 5x = 20 \\Rightarrow x = 4$. Substituting $x = 4$ back into the equation yields $y = 0$. Thus, $x + y = 4 + 0 = 4$."
+            },
+            {
+                id: 2,
+                category: "Standard English Conventions",
+                type: "writing",
+                passage: null,
+                question: "Choose the correction that satisfies the conventions of Standard written English:\n\n'Walking down the busy street during the unexpected parade, ________.'",
+                options: [
+                    "the skyscraper came beautifully into view.",
+                    "my colorful hat blew off into the wind.",
+                    "I suddenly noticed a rare antique shop.",
+                    "a vintage flyer was handed to me by a scout."
+                ],
+                correctIndex: 2, // "I suddenly noticed..."
+                hint: "Watch out for dangling modifiers! The phrase 'Walking down the busy street' must logically modify the subject that directly follows it.",
+                explanation: "The opening phrase 'Walking down the busy street' is a participial modifier. The noun immediately following must be the entity doing the walking. Skyscrapers, hats, and flyers cannot walk; only 'I' can walk, making choice C correct."
+            },
+            {
+                id: 3,
+                category: "Problem Solving & Data Analysis",
+                type: "math",
+                passage: null,
+                question: "A car rental agency charges a flat daily base fee of $\\$25$ plus a usage rate of $\\$0.15$ per mile driven. Which of the following linear functions represents the total cost, $C(m)$, in dollars, for renting a car for one day and driving $m$ miles?",
+                options: [
+                    "$C(m) = 25m + 0.15$",
+                    "$C(m) = 0.15m + 25$",
+                    "$C(m) = 25.15m$",
+                    "$C(m) = 25m - 0.15$"
+                ],
+                correctIndex: 1, // "$C(m) = 0.15m + 25$"
+                hint: "Identify the fixed rate (y-intercept) and the variable rate (slope) of the linear equation.",
+                explanation: "The daily fee is flat/fixed ($\\$25$), whereas the variable charge changes with miles driven ($0.15$ per mile). Therefore, $C(m) = 0.15m + 25$ perfectly models the function."
+            },
+            {
+                id: 4,
+                category: "Words in Context",
+                type: "reading",
+                passage: "Notwithstanding fatigues of every description, and in all climates, Ferguson's constitution continued marvelously sound. He felt at absolute ease in the midst of the most complete privations; he was the very type of the accomplished explorer.",
+                question: "As used in the text, what does the word 'constitution' most nearly mean?",
+                options: [
+                    "Statute",
+                    "Principles",
+                    "Physical health",
+                    "Ordinance"
+                ],
+                correctIndex: 2, // "Physical health"
+                hint: "Look at the description 'continued marvelously sound' despite fatigue and climate stressors.",
+                explanation: "In this passage, 'constitution' refers to Ferguson's physical state, health, and vitality, which remained robust ('sound') despite hardships."
+            },
+            {
+                id: 5,
+                category: "Advanced Math",
+                type: "math",
+                passage: null,
+                question: "Solve the quadratic equation for $x$: $x^2 - 5x + 6 = 0$. Which of the following is a correct solution for $x$?",
+                options: [
+                    "$-2$",
+                    "$-3$",
+                    "$3$",
+                    "$5$"
+                ],
+                correctIndex: 2, // "3"
+                hint: "Factor the quadratic trinomial into $(x - a)(x - b) = 0$. Find factors of 6 that sum to -5.",
+                explanation: "The quadratic factors to $(x - 2)(x - 3) = 0$. Solving for $x$ yields roots $x = 2$ and $x = 3$. Therefore, $3$ is a correct option."
+            },
+            {
+                id: 6,
+                category: "Standard English Conventions",
+                type: "writing",
+                passage: null,
+                question: "The newly proposed space telescope requires three primary components to perform deep stellar imaging________ an ultra-sensitive light sensor, a cryogenic cooling array, and a high-gain telemetry system.",
+                options: [
+                    "semicolon (;)",
+                    "comma (,)",
+                    "colon (:)",
+                    "dash (-)"
+                ],
+                correctIndex: 2, // "colon (:)"
+                hint: "Which punctuation mark is used to introduce an itemized list that elaborates on elements mentioned in an independent clause?",
+                explanation: "A colon is the correct choice to introduce a list following an independent clause that sets up the components."
+            },
+            {
+                id: 7,
+                category: "Additional Topics in Math",
+                type: "math",
+                passage: null,
+                question: "The equation $(x - 3)^2 + (y + 4)^2 = 25$ represents a circle in the xy-plane. What are the coordinates of the center and the length of the radius of the circle?",
+                options: [
+                    "Center: $(-3, 4)$, Radius: $5$",
+                    "Center: $(3, -4)$, Radius: $5$",
+                    "Center: $(3, -4)$, Radius: $25$",
+                    "Center: $(-3, -4)$, Radius: $25$"
+                ],
+                correctIndex: 1, // "Center: (3, -4), Radius: 5"
+                hint: "The standard equation of a circle is $(x - h)^2 + (y - k)^2 = r^2$. Observe the signs of h and k.",
+                explanation: "Comparing with $(x - h)^2 + (y - k)^2 = r^2$, we find $h = 3$, $k = -4$, and $r^2 = 25$, meaning radius $r = 5$. Thus, center is $(3, -4)$ and radius is $5$."
+            },
+            {
+                id: 8,
+                category: "Words in Context",
+                type: "reading",
+                passage: "The parasitic dodder plant increases its reproductive success by flowering at the exact same time as the host plant it has latched onto. In 2020, biologists determined that the dodder achieves this ________ with its host by absorbing and utilizing a crucial protein the host produces when it is preparing to flower.",
+                question: "Which choice completes the text with the most logical and precise word or phrase?",
+                options: [
+                    "synchronization",
+                    "hibernation",
+                    "isolation",
+                    "resistance"
+                ],
+                correctIndex: 0, // "synchronization"
+                hint: "Identify the word that means happening or coordinating at the exact same time.",
+                explanation: "Flowering at the 'exact same time' corresponds directly to 'synchronization'. The other terms do not convey coordinated timing."
+            },
+            {
+                id: 9,
+                category: "Standard English Conventions",
+                type: "writing",
+                passage: null,
+                question: "The highly specialized team of atmospheric scientists ________ currently analyzing the soil and vapor readings collected from the Martian landing zone.",
+                options: [
+                    "are",
+                    "is",
+                    "have been",
+                    "were"
+                ],
+                correctIndex: 1, // "is"
+                hint: "Look for the true subject of the sentence. Is it plural 'scientists' or the singular collective noun 'team'?",
+                explanation: "The subject of the sentence is the collective singular noun 'team' ('of atmospheric scientists' is a prepositional modifier). Thus, a singular verb 'is' is required."
+            },
+            {
+                id: 10,
+                category: "Geometry & Trigonometry",
+                type: "math",
+                passage: null,
+                question: "In a right triangle, the cosine of acute angle $\\theta$ is $\\frac{4}{5}$. What is the value of the sine of $\\theta$?",
+                options: [
+                    "$\\frac{3}{5}$",
+                    "$\\frac{3}{4}$",
+                    "$\\frac{5}{4}$",
+                    "$\\frac{1}{5}$"
+                ],
+                correctIndex: 0, // "3/5"
+                hint: "Recall the Pythagorean trigonometric identity: $\\sin^2(\\theta) + \\cos^2(\\theta) = 1$, or sketch a 3-4-5 right triangle.",
+                explanation: "In a right-angled triangle with adjacent side of 4 and hypotenuse of 5, the opposite side is $\\sqrt{5^2 - 4^2} = 3$. Sine is opposite over hypotenuse, yielding $\\frac{3}{5}$."
+            }
+        ];
+
+        // --- MONSTERS DATABASE ---
+        const monsters = [
+            { name: "Algebraic Golem", sprite: "🤖", hp: 100, maxHp: 100 },
+            { name: "Sentence Gargoyle", sprite: "🦇", hp: 100, maxHp: 100 },
+            { name: "Quadratic Slime", sprite: "🟢", hp: 100, maxHp: 100 },
+            { name: "Context Chimera", sprite: "🦁", hp: 100, maxHp: 100 },
+            { name: "Linear Wyvern", sprite: "🐉", hp: 100, maxHp: 100 },
+            { name: "Syntactic Spider", sprite: "🕷️", hp: 120, maxHp: 120 },
+            { name: "Circle Specter", sprite: "👻", hp: 120, maxHp: 120 },
+            { name: "Vocabulary Basilisk", sprite: "🦎", hp: 120, maxHp: 120 },
+            { name: "Trigonometry Griffin", sprite: "🦅", hp: 120, maxHp: 120 },
+            { name: "SAT Grand Arch-Mage", sprite: "👑", hp: 150, maxHp: 150 }
+        ];
+
+        // --- GAME STATE ---
+        let gameState = {
+            level: 1,
+            xp: 0,
+            maxXp: 100,
+            hp: 100,
+            maxHp: 100,
+            gold: 0,
+            currentQuestionIdx: 0,
+            comboCount: 0,
+            activeShield: false,
+            userAnswers: [], // Track choices for review screen
+            currentMonster: null,
+            theme: 'wizard',
+            trialCompleted: false
+        };
+
+        // Class theme setups
+        const themeStyles = {
+            wizard: {
+                bg: "from-indigo-600 to-purple-700",
+                avatar: "🧙‍♂️",
+                title: "Aether Scholar",
+                buttonActive: "border-indigo-500 bg-indigo-600/20"
+            },
+            cyber: {
+                bg: "from-cyan-600 to-teal-700",
+                avatar: "🧬",
+                title: "Cyber Hacker",
+                buttonActive: "border-cyan-500 bg-cyan-600/20"
+            },
+            cosmic: {
+                bg: "from-pink-600 to-rose-700",
+                avatar: "☄️",
+                title: "Stellar Druid",
+                buttonActive: "border-pink-500 bg-pink-600/20"
+            }
+        };
+
+        function setTheme(themeKey) {
+            gameState.theme = themeKey;
+            
+            // Highlight chosen theme buttons
+            document.querySelectorAll('.theme-opt').forEach(btn => {
+                btn.className = "theme-opt p-3 bg-slate-900 border-2 border-slate-800 rounded-xl text-center transition hover:border-indigo-500 flex flex-col items-center";
+            });
+
+            const activeBtn = document.getElementById(`theme-${themeKey}`);
+            if (activeBtn) {
+                if (themeKey === 'wizard') activeBtn.className = "theme-opt p-3 bg-indigo-600/20 border-2 border-indigo-500 rounded-xl text-center transition flex flex-col items-center";
+                if (themeKey === 'cyber') activeBtn.className = "theme-opt p-3 bg-cyan-600/20 border-2 border-cyan-500 rounded-xl text-center transition flex flex-col items-center";
+                if (themeKey === 'cosmic') activeBtn.className = "theme-opt p-3 bg-pink-600/20 border-2 border-pink-500 rounded-xl text-center transition flex flex-col items-center";
+            }
+
+            // Update avatars
+            const t = themeStyles[themeKey];
+            document.getElementById('player-avatar').innerText = t.avatar;
+            document.getElementById('player-avatar').className = `w-16 h-16 bg-gradient-to-br ${t.bg} border-2 border-indigo-400 rounded-2xl flex items-center justify-center text-3xl shadow-md`;
+            document.getElementById('combat-hero-icon').innerText = t.avatar;
+            document.getElementById('player-name-title').innerText = t.title;
+        }
+
+        // --- START GAME ENGINE ---
+        function startGame() {
+            playSound('levelUp');
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('battle-screen').classList.remove('hidden');
+            document.getElementById('quick-hud').classList.remove('hidden');
+
+            // Reset Game state variables
+            gameState.level = 1;
+            gameState.xp = 0;
+            gameState.hp = 100;
+            gameState.gold = 30; // Start with some bonus spell gold!
+            gameState.currentQuestionIdx = 0;
+            gameState.comboCount = 0;
+            gameState.activeShield = false;
+            gameState.userAnswers = [];
+            gameState.trialCompleted = false;
+
+            updateHUD();
+            loadMonster(0);
+            loadQuestion(0);
+        }
+
+        function updateHUD() {
+            document.getElementById('hud-level').innerText = gameState.level;
+            document.getElementById('player-lvl-badge').innerText = gameState.level;
+            
+            // XP Percentages
+            const xpPct = (gameState.xp / gameState.maxXp) * 100;
+            document.getElementById('hud-xp-ratio').innerText = `${gameState.xp}/${gameState.maxXp}`;
+            document.getElementById('hud-xp-bar').style.width = `${xpPct}%`;
+
+            // HP Elements
+            document.getElementById('hud-hp').innerText = `${gameState.hp}/${gameState.maxHp}`;
+            document.getElementById('battle-hp-text').innerText = `${gameState.hp}/${gameState.maxHp}`;
+            document.getElementById('battle-hp-bar').style.width = `${gameState.hp}%`;
+
+            // Shield status
+            if (gameState.activeShield) {
+                document.getElementById('hud-shield').classList.remove('hidden');
+                document.getElementById('shield-active-banner').classList.remove('hidden');
+            } else {
+                document.getElementById('hud-shield').classList.add('hidden');
+                document.getElementById('shield-active-banner').classList.add('hidden');
+            }
+
+            // Gold Elements
+            document.getElementById('hud-gold').innerText = gameState.gold;
+            document.getElementById('shop-gold').innerText = gameState.gold;
+        }
+
+        // --- ENEMY STAGINGS ---
+        function loadMonster(index) {
+            const m = monsters[index];
+            gameState.currentMonster = { ...m };
+            document.getElementById('enemy-sprite').innerText = m.sprite;
+            document.getElementById('enemy-name').innerText = m.name;
+            document.getElementById('stage-badge').innerText = `Anomaly Level ${index + 1}`;
+            updateMonsterHP();
+        }
+
+        function updateMonsterHP() {
+            const pct = (gameState.currentMonster.hp / gameState.currentMonster.maxHp) * 100;
+            document.getElementById('enemy-hp-bar').style.width = `${pct}%`;
+        }
+
+        // --- QUESTION ENGINE ---
+        function loadQuestion(index) {
+            if (index >= satQuestions.length) {
+                endTrial(true);
+                return;
+            }
+
+            const q = satQuestions[index];
+            document.getElementById('question-counter').innerText = `Anomaly ${index + 1} of ${satQuestions.length}`;
+            document.getElementById('question-category').innerText = q.category;
+            
+            // Format math tags elegantly
+            let cleanText = q.question.replace(/\$(.*?)\$/g, '<code class="bg-indigo-950/40 text-indigo-300 font-bold px-1.5 py-0.5 rounded border border-indigo-900/30">$1</code>');
+            document.getElementById('question-text').innerHTML = cleanText;
+
+            // Handle passage snippets if provided
+            const passageEl = document.getElementById('question-passage');
+            if (q.passage) {
+                passageEl.innerText = q.passage;
+                passageEl.classList.remove('hidden');
+            } else {
+                passageEl.classList.add('hidden');
+            }
+
+            // Generate option buttons
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            
+            // Close hint pane if open
+            document.getElementById('hint-panel').classList.add('hidden');
+
+            q.options.forEach((optText, optIdx) => {
+                const button = document.createElement('button');
+                button.className = "w-full text-left p-4 rounded-2xl bg-slate-950/80 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500 transition-all flex items-start space-x-3 group relative overflow-hidden";
+                button.onclick = () => castSpell(optIdx);
+
+                // Option prefix badge
+                const prefix = ['A', 'B', 'C', 'D'][optIdx];
+                const cleanOpt = optText.replace(/\$(.*?)\$/g, '$1');
+
+                button.innerHTML = `
+                    <div class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-950 text-indigo-400 border border-indigo-900/50 group-hover:bg-indigo-600 group-hover:text-white transition font-bold text-xs shrink-0">${prefix}</div>
+                    <div class="text-slate-200 text-sm font-medium pt-0.5 leading-normal">${cleanOpt}</div>
+                `;
+                optsContainer.appendChild(button);
+            });
+        }
+
+        // --- COMBAT LOG ACTIONS ---
+        function logAction(msg, type = 'info') {
+            const log = document.getElementById('combat-log');
+            let color = 'text-slate-300';
+            if (type === 'success') color = 'text-emerald-400 font-bold';
+            if (type === 'danger') color = 'text-rose-400 font-bold';
+            if (type === 'special') color = 'text-amber-400 font-bold';
+            
+            log.innerHTML = `<span class="${color}">${msg}</span>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // --- MAGIC SHOP PURCHASES ---
+        function buyItem(item) {
+            if (item === 'potion') {
+                if (gameState.gold >= 30) {
+                    gameState.gold -= 30;
+                    gameState.hp = Math.min(gameState.maxHp, gameState.hp + 40);
+                    playSound('shop');
+                    logAction("🧪 You chugged an Elixir of Life! Restored 40 HP.", "special");
+                } else {
+                    logAction("❌ Not enough gold to buy an Elixir of Life!", "danger");
+                }
+            } else if (item === 'shield') {
+                if (gameState.gold >= 40) {
+                    if (gameState.activeShield) {
+                        logAction("⚠️ You already have an active Aegis Ward!", "info");
+                        return;
+                    }
+                    gameState.gold -= 40;
+                    gameState.activeShield = true;
+                    playSound('shop');
+                    logAction("🛡️ Aegis Ward equipped! Your next wrong answer's damage is negated.", "special");
+                } else {
+                    logAction("❌ Not enough gold to buy an Aegis Ward!", "danger");
+                }
+            } else if (item === 'scroll') {
+                if (gameState.gold >= 50) {
+                    gameState.gold -= 50;
+                    playSound('shop');
+                    logAction("📜 Scroll of Clarity active! 2 wrong options have been vaporized.", "special");
+                    triggerClarityScroll();
+                } else {
+                    logAction("❌ Not enough gold to buy Scroll of Clarity!", "danger");
+                }
+            }
+            updateHUD();
+        }
+
+        // Vaporizes 2 wrong answers
+        function triggerClarityScroll() {
+            const currentQ = satQuestions[gameState.currentQuestionIdx];
+            const incorrectIndices = [];
+            currentQ.options.forEach((_, idx) => {
+                if (idx !== currentQ.correctIndex) {
+                    incorrectIndices.push(idx);
+                }
+            });
+
+            // Randomly select 2 wrong options to gray out/disable
+            const shuffled = incorrectIndices.sort(() => 0.5 - Math.random());
+            const toDisable = shuffled.slice(0, 2);
+
+            const buttons = document.getElementById('options-container').children;
+            for (let idx of toDisable) {
+                if (buttons[idx]) {
+                    buttons[idx].classList.add('opacity-30', 'pointer-events-none');
+                    buttons[idx].querySelector('div').innerText = '🚫';
+                }
+            }
+        }
+
+        // --- USE HINTS ---
+        function revealHint() {
+            const currentQ = satQuestions[gameState.currentQuestionIdx];
+            const panel = document.getElementById('hint-panel');
+            panel.innerText = currentQ.hint;
+            panel.classList.toggle('hidden');
+        }
+
+        // --- ANSWER SPELLCAST LOGIC ---
+        function castSpell(selectedIdx) {
+            const q = satQuestions[gameState.currentQuestionIdx];
+            const isCorrect = selectedIdx === q.correctIndex;
+            const card = document.getElementById('question-card');
+            const theater = document.getElementById('battle-theater');
+
+            // Log player answer
+            gameState.userAnswers.push({
+                question: q,
+                selectedIdx: selectedIdx,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                playSound('hit');
+                gameState.comboCount++;
+                const multiplier = gameState.comboCount >= 3 ? 2 : 1;
+                
+                // Deal Damage to current monster
+                const dmg = 40 * multiplier;
+                gameState.currentMonster.hp = Math.max(0, gameState.currentMonster.hp - dmg);
+                updateMonsterHP();
+
+                // Rewards
+                const goldGained = 15 * multiplier;
+                const xpGained = 20;
+                gameState.gold += goldGained;
+                gameState.xp += xpGained;
+
+                logAction(`🔥 Spell Successful! Dealt ${dmg} damage to ${gameState.currentMonster.name}! (+${goldGained} Gold, +${xpGained} XP)`, "success");
+
+                // Trigger combat visual shake on monster
+                const enemySprite = document.getElementById('enemy-sprite');
+                enemySprite.classList.add('animate-shake');
+                setTimeout(() => enemySprite.classList.remove('animate-shake'), 400);
+
+                // Level Up checks
+                if (gameState.xp >= gameState.maxXp) {
+                    gameState.level++;
+                    gameState.xp -= gameState.maxXp;
+                    playSound('levelUp');
+                    logAction(`🌟 LEVEL UP! You reached Level ${gameState.level}! Max health increased!`, "special");
+                }
+
+                // Check if monster defeated
+                if (gameState.currentMonster.hp <= 0) {
+                    logAction(`☠️ You vaporized the ${gameState.currentMonster.name}! Loading next anomaly...`, "special");
+                    // Load next monster index (wrapping or based on index)
+                    const nextMonsterIdx = Math.min(monsters.length - 1, gameState.currentQuestionIdx + 1);
+                    setTimeout(() => loadMonster(nextMonsterIdx), 1000);
+                }
+
+            } else {
+                // Incorrect
+                playSound('hurt');
+                gameState.comboCount = 0; // Break combo
+
+                if (gameState.activeShield) {
+                    // Shield protects player
+                    gameState.activeShield = false;
+                    logAction(`🛡️ Aegis Ward absorbed the backlash! HP saved.`, "info");
+                } else {
+                    // Take damage
+                    const dmgTaken = 20;
+                    gameState.hp = Math.max(0, gameState.hp - dmgTaken);
+                    logAction(`💥 Backfire! You failed to formulate the glyph correctly. Took ${dmgTaken} damage.`, "danger");
+                }
+
+                // Shake question card
+                card.classList.add('animate-shake');
+                setTimeout(() => card.classList.remove('animate-shake'), 400);
+
+                if (gameState.hp <= 0) {
+                    endTrial(false);
+                    return;
+                }
+            }
+
+            // Move to next question after short delay
+            gameState.currentQuestionIdx++;
+            updateHUD();
+
+            setTimeout(() => {
+                loadQuestion(gameState.currentQuestionIdx);
+            }, 1200);
+        }
+
+        // --- END OF TRIAL ---
+        function endTrial(victory) {
+            document.getElementById('battle-screen').classList.add('hidden');
+            document.getElementById('quick-hud').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+
+            const resTitle = document.getElementById('result-title');
+            const resDesc = document.getElementById('result-desc');
+            const resIcon = document.getElementById('result-icon');
+
+            // Calculate final statistics
+            const correctCount = gameState.userAnswers.filter(a => a.isCorrect).length;
+            const accuracyPct = Math.round((correctCount / satQuestions.length) * 100) || 0;
+
+            if (victory && accuracyPct >= 50) {
+                playSound('levelUp');
+                resIcon.innerText = "🏆";
+                resTitle.innerText = "TRIAL COMPLETED: HIGH ARCH-MAGE!";
+                resTitle.className = "fantasy-header text-3xl font-black text-emerald-400";
+                resDesc.innerText = `Sensational work! You purified the anomaly fields, earning deep commendations from the High Elder Council. Your SAT knowledge deck is fully loaded!`;
+            } else {
+                playSound('gameover');
+                resIcon.innerText = "💀";
+                resTitle.innerText = "TRIAL FAILED: CRITICAL OVERLOAD";
+                resTitle.className = "fantasy-header text-3xl font-black text-rose-500";
+                resDesc.innerText = `The anomaly structures became unstable and backfired. Study your Spellbook below to patch your knowledge leaks and try again!`;
+            }
+
+            // Populate stats cards
+            document.getElementById('res-accuracy').innerText = `${accuracyPct}%`;
+            document.getElementById('res-xp').innerText = `${correctCount * 20}`;
+            document.getElementById('res-gold').innerText = `${gameState.gold}`;
+            document.getElementById('res-level').innerText = `Level ${gameState.level}`;
+
+            // Generate review list with detailed rationales
+            const reviewContainer = document.getElementById('spellbook-review');
+            reviewContainer.innerHTML = '';
+
+            gameState.userAnswers.forEach((ans, idx) => {
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-xl text-xs space-y-2 ${ans.isCorrect ? 'bg-emerald-950/20 border border-emerald-900/30' : 'bg-rose-950/20 border border-rose-900/30'}`;
+                
+                const statusBadge = ans.isCorrect 
+                    ? '<span class="bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded-md uppercase">Glyph Aligned</span>' 
+                    : '<span class="bg-rose-500/20 text-rose-400 font-bold px-2 py-0.5 rounded-md uppercase">Glyph Faulty</span>';
+
+                const cleanQ = ans.question.question.replace(/\$(.*?)\$/g, '$1');
+                const cleanExplanation = ans.question.explanation.replace(/\$(.*?)\$/g, '$1');
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-300">Anomaly #${idx + 1} (${ans.question.category})</span>
+                        ${statusBadge}
+                    </div>
+                    <p class="text-slate-200 mt-1">${cleanQ}</p>
+                    <div class="p-2.5 bg-slate-950 rounded-lg mt-1 text-slate-400">
+                        <p class="mb-1"><span class="font-semibold text-indigo-400">Your Answer:</span> ${ans.question.options[ans.selectedIdx] || "No Answer"}</p>
+                        <p class="mb-1"><span class="font-semibold text-emerald-400">Correct Spell Formulation:</span> ${ans.question.options[ans.question.correctIndex]}</p>
+                    </div>
+                    <p class="text-[11px] text-indigo-300 leading-relaxed"><span class="font-bold">Scroll Explanation:</span> ${cleanExplanation}</p>
+                `;
+                reviewContainer.appendChild(div);
+            });
+        }
+
+        function restartGame() {
+            document.getElementById('results-screen').classList.add('hidden');
+            startGame();
+        }
+
+        // Initialize theme selector highlight
+        setTheme('wizard');
+    </script>
+</body>
+</html>
+

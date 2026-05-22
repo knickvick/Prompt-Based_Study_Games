@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindForge: RPG Study Quest</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-fantasy {
+      font-family: 'Cinzel', serif;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    @keyframes bounce-up {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-60px) scale(1.1); opacity: 0; }
+    }
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+    .animate-damage {
+      animation: bounce-up 1.2s cubic-bezier(0.25, 1, 0.50, 1) forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950 overflow-x-hidden">
+
+  <!-- Main Game Container -->
+  <div id="app" class="flex-grow flex flex-col max-w-5xl w-full mx-auto p-4 md:py-6">
+    
+    <!-- Top Header -->
+    <header class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-tr from-amber-600 to-yellow-500 p-2.5 rounded-xl shadow-lg shadow-amber-900/30">
+          <i class="fa-solid fa-wand-magic-sparkles text-xl text-slate-950"></i>
+        </div>
+        <div>
+          <h1 class="font-fantasy text-xl md:text-2xl font-black tracking-wide bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-500 bg-clip-text text-transparent">
+            MINDFORGE
+          </h1>
+          <p class="text-xs text-slate-400 font-medium tracking-widest uppercase">RPG Study Quest</p>
+        </div>
+      </div>
+      
+      <!-- Top Resource Bar -->
+      <div class="flex items-center gap-3 md:gap-5 text-sm">
+        <!-- Gold -->
+        <div class="flex items-center gap-1.5 bg-slate-900/80 border border-slate-800 px-3 py-1.5 rounded-lg">
+          <i class="fa-solid fa-coins text-amber-500"></i>
+          <span id="gold-val" class="font-bold text-amber-400">100</span>
+        </div>
+        <!-- Level -->
+        <div class="flex items-center gap-1.5 bg-gradient-to-r from-indigo-950 to-purple-950 border border-indigo-500/30 px-3 py-1.5 rounded-lg">
+          <span class="text-xs text-indigo-300 uppercase font-semibold">LV</span>
+          <span id="level-val" class="font-black text-indigo-200">1</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN GAME SCREENS CONTAINER -->
+    <main class="flex-grow flex flex-col justify-center relative">
+
+      <!-- SCREEN 1: DECK SELECTION & AI GENERATOR -->
+      <section id="screen-selection" class="space-y-6">
+        <div class="text-center max-w-xl mx-auto space-y-2 mb-4">
+          <h2 class="text-2xl md:text-3xl font-fantasy text-amber-100">Prepare Your Mind for Battle</h2>
+          <p class="text-sm text-slate-400">Choose a predefined study topic, or forge a brand-new custom battleground utilizing the power of Gemini AI.</p>
+        </div>
+
+        <!-- Custom AI Generator Box -->
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-indigo-500/30 p-5 md:p-6 rounded-2xl shadow-xl shadow-indigo-950/20 max-w-2xl mx-auto relative overflow-hidden">
+          <div class="absolute -right-12 -top-12 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full"></div>
+          
+          <div class="flex items-center gap-2 mb-3">
+            <span class="flex h-2.5 w-2.5 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <h3 class="font-fantasy text-base text-amber-300 tracking-wide uppercase">Forge Custom Topic with Gemini AI</h3>
+          </div>
+          
+          <p class="text-xs text-slate-400 mb-4">Type any subject, exam topic, language, or concept. Gemini will construct a fully interactive battle quiz for you!</p>
+          
+          <div class="space-y-3">
+            <div class="relative">
+              <input 
+                type="text" 
+                id="custom-topic-input" 
+                placeholder="e.g., Photosynthesis, Python dictionaries, French vocabulary, SAT Math..." 
+                class="w-full bg-slate-950 border border-slate-800 focus:border-amber-500/70 focus:ring-1 focus:ring-amber-500/70 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 outline-none transition"
+              >
+              <div class="absolute right-3 top-3 text-slate-500">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+            </div>
+            
+            <button 
+              onclick="generateCustomTopic()" 
+              id="btn-forge"
+              class="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-bold py-3 px-4 rounded-xl shadow-lg shadow-amber-900/20 flex items-center justify-center gap-2 transition active:scale-95 text-sm"
+            >
+              <span>FORGE STUDY QUEST</span>
+              <i class="fa-solid fa-hammer"></i>
+            </button>
+          </div>
+
+          <!-- Loading state -->
+          <div id="ai-loading" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div class="relative w-16 h-16">
+              <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+              <div class="absolute inset-0 rounded-full border-4 border-t-amber-500 animate-spin"></div>
+              <i class="fa-solid fa-scroll text-xl text-amber-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+            </div>
+            <div class="space-y-1">
+              <h4 class="font-fantasy text-amber-300 text-sm tracking-widest animate-pulse">Consulting the Archives...</h4>
+              <p class="text-xs text-slate-400 max-w-xs">Gemini is forging your personalized combat quest from your chosen topic. Please stand by.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Or Divider -->
+        <div class="flex items-center justify-center gap-4 max-w-md mx-auto">
+          <div class="h-px bg-slate-800 flex-grow"></div>
+          <span class="text-xs text-slate-500 uppercase tracking-widest">Or Pick Preset Quest</span>
+          <div class="h-px bg-slate-800 flex-grow"></div>
+        </div>
+
+        <!-- Predefined Quests Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <!-- Science & Space -->
+          <button 
+            onclick="loadPresetQuest('science')"
+            class="group text-left bg-slate-900 hover:bg-slate-900/60 border border-slate-800 hover:border-indigo-500/50 p-4 rounded-xl transition flex gap-3 items-start relative overflow-hidden"
+          >
+            <div class="bg-indigo-950/80 p-2.5 rounded-lg border border-indigo-500/20 text-indigo-400 group-hover:scale-110 transition">
+              <i class="fa-solid fa-user-astronaut text-lg"></i>
+            </div>
+            <div>
+              <h4 class="font-fantasy text-slate-200 font-semibold group-hover:text-amber-300 transition text-sm md:text-base">Space & Science</h4>
+              <p class="text-xs text-slate-400 mt-1">Cosmology, solar system physics, and elemental chemistry questions.</p>
+            </div>
+          </button>
+
+          <!-- Web Development -->
+          <button 
+            onclick="loadPresetQuest('webdev')"
+            class="group text-left bg-slate-900 hover:bg-slate-900/60 border border-slate-800 hover:border-amber-500/50 p-4 rounded-xl transition flex gap-3 items-start relative overflow-hidden"
+          >
+            <div class="bg-amber-950/80 p-2.5 rounded-lg border border-amber-500/20 text-amber-400 group-hover:scale-110 transition">
+              <i class="fa-solid fa-code text-lg"></i>
+            </div>
+            <div>
+              <h4 class="font-fantasy text-slate-200 font-semibold group-hover:text-amber-300 transition text-sm md:text-base">Web Architecture</h4>
+              <p class="text-xs text-slate-400 mt-1">HTML, CSS, JavaScript engine mechanics, and basic web routing.</p>
+            </div>
+          </button>
+
+          <!-- History & Myth -->
+          <button 
+            onclick="loadPresetQuest('history')"
+            class="group text-left bg-slate-900 hover:bg-slate-900/60 border border-slate-800 hover:border-rose-500/50 p-4 rounded-xl transition flex gap-3 items-start relative overflow-hidden"
+          >
+            <div class="bg-rose-950/80 p-2.5 rounded-lg border border-rose-500/20 text-rose-400 group-hover:scale-110 transition">
+              <i class="fa-solid fa-landmark text-lg"></i>
+            </div>
+            <div>
+              <h4 class="font-fantasy text-slate-200 font-semibold group-hover:text-amber-300 transition text-sm md:text-base">World Empires</h4>
+              <p class="text-xs text-slate-400 mt-1">Ancient Roman, Greek, Egyptian culture, and crucial turning points in history.</p>
+            </div>
+          </button>
+        </div>
+      </section>
+
+
+      <!-- SCREEN 2: BATTLE ARENA (COMBAT & FLASHCARD MODES) -->
+      <section id="screen-arena" class="hidden space-y-6">
+        
+        <!-- Arena Navigation & Quest Stats -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-900/50 border border-slate-800 p-3.5 rounded-xl">
+          <div>
+            <span class="text-[10px] bg-slate-800 text-slate-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded-md">Active Quest</span>
+            <h3 id="arena-quest-title" class="font-fantasy text-amber-300 text-lg mt-0.5">Custom Topic Battle</h3>
+          </div>
+          
+          <!-- Mode Selector & Controls -->
+          <div class="flex items-center gap-2 self-stretch md:self-auto justify-between">
+            <div class="flex bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs font-semibold">
+              <button onclick="switchMode('battle')" id="btn-mode-battle" class="px-3 py-1.5 rounded-md transition bg-amber-500 text-slate-950">
+                <i class="fa-solid fa-shield-halved mr-1.5"></i>Battle Mode
+              </button>
+              <button onclick="switchMode('flashcard')" id="btn-mode-flashcard" class="px-3 py-1.5 rounded-md transition text-slate-400 hover:text-slate-200">
+                <i class="fa-solid fa-layer-group mr-1.5"></i>Flashcards
+              </button>
+            </div>
+
+            <button onclick="showScreen('selection')" class="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-xs px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 transition">
+              <i class="fa-solid fa-chevron-left mr-1"></i> Quit Quest
+            </button>
+          </div>
+        </div>
+
+        <!-- CORE INTERFACE -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          
+          <!-- LEFT/CENTER: Combat Scene & Question Board -->
+          <div class="lg:col-span-2 space-y-6">
+
+            <!-- BATTLEFIELD VISUALS -->
+            <div id="battle-field" class="bg-slate-900 border border-slate-800 rounded-2xl relative overflow-hidden h-52 md:h-64 flex flex-col justify-between p-4 bg-cover bg-center bg-slate-950">
+              
+              <!-- Floating Damage numbers dynamically appended here -->
+              <div id="floating-numbers-layer" class="absolute inset-0 pointer-events-none z-10"></div>
+
+              <!-- Top UI: Monster Name & HP -->
+              <div class="flex justify-between items-start z-10">
+                <!-- Player Health / Mana summary -->
+                <div class="bg-slate-950/90 backdrop-blur-sm border border-slate-800 p-2.5 rounded-xl w-44">
+                  <div class="flex justify-between items-center text-xs mb-1">
+                    <span class="font-fantasy text-slate-300">Hero (You)</span>
+                    <span id="player-hp-text" class="font-bold text-rose-400">100/100 HP</span>
+                  </div>
+                  <!-- HP Bar -->
+                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-2">
+                    <div id="player-hp-bar" class="bg-gradient-to-r from-rose-600 to-rose-500 h-full transition-all duration-300" style="width: 100%;"></div>
+                  </div>
+                  <!-- Mana Bar -->
+                  <div class="flex justify-between items-center text-[10px] mb-0.5">
+                    <span class="text-indigo-400">Mana Pool</span>
+                    <span id="player-mana-text" class="font-bold text-indigo-400">20/50</span>
+                  </div>
+                  <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div id="player-mana-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-300" style="width: 40%;"></div>
+                  </div>
+                </div>
+
+                <!-- Monster Summary -->
+                <div class="bg-slate-950/90 backdrop-blur-sm border border-slate-800 p-2.5 rounded-xl w-44 text-right">
+                  <div class="flex justify-between items-center text-xs mb-1">
+                    <span id="monster-level" class="text-[10px] bg-red-950/80 border border-red-500/20 text-red-300 px-1 rounded font-bold uppercase">LV 1</span>
+                    <span id="monster-name" class="font-fantasy text-slate-300">Goblin Sentry</span>
+                  </div>
+                  <div class="text-xs font-bold text-amber-400 mb-1" id="monster-hp-text">80/80 HP</div>
+                  <!-- HP Bar -->
+                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div id="monster-hp-bar" class="bg-gradient-to-r from-amber-500 to-red-500 h-full transition-all duration-300" style="width: 100%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Animated Avatars Scene -->
+              <div class="flex justify-between items-center px-4 md:px-8 mt-auto mb-2 z-10">
+                <!-- Hero Sprite -->
+                <div id="hero-avatar" class="relative text-center">
+                  <div class="text-5xl md:text-6xl animate-float">🧙‍♂️</div>
+                  <div class="bg-slate-950/80 border border-slate-800 text-[10px] px-2 py-0.5 rounded-full mt-2 font-bold tracking-wider text-indigo-300">MAGE</div>
+                </div>
+
+                <!-- Versus FX -->
+                <div class="text-slate-600 font-fantasy font-black italic tracking-widest text-lg opacity-40">VS</div>
+
+                <!-- Monster Sprite -->
+                <div id="monster-avatar" class="relative text-center">
+                  <div id="monster-sprite" class="text-5xl md:text-6xl animate-float" style="animation-delay: 0.5s">👹</div>
+                  <div id="monster-badge" class="bg-slate-950/80 border border-slate-800 text-[10px] px-2 py-0.5 rounded-full mt-2 font-bold tracking-wider text-rose-300 uppercase">ENEMY</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COMBAT QUESTION CARD -->
+            <div id="quiz-card" class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-2xl relative">
+              
+              <!-- Question Progress -->
+              <div class="flex justify-between items-center mb-4 text-xs">
+                <span class="text-slate-400 uppercase font-semibold">Study Question <span id="question-current" class="text-amber-400">1</span>/<span id="question-total">10</span></span>
+                <span class="bg-slate-950 border border-slate-800 text-indigo-300 px-2 py-1 rounded font-bold" id="quest-combo">Combo: x1</span>
+              </div>
+
+              <!-- Active Question Text -->
+              <p id="question-text" class="text-base md:text-lg text-slate-100 font-medium leading-relaxed mb-6">
+                Loading study materials...
+              </p>
+
+              <!-- Option Buttons -->
+              <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-4">
+                <!-- Options injected by Javascript -->
+              </div>
+
+              <!-- Action Feedback Bar -->
+              <div id="feedback-panel" class="hidden mt-4 p-4 rounded-xl border flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <i id="feedback-icon" class="text-lg"></i>
+                  <h4 id="feedback-title" class="font-fantasy font-bold tracking-wide">Feedback</h4>
+                </div>
+                <p id="feedback-desc" class="text-xs md:text-sm leading-relaxed"></p>
+                <button onclick="advanceRound()" class="mt-2 self-end bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs py-2 px-4 rounded-lg text-amber-300 font-semibold transition active:scale-95">
+                  Continue Battle <i class="fa-solid fa-forward ml-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- FLASHCARD STUDY INTERFACE -->
+            <div id="flashcard-field" class="hidden space-y-6">
+              <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl min-h-[300px] flex flex-col justify-between items-center text-center cursor-pointer transition-all duration-500 relative group select-none shadow-xl" onclick="flipFlashcard()">
+                <!-- Progress -->
+                <div class="text-xs text-slate-500 uppercase font-bold tracking-widest mb-4">
+                  Flashcard <span id="fc-current" class="text-indigo-400">1</span> of <span id="fc-total">10</span>
+                </div>
+
+                <!-- Card Content Frame -->
+                <div class="flex-grow flex items-center justify-center max-w-xl mx-auto py-6">
+                  <!-- Front Side (Question) -->
+                  <div id="fc-front" class="space-y-4">
+                    <h3 class="text-lg md:text-xl font-medium text-slate-200" id="fc-question">Loading...</h3>
+                    <p class="text-xs text-amber-500/80 font-bold uppercase tracking-widest animate-pulse mt-4"><i class="fa-solid fa-rotate mr-1"></i> Click anywhere to Flip</p>
+                  </div>
+                  
+                  <!-- Back Side (Answer - Hidden initially) -->
+                  <div id="fc-back" class="hidden space-y-4">
+                    <div class="inline-block bg-emerald-950/60 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-2">
+                      Answer & Concept
+                    </div>
+                    <p class="text-lg font-bold text-emerald-300" id="fc-answer"></p>
+                    <p class="text-xs text-slate-400 leading-relaxed max-w-md mx-auto" id="fc-explanation"></p>
+                  </div>
+                </div>
+
+                <!-- Navigation controls -->
+                <div class="flex justify-between items-center w-full mt-6 border-t border-slate-800 pt-4" onclick="event.stopPropagation();">
+                  <button onclick="prevFlashcard()" class="bg-slate-950 hover:bg-slate-900 text-xs px-4 py-2 rounded-lg border border-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Previous
+                  </button>
+                  <button onclick="flipFlashcard()" class="bg-slate-950 hover:bg-slate-900 text-xs px-4 py-2 rounded-lg border border-slate-800 text-indigo-400 hover:text-indigo-300 font-semibold transition">
+                    Flip Card
+                  </button>
+                  <button onclick="nextFlashcard()" class="bg-slate-950 hover:bg-slate-900 text-xs px-4 py-2 rounded-lg border border-slate-800 text-slate-400 hover:text-slate-200 transition">
+                    Next <i class="fa-solid fa-arrow-right ml-1"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Inventory, Skill Spells, & Merchants -->
+          <div class="space-y-6">
+
+            <!-- CHARACTER STATUS & LEVEL PROGRESS -->
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+              <h4 class="font-fantasy text-amber-300 text-sm tracking-widest uppercase mb-3">Hero Status</h4>
+              <div class="space-y-3.5">
+                <!-- Level Progress -->
+                <div>
+                  <div class="flex justify-between items-center text-xs text-slate-400 mb-1.5">
+                    <span>XP Progression</span>
+                    <span id="xp-text" class="font-medium text-slate-200">0/100 XP</span>
+                  </div>
+                  <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                    <div id="xp-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-300" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <!-- Hero Stats Grid -->
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                    <span class="text-slate-500 block mb-0.5">Spell Attack</span>
+                    <span id="stat-atk" class="font-bold text-amber-400 text-sm">15 Base DMG</span>
+                  </div>
+                  <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                    <span class="text-slate-500 block mb-0.5">Spell Defense</span>
+                    <span id="stat-def" class="font-bold text-indigo-400 text-sm">0 DMG Blocked</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SPELLS & MANA ACTIONS -->
+            <div id="spells-panel" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+              <h4 class="font-fantasy text-amber-300 text-sm tracking-widest uppercase mb-3">Spellbook (Combat)</h4>
+              <p class="text-xs text-slate-400 mb-4">Cast magical spells during combat by spending earned mana!</p>
+              
+              <div class="space-y-2.5">
+                <!-- Heal Spell -->
+                <button 
+                  onclick="castSpell('heal')" 
+                  class="w-full bg-slate-950 hover:bg-indigo-950/20 border border-slate-800 hover:border-emerald-500/40 text-left p-2.5 rounded-xl transition flex justify-between items-center group"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <div class="bg-emerald-950/60 border border-emerald-500/20 p-2 rounded-lg text-emerald-400 group-hover:scale-105 transition">
+                      <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                      <span class="text-xs font-bold text-slate-200 block">Cure Light Wounds</span>
+                      <span class="text-[10px] text-slate-400">Heals +35 HP instantly</span>
+                    </div>
+                  </div>
+                  <span class="text-xs font-bold text-indigo-400 bg-indigo-950/80 px-2 py-1 rounded">15 Mana</span>
+                </button>
+
+                <!-- Fireball Damage Spell -->
+                <button 
+                  onclick="castSpell('fireball')" 
+                  class="w-full bg-slate-950 hover:bg-indigo-950/20 border border-slate-800 hover:border-amber-500/40 text-left p-2.5 rounded-xl transition flex justify-between items-center group"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <div class="bg-amber-950/60 border border-amber-500/20 p-2 rounded-lg text-amber-400 group-hover:scale-105 transition">
+                      <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div>
+                      <span class="text-xs font-bold text-slate-200 block">Solar Fireball</span>
+                      <span class="text-[10px] text-slate-400">Deals 35 instant DMG to enemy</span>
+                    </div>
+                  </div>
+                  <span class="text-xs font-bold text-indigo-400 bg-indigo-950/80 px-2 py-1 rounded">20 Mana</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- MAGIC MERCHANT (SHOP & INVENTORY) -->
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+              <div class="flex justify-between items-center mb-3">
+                <h4 class="font-fantasy text-amber-300 text-sm tracking-widest uppercase">The Magic Merchant</h4>
+                <span class="text-[10px] bg-amber-950/80 border border-amber-500/20 text-amber-400 px-1.5 rounded font-bold uppercase">Store</span>
+              </div>
+              
+              <!-- Items for sale -->
+              <div class="space-y-2">
+                <!-- Health Potion -->
+                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                  <div class="flex items-center gap-2.5">
+                    <div class="text-rose-400 bg-slate-900 border border-slate-800 p-1.5 rounded text-sm">
+                      <i class="fa-solid fa-flask"></i>
+                    </div>
+                    <div>
+                      <span class="text-xs font-semibold text-slate-300 block">Health Potion</span>
+                      <span class="text-[9px] text-slate-500">Heals 50 HP. Owned: <span id="owned-potions" class="text-slate-400 font-bold">1</span></span>
+                    </div>
+                  </div>
+                  <div class="flex gap-1.5">
+                    <!-- Buy -->
+                    <button onclick="buyItem('potion')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-1 rounded transition">
+                      30g Buy
+                    </button>
+                    <!-- Use -->
+                    <button onclick="useItem('potion')" class="bg-indigo-950 border border-indigo-500/20 hover:border-indigo-500/40 text-indigo-300 font-semibold text-[10px] px-2 py-1 rounded transition">
+                      Use
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Spell Tome (ATK boost) -->
+                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center">
+                  <div class="flex items-center gap-2.5">
+                    <div class="text-purple-400 bg-slate-900 border border-slate-800 p-1.5 rounded text-sm">
+                      <i class="fa-solid fa-book-sparkles"></i>
+                    </div>
+                    <div>
+                      <span class="text-xs font-semibold text-slate-300 block">Eldritch Spell Tome</span>
+                      <span class="text-[9px] text-slate-500">Permanently grants +5 spell attack DMG.</span>
+                    </div>
+                  </div>
+                  <button onclick="buyItem('tome')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-1 rounded transition shrink-0">
+                    75g Buy
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: ADVENTURE END / RESULTS -->
+      <section id="screen-results" class="hidden max-w-xl mx-auto text-center space-y-6 py-6">
+        <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl space-y-6 shadow-2xl relative overflow-hidden">
+          <div class="absolute -left-16 -top-16 w-40 h-40 bg-amber-500/10 blur-3xl rounded-full"></div>
+          
+          <div class="text-6xl" id="results-icon">🏆</div>
+          
+          <div class="space-y-1">
+            <h2 id="results-headline" class="font-fantasy text-3xl text-amber-300 font-bold tracking-wide">Quest Cleared!</h2>
+            <p class="text-slate-400 text-sm" id="results-subtitle">You successfully banished the dark monsters with pure knowledge.</p>
+          </div>
+
+          <!-- Score Card / Stats -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 grid grid-cols-2 gap-4">
+            <div>
+              <span class="text-slate-500 text-xs block uppercase tracking-wider mb-0.5">Correct Answers</span>
+              <span id="results-accuracy" class="text-xl font-bold text-amber-400">8 / 10</span>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block uppercase tracking-wider mb-0.5">Gold Acquired</span>
+              <span id="results-gold" class="text-xl font-bold text-emerald-400">+120g</span>
+            </div>
+          </div>
+
+          <!-- Explanation helper block -->
+          <div class="text-xs text-slate-400 italic">
+            "Your studies are paying off. Repeat quests or generate new topics to level up your wizard further!"
+          </div>
+
+          <!-- Control Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button onclick="showScreen('selection')" class="flex-grow bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-bold py-3 px-6 rounded-xl shadow-lg transition active:scale-95 text-sm">
+              New Study Session
+            </button>
+            <button onclick="restartActiveQuest()" class="flex-grow bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-200 font-semibold py-3 px-6 rounded-xl transition active:scale-95 text-sm">
+              Replay Quest
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Custom Modal/Dialogue box -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-6 text-center space-y-4 shadow-2xl relative">
+        <div id="modal-icon" class="text-4xl text-amber-400">⚠️</div>
+        <h4 id="modal-title" class="font-fantasy text-lg text-slate-100 font-bold">Alert</h4>
+        <p id="modal-desc" class="text-xs text-slate-400 leading-relaxed"></p>
+        <button onclick="closeModal()" class="w-full bg-slate-950 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/40 text-xs text-amber-300 font-bold py-2 px-4 rounded-xl transition">
+          Dismiss
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer / Guide -->
+    <footer class="mt-8 text-center text-xs text-slate-600 border-t border-slate-900 pt-4 flex flex-col md:flex-row justify-between items-center gap-3">
+      <p>© 2026 MindForge Suite • Guided Gamified Learning Platform.</p>
+      <div class="flex gap-4">
+        <a href="#" onclick="showGuideModal(); return false;" class="hover:text-slate-400 transition underline">How to Play Guide</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- IN-MEMORY DATA & GAME CODE -->
+  <script>
+    // PRESETS STUDY QUESTIONS
+    const PRESET_DECKS = {
+      science: {
+        title: "Space & Physical Science Quest",
+        questions: [
+          {
+            question: "What primary fuel resource generates the heat and fusion reaction inside our sun?",
+            options: ["Helium-4 Gas", "Hydrogen Atoms", "Superheated Oxygen", "Liquid Nitrogen"],
+            answer: "Hydrogen Atoms",
+            explanation: "Sunlight and energy are produced inside the core by nuclear fusion of Hydrogen into Helium atoms under extreme gravity."
+          },
+          {
+            question: "Which of the following describes the thermodynamic boundary of a black hole from which nothing can escape?",
+            options: ["The Singularity Core", "The Ergosphere", "The Event Horizon", "The accretion disk"],
+            answer: "The Event Horizon",
+            explanation: "The event horizon is the outer boundary of a black hole where the escape velocity exceeds the speed of light."
+          },
+          {
+            question: "What is the primary gas composing the atmosphere of the planet Venus?",
+            options: ["Methane", "Nitrogen", "Carbon Dioxide", "Hydrogen Sulfide"],
+            answer: "Carbon Dioxide",
+            explanation: "Venus' thick, hostile atmosphere is roughly 96.5% Carbon Dioxide, causing a runaway greenhouse effect."
+          },
+          {
+            question: "Which subatomic particles orbit the nucleus of an atom and possess a negative charge?",
+            options: ["Protons", "Neutrons", "Electrons", "Quarks"],
+            answer: "Electrons",
+            explanation: "Electrons carry a negative charge and orbit the positive atomic nucleus in distinct electron shells."
+          },
+          {
+            question: "What law of physics states that for every action force, there is an equal and opposite reaction force?",
+            options: ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Kepler's Second Law"],
+            answer: "Newton's Third Law",
+            explanation: "Isaac Newton's Third Law of Motion governs reciprocal actions, stating forces always occur in equal, opposite pairs."
+          }
+        ]
+      },
+      webdev: {
+        title: "Web Architecture Quest",
+        questions: [
+          {
+            question: "What HTTP method is standardly used by a browser to retrieve static document pages and data from a server?",
+            options: ["POST", "PUT", "GET", "DELETE"],
+            answer: "GET",
+            explanation: "The GET method is used to request data from a specified resource on a server without causing side-effects."
+          },
+          {
+            question: "Which of the following describes the execution behavior of asynchronous JavaScript event loops?",
+            options: ["Single-threaded, non-blocking", "Multi-threaded, blocking", "Synchronous multi-tasking", "Strictly multi-core concurrent"],
+            answer: "Single-threaded, non-blocking",
+            explanation: "JavaScript relies on a single-threaded execution context with an event loop that delegates async events off the main thread."
+          },
+          {
+            question: "In CSS Grid, which property specifically governs the distribution gap spacing between active grid cells?",
+            options: ["padding", "grid-gap", "margin-spacing", "cell-border"],
+            answer: "grid-gap",
+            explanation: "The 'grid-gap' (or modern 'gap') property determines the spacing width between rows and columns in grid layouts."
+          },
+          {
+            question: "What does DOM stand for in high-fidelity browser client-side rendering?",
+            options: ["Data Object Management", "Document Object Model", "Decentralized Output Memory", "Direct Option Multiplexing"],
+            answer: "Document Object Model",
+            explanation: "DOM stands for Document Object Model, which provides an object-oriented representation of the web page."
+          },
+          {
+            question: "What component of modern web protocols allows secure real-time, bi-directional socket connections?",
+            options: ["HTTP/1.1", "WebSockets", "Rest APIs", "XML Requests"],
+            answer: "WebSockets",
+            explanation: "WebSockets provide a persistent, low-overhead, full-duplex TCP socket connection between client and server."
+          }
+        ]
+      },
+      history: {
+        title: "Ancient World Empires Quest",
+        questions: [
+          {
+            question: "Which legendary Roman commander declared 'Alea iacta est' (The die is cast) upon crossing the Rubicon in 49 BC?",
+            options: ["Julius Caesar", "Augustus Caesar", "Mark Antony", "Marcus Aurelius"],
+            answer: "Julius Caesar",
+            explanation: "Julius Caesar crossed the Rubicon, initiating a major civil war that would ultimately lead to the end of the Roman Republic."
+          },
+          {
+            question: "Who was the supreme king of gods in classic Mount Olympus Greek Mythology?",
+            options: ["Poseidon", "Apollo", "Zeus", "Hades"],
+            answer: "Zeus",
+            explanation: "Zeus was the sky god, ruler of the Olympian pantheon, and wielder of the primary thunderbolt weapon."
+          },
+          {
+            question: "The Rosetta Stone was the ultimate archaeological artifact that enabled researchers to translate which ancient language?",
+            options: ["Sanskrit", "Egyptian Hieroglyphs", "Cuneiform Tablets", "Aramaic Scripts"],
+            answer: "Egyptian Hieroglyphs",
+            explanation: "Because the Rosetta Stone contained the same decree written in Greek, Demotic, and Hieroglyphic, it unlocked Egyptian translation."
+          },
+          {
+            question: "Which general led a legendary military expedition of war elephants across the high European Alps to attack Rome?",
+            options: ["Hannibal of Carthage", "Alexander the Great", "Cyrus the Great", "Scipio Africanus"],
+            answer: "Hannibal of Carthage",
+            explanation: "During the Second Punic War, Carthaginian general Hannibal famously marched his armies and elephants over the Alps."
+          },
+          {
+            question: "What was the capital of the Byzantine (Eastern Roman) Empire established by Emperor Constantine?",
+            options: ["Athens", "Rome", "Constantinople", "Alexandria"],
+            answer: "Constantinople",
+            explanation: "Constantinople (now Istanbul) served as the brilliant cultural and trade capital of the eastern Roman empire."
+          }
+        ]
+      }
+    };
+
+    // GAME STATE & STATS
+    let gameState = {
+      level: 1,
+      xp: 0,
+      xpNeeded: 100,
+      gold: 50,
+      potions: 1,
+      spellAtkBoost: 0,
+      
+      // Current Combat State
+      playerMaxHp: 100,
+      playerHp: 100,
+      playerMaxMana: 50,
+      playerMana: 20,
+      
+      enemyMaxHp: 80,
+      enemyHp: 80,
+      enemyLvl: 1,
+      enemyName: "Feral Goblin",
+      enemySprite: "👹",
+      
+      // Active study deck questions
+      activeDeck: [],
+      currentQuestionIdx: 0,
+      correctCount: 0,
+      combo: 1,
+      
+      currentMode: "battle", // "battle" or "flashcard"
+      canAnswer: true,
+      currentFlipped: false
+    };
+
+    // Initialize Game
+    window.onload = function() {
+      loadState();
+      updateUI();
+    };
+
+    // Safe Save/Load with in-memory fallbacks to prevent SecurityError blocks in iframes
+    function saveState() {
+      try {
+        if (window.localStorage) {
+          localStorage.setItem("mindforge_state", JSON.stringify({
+            level: gameState.level,
+            xp: gameState.xp,
+            xpNeeded: gameState.xpNeeded,
+            gold: gameState.gold,
+            potions: gameState.potions,
+            spellAtkBoost: gameState.spellAtkBoost
+          }));
+        }
+      } catch (e) {
+        console.warn("Storage restricted: Saving state in-memory only.");
+      }
+    }
+
+    function loadState() {
+      try {
+        if (window.localStorage) {
+          const saved = localStorage.getItem("mindforge_state");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            gameState.level = parsed.level || 1;
+            gameState.xp = parsed.xp || 0;
+            gameState.xpNeeded = parsed.xpNeeded || 100;
+            gameState.gold = parsed.gold || 50;
+            gameState.potions = parsed.potions !== undefined ? parsed.potions : 1;
+            gameState.spellAtkBoost = parsed.spellAtkBoost || 0;
+          }
+        }
+      } catch (e) {
+        console.warn("Storage restricted: Loading default state.");
+      }
+    }
+
+    // UPDATE PROGRESS BARS AND DOM LABELS
+    function updateUI() {
+      // Top stats
+      document.getElementById("gold-val").innerText = gameState.gold;
+      document.getElementById("level-val").innerText = gameState.level;
+
+      // Status values
+      document.getElementById("xp-text").innerText = `${gameState.xp}/${gameState.xpNeeded} XP`;
+      const xpPercent = Math.min(100, (gameState.xp / gameState.xpNeeded) * 100);
+      document.getElementById("xp-bar").style.width = `${xpPercent}%`;
+
+      document.getElementById("stat-atk").innerText = `${15 + gameState.spellAtkBoost} Base DMG`;
+      document.getElementById("stat-def").innerText = `${Math.min(10, gameState.level * 2)} DMG Blocked`;
+
+      // Combat stats
+      document.getElementById("player-hp-text").innerText = `${gameState.playerHp}/${gameState.playerMaxHp} HP`;
+      const hpPercent = Math.min(100, (gameState.playerHp / gameState.playerMaxHp) * 100);
+      document.getElementById("player-hp-bar").style.width = `${hpPercent}%`;
+
+      document.getElementById("player-mana-text").innerText = `${gameState.playerMana}/${gameState.playerMaxMana}`;
+      const manaPercent = Math.min(100, (gameState.playerMana / gameState.playerMaxMana) * 100);
+      document.getElementById("player-mana-bar").style.width = `${manaPercent}%`;
+
+      document.getElementById("monster-hp-text").innerText = `${gameState.enemyHp}/${gameState.enemyMaxHp} HP`;
+      const enemyHpPercent = Math.max(0, Math.min(100, (gameState.enemyHp / gameState.enemyMaxHp) * 100));
+      document.getElementById("monster-hp-bar").style.width = `${enemyHpPercent}%`;
+
+      document.getElementById("monster-level").innerText = `LV ${gameState.enemyLvl}`;
+      document.getElementById("monster-name").innerText = gameState.enemyName;
+      document.getElementById("monster-sprite").innerText = gameState.enemySprite;
+
+      // Shop Inventory counts
+      document.getElementById("owned-potions").innerText = gameState.potions;
+    }
+
+    // SCREEN SWITCHING
+    function showScreen(screenId) {
+      document.getElementById("screen-selection").classList.add("hidden");
+      document.getElementById("screen-arena").classList.add("hidden");
+      document.getElementById("screen-results").classList.add("hidden");
+
+      document.getElementById(`screen-${screenId}`).classList.remove("hidden");
+      
+      if (screenId === 'selection') {
+        document.getElementById("custom-topic-input").value = "";
+      }
+    }
+
+    // RESTART ACTIVE QUEST DECK
+    function restartActiveQuest() {
+      startQuest(gameState.activeDeck, document.getElementById("arena-quest-title").innerText);
+    }
+
+    // ENGAGE PRESET QUESTS
+    function loadPresetQuest(presetId) {
+      const preset = PRESET_DECKS[presetId];
+      if (preset) {
+        startQuest(preset.questions, preset.title);
+      }
+    }
+
+    // INITIATE STUDY QUEST ROUNDS
+    function startQuest(questionsList, titleText) {
+      gameState.activeDeck = JSON.parse(JSON.stringify(questionsList)); // Deep copy
+      gameState.currentQuestionIdx = 0;
+      gameState.correctCount = 0;
+      gameState.combo = 1;
+      
+      // Calculate scaled enemy level based on player level
+      gameState.enemyLvl = Math.max(1, gameState.level + Math.floor(Math.random() * 2) - 1);
+      gameState.enemyMaxHp = 60 + (gameState.enemyLvl * 15);
+      gameState.enemyHp = gameState.enemyMaxHp;
+      
+      // Select random enemy name & sprite (Safe and friendly fantasy beasts)
+      const monsters = [
+        { name: "Scribe Owl", sprite: "🦉" },
+        { name: "Ancient Sphinx", sprite: "🦁" },
+        { name: "Galaxy Wyrm", sprite: "🐉" },
+        { name: "Titan Scholar", sprite: "🗿" },
+        { name: "Forest Pixie", sprite: "🧚" }
+      ];
+      const selectedMonster = monsters[Math.floor(Math.random() * monsters.length)];
+      gameState.enemyName = selectedMonster.name;
+      gameState.enemySprite = selectedMonster.sprite;
+
+      // Reset Player health for the battle
+      gameState.playerHp = gameState.playerMaxHp;
+      gameState.playerMana = 15;
+
+      document.getElementById("arena-quest-title").innerText = titleText;
+      
+      showScreen("arena");
+      switchMode(gameState.currentMode);
+      
+      loadQuestion();
+      updateUI();
+    }
+
+    // MODE TOGGLER
+    function switchMode(mode) {
+      gameState.currentMode = mode;
+      
+      const btnBattle = document.getElementById("btn-mode-battle");
+      const btnFlashcard = document.getElementById("btn-mode-flashcard");
+      
+      const battleField = document.getElementById("battle-field");
+      const quizCard = document.getElementById("quiz-card");
+      const flashcardField = document.getElementById("flashcard-field");
+      const spellsPanel = document.getElementById("spells-panel");
+
+      if (mode === "battle") {
+        btnBattle.className = "px-3 py-1.5 rounded-md transition bg-amber-500 text-slate-950 font-bold";
+        btnFlashcard.className = "px-3 py-1.5 rounded-md transition text-slate-400 hover:text-slate-200";
+        
+        battleField.classList.remove("hidden");
+        quizCard.classList.remove("hidden");
+        flashcardField.classList.add("hidden");
+        spellsPanel.classList.remove("opacity-40", "pointer-events-none");
+      } else {
+        btnBattle.className = "px-3 py-1.5 rounded-md transition text-slate-400 hover:text-slate-200";
+        btnFlashcard.className = "px-3 py-1.5 rounded-md transition bg-indigo-600 text-slate-100 font-bold";
+        
+        battleField.classList.add("hidden");
+        quizCard.classList.add("hidden");
+        flashcardField.classList.remove("hidden");
+        spellsPanel.classList.add("opacity-40", "pointer-events-none");
+        
+        setupFlashcard();
+      }
+    }
+
+    // DISPLAY / LOAD QUIZ QUESTION
+    function loadQuestion() {
+      if (gameState.activeDeck.length === 0) return;
+      
+      gameState.canAnswer = true;
+      const qNum = gameState.currentQuestionIdx;
+      const qData = gameState.activeDeck[qNum];
+
+      document.getElementById("question-current").innerText = qNum + 1;
+      document.getElementById("question-total").innerText = gameState.activeDeck.length;
+      document.getElementById("quest-combo").innerText = `Combo: x${gameState.combo}`;
+
+      // Set question text
+      document.getElementById("question-text").innerText = qData.question;
+
+      // Render Options
+      const optionsContainer = document.getElementById("options-container");
+      optionsContainer.innerHTML = "";
+      document.getElementById("feedback-panel").classList.add("hidden");
+
+      qData.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "w-full text-left bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 py-3 px-4 rounded-xl text-slate-300 font-medium text-sm md:text-base transition active:scale-[0.98] flex items-center justify-between group";
+        btn.innerHTML = `
+          <span>${opt}</span>
+          <i class="fa-regular fa-circle-play text-slate-700 group-hover:text-amber-400 transition"></i>
+        `;
+        btn.onclick = () => submitAnswer(opt, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // PROCESS CHOSEN ANSWER
+    function submitAnswer(chosenOption, selectedBtn) {
+      if (!gameState.canAnswer) return;
+      gameState.canAnswer = false;
+
+      const qNum = gameState.currentQuestionIdx;
+      const qData = gameState.activeDeck[qNum];
+      const isCorrect = chosenOption === qData.answer;
+
+      const feedbackPanel = document.getElementById("feedback-panel");
+      const feedbackIcon = document.getElementById("feedback-icon");
+      const feedbackTitle = document.getElementById("feedback-title");
+      const feedbackDesc = document.getElementById("feedback-desc");
+
+      // Stop any prior avatar animations
+      document.getElementById("monster-avatar").classList.remove("animate-shake");
+      document.getElementById("hero-avatar").classList.remove("animate-shake");
+
+      if (isCorrect) {
+        gameState.correctCount++;
+        
+        const multiplier = 1 + (gameState.combo * 0.1);
+        const playerDamage = Math.floor((15 + gameState.spellAtkBoost) * multiplier);
+        gameState.enemyHp = Math.max(0, gameState.enemyHp - playerDamage);
+        
+        const manaGain = 10;
+        gameState.playerMana = Math.min(gameState.playerMaxMana, gameState.playerMana + manaGain);
+
+        spawnFloatingNumber(playerDamage, "monster", "rose-400", "⚔️");
+        triggerAvatarShake("monster-avatar");
+        
+        feedbackPanel.className = "mt-4 p-4 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-300 flex flex-col gap-2";
+        feedbackIcon.className = "fa-solid fa-circle-check text-emerald-400";
+        feedbackTitle.innerText = "CRITICAL CAST! Correct Answer";
+        feedbackDesc.innerText = `Your spell hit the beast for ${playerDamage} DMG! Explanation: ${qData.explanation}`;
+
+        gameState.combo++;
+      } else {
+        const baseEnemyDamage = 10 + (gameState.enemyLvl * 3);
+        const blocked = Math.min(10, gameState.level * 2);
+        const actualDamage = Math.max(2, baseEnemyDamage - blocked);
+        
+        gameState.playerHp = Math.max(0, gameState.playerHp - actualDamage);
+        gameState.combo = 1;
+
+        spawnFloatingNumber(actualDamage, "hero", "red-500", "💥");
+        triggerAvatarShake("hero-avatar");
+
+        highlightCorrectOption(qData.answer);
+
+        feedbackPanel.className = "mt-4 p-4 rounded-xl border border-red-500/30 bg-red-950/20 text-rose-300 flex flex-col gap-2";
+        feedbackIcon.className = "fa-solid fa-triangle-exclamation text-rose-500";
+        feedbackTitle.innerText = "SPELL FIZZLE! Incorrect Answer";
+        feedbackDesc.innerText = `The opponent struck back for ${actualDamage} magic damage. Explanation: ${qData.explanation}`;
+      }
+
+      feedbackPanel.classList.remove("hidden");
+      updateUI();
+    }
+
+    // Reveal correct option in UI
+    function highlightCorrectOption(correctAns) {
+      const optionsContainer = document.getElementById("options-container");
+      Array.from(optionsContainer.children).forEach(btn => {
+        if (btn.innerText.trim() === correctAns) {
+          btn.className = "w-full text-left bg-emerald-950 border border-emerald-500/50 py-3 px-4 rounded-xl text-emerald-300 font-semibold text-sm md:text-base flex items-center justify-between";
+          btn.innerHTML = `<span>${correctAns}</span><i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+        }
+      });
+    }
+
+    // FLOATING DAMAGE POPUP
+    function spawnFloatingNumber(amount, target, colorClass, prefix = "") {
+      const layer = document.getElementById("floating-numbers-layer");
+      const numDiv = document.createElement("div");
+      numDiv.className = `absolute font-fantasy font-black text-lg md:text-xl text-${colorClass} animate-damage pointer-events-none drop-shadow-lg z-20`;
+      
+      const isHero = target === "hero";
+      const leftOffset = isHero ? "left-[20%]" : "right-[20%]";
+      numDiv.classList.add(leftOffset);
+      numDiv.style.top = "40%";
+      
+      numDiv.innerText = `${prefix} ${amount}`;
+      layer.appendChild(numDiv);
+      
+      setTimeout(() => numDiv.remove(), 1200);
+    }
+
+    function triggerAvatarShake(elementId) {
+      const el = document.getElementById(elementId);
+      el.classList.add("animate-shake");
+      setTimeout(() => el.classList.remove("animate-shake"), 400);
+    }
+
+    function advanceRound() {
+      if (gameState.enemyHp <= 0 || gameState.playerHp <= 0 || gameState.currentQuestionIdx >= gameState.activeDeck.length - 1) {
+        finishQuest();
+        return;
+      }
+
+      gameState.currentQuestionIdx++;
+      loadQuestion();
+    }
+
+    // COMPLETE QUEST BATTLE / PROCESS XP & LEVEL UPS
+    function finishQuest() {
+      const hasWon = gameState.enemyHp <= 0 || (gameState.playerHp > 0 && gameState.correctCount >= gameState.activeDeck.length / 2);
+      const accuracy = `${gameState.correctCount}/${gameState.activeDeck.length}`;
+      
+      const baseGold = gameState.correctCount * 15;
+      const bonusGold = hasWon ? 45 : 10;
+      const totalGoldReward = baseGold + bonusGold;
+      const xpReward = gameState.correctCount * 20;
+
+      gameState.gold += totalGoldReward;
+      gameState.xp += xpReward;
+
+      let leveledUp = false;
+      while (gameState.xp >= gameState.xpNeeded) {
+        gameState.xp -= gameState.xpNeeded;
+        gameState.level++;
+        gameState.xpNeeded = Math.floor(gameState.xpNeeded * 1.3);
+        gameState.playerMaxHp += 15;
+        leveledUp = true;
+      }
+
+      saveState();
+
+      const iconEl = document.getElementById("results-icon");
+      const titleEl = document.getElementById("results-headline");
+      const subtitleEl = document.getElementById("results-subtitle");
+      const accuracyEl = document.getElementById("results-accuracy");
+      const goldEl = document.getElementById("results-gold");
+
+      if (hasWon) {
+        iconEl.innerText = "🏆";
+        titleEl.innerText = leveledUp ? "Level Up & Victory!" : "Quest Cleared!";
+        titleEl.className = "font-fantasy text-3xl text-amber-300 font-bold tracking-wide";
+        subtitleEl.innerText = `You earned victory against ${gameState.enemyName}! Your learning powers are growing.`;
+      } else {
+        iconEl.innerText = "✨";
+        titleEl.innerText = "Session Complete";
+        titleEl.className = "font-fantasy text-3xl text-indigo-400 font-bold tracking-wide";
+        subtitleEl.innerText = `The challenge is finished! Let's review, adjust items, and try again.`;
+      }
+
+      accuracyEl.innerText = `${accuracy} (${Math.round((gameState.correctCount / gameState.activeDeck.length) * 100)}%)`;
+      goldEl.innerText = `+${totalGoldReward}g`;
+
+      showScreen("results");
+      updateUI();
+    }
+
+    // SPELL CASTING MECHANICS
+    function castSpell(spellType) {
+      if (gameState.currentMode !== "battle" || !gameState.canAnswer) return;
+
+      if (spellType === 'heal') {
+        if (gameState.playerMana < 15) {
+          showModal("Mana Depleted", "You do not possess enough mana to weave this spell.", "✨");
+          return;
+        }
+        gameState.playerMana -= 15;
+        const healAmt = 35;
+        gameState.playerHp = Math.min(gameState.playerMaxHp, gameState.playerHp + healAmt);
+        spawnFloatingNumber(healAmt, "hero", "emerald-400", "💖");
+        showModal("Cure Casted", "A warm mystical energy surrounds your wounds, healing +35 HP.", "💖");
+      }
+
+      else if (spellType === 'fireball') {
+        if (gameState.playerMana < 20) {
+          showModal("Mana Depleted", "You do not possess enough mana to weave this spell.", "✨");
+          return;
+        }
+        gameState.playerMana -= 20;
+        const spellDmg = 35;
+        gameState.enemyHp = Math.max(0, gameState.enemyHp - spellDmg);
+        spawnFloatingNumber(spellDmg, "monster", "amber-500", "🔥");
+        triggerAvatarShake("monster-avatar");
+        showModal("Fireball Casted", "An intense orb of cosmic energy crashes into the opponent for 35 direct DMG!", "🔥");
+
+        if (gameState.enemyHp <= 0) {
+          finishQuest();
+        }
+      }
+
+      updateUI();
+    }
+
+    // SHOP & INVENTORY ACTIONS
+    function buyItem(itemType) {
+      if (itemType === 'potion') {
+        if (gameState.gold < 30) {
+          showModal("Insufficient Gold", "You lack gold pieces to purchase this potion.", "🪙");
+          return;
+        }
+        gameState.gold -= 30;
+        gameState.potions++;
+        showModal("Purchased Potion", "You bought a Healing Potion.", "🧪");
+      } 
+      else if (itemType === 'tome') {
+        if (gameState.gold < 75) {
+          showModal("Insufficient Gold", "You lack gold pieces to unlock this ancient wisdom.", "🪙");
+          return;
+        }
+        gameState.gold -= 75;
+        gameState.spellAtkBoost += 5;
+        showModal("Studied Tome", "You study the arcane parchment, permanently boosting spell attacks by +5 DMG!", "📖");
+      }
+
+      saveState();
+      updateUI();
+    }
+
+    function useItem(itemType) {
+      if (itemType === 'potion') {
+        if (gameState.potions <= 0) {
+          showModal("Empty Satchel", "You do not own any active health potions. Purchase one at the merchant!", "🧪");
+          return;
+        }
+        if (gameState.playerHp >= gameState.playerMaxHp) {
+          showModal("Max Health", "Your health is already full!", "🧪");
+          return;
+        }
+        gameState.potions--;
+        const potionHeal = 50;
+        gameState.playerHp = Math.min(gameState.playerMaxHp, gameState.playerHp + potionHeal);
+        spawnFloatingNumber(potionHeal, "hero", "emerald-400", "🧪");
+        showModal("Potion Drunk", "You drank the glowing potion and gained +50 HP!", "🧪");
+      }
+      
+      saveState();
+      updateUI();
+    }
+
+    // FLASHCARD MODE FUNCTIONS
+    function setupFlashcard() {
+      if (gameState.activeDeck.length === 0) return;
+      gameState.currentFlipped = false;
+      
+      const qNum = gameState.currentQuestionIdx;
+      const qData = gameState.activeDeck[qNum];
+
+      document.getElementById("fc-current").innerText = qNum + 1;
+      document.getElementById("fc-total").innerText = gameState.activeDeck.length;
+
+      document.getElementById("fc-question").innerText = qData.question;
+      document.getElementById("fc-answer").innerText = qData.answer;
+      document.getElementById("fc-explanation").innerText = qData.explanation;
+
+      document.getElementById("fc-front").classList.remove("hidden");
+      document.getElementById("fc-back").classList.add("hidden");
+    }
+
+    function flipFlashcard() {
+      gameState.currentFlipped = !gameState.currentFlipped;
+      
+      const front = document.getElementById("fc-front");
+      const back = document.getElementById("fc-back");
+
+      if (gameState.currentFlipped) {
+        front.classList.add("hidden");
+        back.classList.remove("hidden");
+      } else {
+        front.classList.remove("hidden");
+        back.classList.add("hidden");
+      }
+    }
+
+    function nextFlashcard() {
+      if (gameState.currentQuestionIdx < gameState.activeDeck.length - 1) {
+        gameState.currentQuestionIdx++;
+        setupFlashcard();
+      } else {
+        showModal("Study Deck Complete", "You have read through the entire deck! Try transitioning back to Combat Mode to test your learning.", "📖");
+      }
+    }
+
+    function prevFlashcard() {
+      if (gameState.currentQuestionIdx > 0) {
+        gameState.currentQuestionIdx--;
+        setupFlashcard();
+      }
+    }
+
+    // CUSTOM MODAL DIALOGUES
+    function showModal(title, text, icon = "⚠️") {
+      document.getElementById("modal-icon").innerText = icon;
+      document.getElementById("modal-title").innerText = title;
+      document.getElementById("modal-desc").innerText = text;
+      document.getElementById("custom-modal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("custom-modal").classList.add("hidden");
+    }
+
+    function showGuideModal() {
+      showModal(
+        "Quest Guidelines",
+        "Answer multiple-choice questions correctly to cast spells, earn mana, and conquer challenges! Answering incorrectly costs health. Buy Potions or Tomes from the merchant to boost your stats! Tap top tab anytime to toggle safe Flashcard study mode.",
+        "🧙‍♂️"
+      );
+    }
+
+    // OFFLINE AUTOMATIC PROCEDURAL GENERATOR (Saves the game if Gemini API is blocked or offline)
+    function generateFallbackDeck(topic) {
+      const cleaned = topic.toLowerCase();
+      
+      // Math Fallback
+      if (cleaned.includes("math") || cleaned.includes("algebra") || cleaned.includes("calculus") || cleaned.includes("number") || cleaned.includes("geometry")) {
+        return {
+          title: `Algebraic Power Quest: ${topic}`,
+          questions: [
+            {
+              question: "If 3x + 7 = 22, what is the value of x?",
+              options: ["x = 3", "x = 4", "x = 5", "x = 6"],
+              answer: "x = 5",
+              explanation: "Subtract 7 from both sides to get 3x = 15, then divide by 3 to get x = 5."
+            },
+            {
+              question: "What is the slope of the linear equation represented by y = -4x + 9?",
+              options: ["Slope is 9", "Slope is -4", "Slope is 4", "Slope is 1/4"],
+              answer: "Slope is -4",
+              explanation: "In standard slope-intercept form (y = mx + b), the coefficient m represents the slope."
+            },
+            {
+              question: "What is the square root of 144?",
+              options: ["10", "11", "12", "14"],
+              answer: "12",
+              explanation: "Multiplying 12 by itself (12 * 12) yields 144."
+            },
+            {
+              question: "What geometric shape has internal angles that always sum up to exactly 180 degrees?",
+              options: ["Triangle", "Square", "Pentagon", "Hexagon"],
+              answer: "Triangle",
+              explanation: "Any planar triangle's three interior angles always sum to 180 degrees."
+            },
+            {
+              question: "What is 15% of 200?",
+              options: ["15", "20", "30", "45"],
+              answer: "30",
+              explanation: "Multiply 200 by 0.15 to compute the correct percentage, which is 30."
+            }
+          ]
+        };
+      }
+
+      // Language / French / Spanish Fallback
+      if (cleaned.includes("french") || cleaned.includes("spanish") || cleaned.includes("language") || cleaned.includes("english") || cleaned.includes("german") || cleaned.includes("vocabulary")) {
+        return {
+          title: `Linguistic Wisdom Quest: ${topic}`,
+          questions: [
+            {
+              question: "Which of the following translates to 'The Book' in Spanish?",
+              options: ["El libro", "La mesa", "El coche", "La carta"],
+              answer: "El libro",
+              explanation: "'Libro' is the Spanish noun for book, and it takes the masculine article 'El'."
+            },
+            {
+              question: "In French, what greeting is standardly used to say 'Good morning' or 'Hello'?",
+              options: ["Au revoir", "Merci", "Bonjour", "S'il vous plaît"],
+              answer: "Bonjour",
+              explanation: "'Bonjour' means good day or hello and is the most common morning greeting."
+            },
+            {
+              question: "Identify the part of speech that describes an action, state, or occurrence in English grammar.",
+              options: ["Noun", "Verb", "Adjective", "Pronoun"],
+              answer: "Verb",
+              explanation: "Verbs are active doing words or status indicators like 'run', 'learn', or 'be'."
+            },
+            {
+              question: "Translate 'Thank you very much' into French.",
+              options: ["Merci beaucoup", "De rien", "S'il vous plaît", "Enchanté"],
+              answer: "Merci beaucoup",
+              explanation: "'Merci' is thank you, and 'beaucoup' translates to much/very much."
+            },
+            {
+              question: "What punctuation is used to indicate a pause or separate items in a written list?",
+              options: ["Period", "Comma", "Semicolon", "Exclamation Point"],
+              answer: "Comma",
+              explanation: "Comas are used to denote slight pauses and divide listed variables inside written syntax."
+            }
+          ]
+        };
+      }
+
+      // Generic High-Value Educational Fallback
+      return {
+        title: `Mystical Scroll of ${topic}`,
+        questions: [
+          {
+            question: `In the study of '${topic}', which of the following is considered a primary foundational pillar?`,
+            options: ["Direct observation and factual analysis", "Random guessing and speculation", "Ignoring historical research", "Relying on unrelated sources"],
+            answer: "Direct observation and factual analysis",
+            explanation: "Solid logical research and factual inspection are key to understanding any educational concept."
+          },
+          {
+            question: `Which approach is most effective when learning a complex area in '${topic}'?`,
+            options: ["Breaking it into smaller, manageable topics", "Memorizing the entire topic in one minute", "Skipping the basic concepts entirely", "Never asking any questions"],
+            answer: "Breaking it into smaller, manageable topics",
+            explanation: "Breaking down complex data into smaller pieces makes information easier to learn and retain."
+          },
+          {
+            question: `What is the best way to test your actual understanding of '${topic}'?`,
+            options: ["Explaining the concept simply to someone else", "Never reviewing the topic again", "Avoiding tests and self-assessments", "Skimming pages as fast as possible"],
+            answer: "Explaining the concept simply to someone else",
+            explanation: "The Feynman Technique states that explaining a topic simply to others is the absolute best test of retention."
+          },
+          {
+            question: `Why is consistent practice crucial to master '${topic}'?`,
+            options: ["It builds stronger neural pathways over time", "It has no scientific benefit", "It guarantees you never have to study again", "It makes your mind forget old information"],
+            answer: "It builds stronger neural pathways over time",
+            explanation: "Active recall and spaced repetition build long-term memory structures in the brain."
+          },
+          {
+            question: `What tool is most effective for reviewing active vocabulary or formulas in '${topic}'?`,
+            options: ["Interactive flashcards and quizzes", "Staring at a blank wall", "Scribbling randomly", "Only studying once a year"],
+            answer: "Interactive flashcards and quizzes",
+            explanation: "Gamified interactive flashcards prompt active recall, which is a key way to learn."
+          }
+        ]
+      };
+    }
+
+    // GEMINI AI INTEGRATION with robust offline procedural safety catch
+    async function generateCustomTopic() {
+      const topicInput = document.getElementById("custom-topic-input");
+      const query = topicInput.value.trim();
+
+      if (!query) {
+        showModal("Invalid Topic", "Please type an educational topic or subject to forge your custom quest.", "🖋️");
+        return;
+      }
+
+      const loadOverlay = document.getElementById("ai-loading");
+      loadOverlay.classList.remove("hidden");
+
+      const systemPrompt = `
+        You are an expert educational designer. Generate exactly 5 challenging, high-quality multiple choice study questions about: "${query}".
+        Return the result strictly as a valid JSON object. 
+        Do not include markdown tags like \`\`\`json or \`\`\`. Return ONLY raw parsing JSON.
+        The JSON structure MUST follow this exact schema:
+        {
+          "title": "A short, cool medieval RPG-sounding quest title based on the topic",
+          "questions": [
+            {
+              "question": "Clear, informative question prompt",
+              "options": ["Option A", "Option B", "Option C", "Option D"],
+              "answer": "The exact correct option string",
+              "explanation": "A high value 1-2 sentence breakdown of the concept explaining why the answer is correct."
+            }
+          ]
+        }
+        Provide 4 options for each question. Ensure the "answer" perfectly matches one of the values inside the "options" array.
+      `;
+
+      const apiKey = "";
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [{ parts: [{ text: `Generate questions for topic: ${query}` }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: { 
+          responseMimeType: "application/json"
+        }
+      };
+
+      let success = false;
+      let resultText = "";
+      let delay = 1000;
+
+      // Try live API call up to 3 times (reduced count for speedier response)
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (resultText) {
+              success = true;
+              break;
+            }
+          }
+        } catch (err) {
+          // fallback catches this
+        }
+
+        if (attempt < 3) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 1.5;
+        }
+      }
+
+      loadOverlay.classList.add("hidden");
+
+      if (!success) {
+        // ACTIVATE OFFLINE PROCEDURAL GENERATOR (Never let the app feel broken)
+        console.log("Using procedural offline fallback engine.");
+        const fallbackQuest = generateFallbackDeck(query);
+        startQuest(fallbackQuest.questions, fallbackQuest.title);
+        return;
+      }
+
+      try {
+        const generatedQuest = JSON.parse(resultText);
+        if (generatedQuest && generatedQuest.questions && generatedQuest.questions.length > 0) {
+          startQuest(generatedQuest.questions, generatedQuest.title || `${query} Quest`);
+        } else {
+          throw new Error("Invalid structure returned");
+        }
+      } catch (parseError) {
+        // Parse issue fallback
+        const fallbackQuest = generateFallbackDeck(query);
+        startQuest(fallbackQuest.questions, fallbackQuest.title);
+      }
+    }
+  </script>
+</body>
+</html>

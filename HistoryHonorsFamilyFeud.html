@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Honors Family Feud</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #0b132b;
+            --board-bg: #1c2541;
+            --panel-bg: #3a506b;
+            --text-color: #ffffff;
+            --accent-yellow: #ffb703;
+            --strike-red: #d90429;
+            --border-color: #5bc0be;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Anton', sans-serif;
+            color: var(--accent-yellow);
+            font-size: 3rem;
+            margin: 10px 0;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 5px #000;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        #score-display {
+            color: #5bc0be;
+        }
+
+        .question-box {
+            background-color: var(--board-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+            font-size: 1.5rem;
+            box-shadow: 0px 8px 15px rgba(0,0,0,0.5);
+        }
+
+        /* The Game Board */
+        .board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .board { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 3px solid #000;
+            border-radius: 50px; /* Oval shape */
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Anton', sans-serif;
+            text-transform: uppercase;
+            box-shadow: inset 0px 0px 10px rgba(0,0,0,0.7), 0px 5px 10px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            color: var(--accent-yellow);
+            letter-spacing: 1px;
+            transition: background-color 0.3s;
+        }
+
+        .panel .number {
+            background-color: #000;
+            color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0px 0px 5px #fff;
+        }
+
+        .panel .answer-text {
+            display: none;
+            width: 70%;
+            text-align: left;
+            padding-left: 15px;
+        }
+
+        .panel .points {
+            display: none;
+            width: 20%;
+            text-align: right;
+            padding-right: 15px;
+            color: #fff;
+        }
+
+        .panel.revealed {
+            background-color: #0b132b;
+            border-color: var(--border-color);
+        }
+
+        .panel.revealed .number { display: none; }
+        .panel.revealed .answer-text { display: block; }
+        .panel.revealed .points { display: block; }
+
+        /* Input Area */
+        .controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--board-bg);
+            color: #fff;
+            outline: none;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--accent-yellow);
+            color: #000;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #ffc300;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background-color: #555;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Strikes Area */
+        .strikes-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        .strike {
+            font-family: 'Anton', sans-serif;
+            font-size: 4rem;
+            color: var(--strike-red);
+            visibility: hidden;
+            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+        }
+
+        .strike.active {
+            visibility: visible;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Overlay for large X */
+        #big-x-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        #big-x {
+            font-family: 'Anton', sans-serif;
+            font-size: 25rem;
+            color: var(--strike-red);
+            text-shadow: 5px 5px 0 #000, -5px -5px 0 #000, 5px -5px 0 #000, -5px 5px 0 #000;
+            animation: flashX 1s ease-out forwards;
+        }
+
+        @keyframes flashX {
+            0% { transform: scale(0); opacity: 1; }
+            20% { transform: scale(1); opacity: 1; }
+            80% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        #next-round-btn {
+            display: none;
+            margin-top: 20px;
+            background-color: #5bc0be;
+        }
+
+        #game-over {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-board-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>HONORS FEUD</h1>
+    
+    <div class="hud">
+        <div>Round: <span id="round-display">1</span></div>
+        <div id="score-display">Total Score: 0</div>
+    </div>
+
+    <div id="game-board-area">
+        <div class="question-box" id="question-text">
+            Loading prompt...
+        </div>
+
+        <div class="board" id="board">
+            <!-- Panels generated by JS -->
+        </div>
+
+        <div class="strikes-container" id="strikes-display">
+            <div class="strike" id="strike-1">X</div>
+            <div class="strike" id="strike-2">X</div>
+            <div class="strike" id="strike-3">X</div>
+        </div>
+
+        <div class="controls">
+            <input type="text" id="guess-input" placeholder="Type your answer here..." autocomplete="off">
+            <button id="guess-btn" onclick="handleGuess()">GUESS</button>
+        </div>
+
+        <button id="next-round-btn" onclick="startNextRound()">NEXT ROUND</button>
+    </div>
+
+    <div id="game-over">
+        <h2 style="font-size: 3rem; color: var(--accent-yellow);">GAME OVER!</h2>
+        <p style="font-size: 1.5rem;">Your Final Score: <span id="final-score">0</span></p>
+        <p>Excellent studying! Keep reviewing your vocabulary and IR theories.</p>
+        <button onclick="location.reload()" style="margin-top: 20px;">Play Again</button>
+    </div>
+
+    <!-- Big X animation overlay -->
+    <div id="big-x-overlay">
+        <div id="big-x">X</div>
+    </div>
+
+    <script>
+        // Game Data tailored to the study guide topics
+        const gameData = [
+            {
+                question: "Name one of the major International Relations (IR) theories we studied.",
+                answers: [
+                    { text: "REALISM", points: 40, keywords: ["realism", "realist"] },
+                    { text: "LIBERALISM", points: 30, keywords: ["liberalism", "liberal"] },
+                    { text: "MARXISM", points: 15, keywords: ["marxism", "marxist", "marx"] },
+                    { text: "CONSTRUCTIVISM", points: 10, keywords: ["constructivism", "constructivist"] },
+                    { text: "POST-STRUCTURALISM", points: 5, keywords: ["post-structuralism", "post structuralism", "poststructuralism", "feminism"] }
+                ]
+            },
+            {
+                question: "Name a vocabulary term related to 'News Literacy' and fake news.",
+                answers: [
+                    { text: "ECHO CHAMBER", points: 35, keywords: ["echo chamber", "echochamber", "echo"] },
+                    { text: "ALGORITHM", points: 25, keywords: ["algorithm", "algorithms"] },
+                    { text: "CONFIRMATION BIAS", points: 20, keywords: ["confirmation bias", "bias", "confirmation"] },
+                    { text: "SECTION 230", points: 15, keywords: ["section 230", "230"] },
+                    { text: "DEEP FAKE", points: 5, keywords: ["deep fake", "deepfake", "propaganda"] }
+                ]
+            },
+            {
+                question: "Name a category used to describe people who have fled their homes or migrated.",
+                answers: [
+                    { text: "REFUGEE", points: 40, keywords: ["refugee", "refugees"] },
+                    { text: "IDP", points: 30, keywords: ["idp", "idps", "internally displaced", "internally displaced person"] },
+                    { text: "ECONOMIC MIGRANT", points: 20, keywords: ["economic migrant", "migrant", "economic"] },
+                    { text: "STATELESS PERSON", points: 10, keywords: ["stateless", "stateless person"] }
+                ]
+            },
+            {
+                question: "Name a country or alliance heavily involved in the NATO/European conflict sphere.",
+                answers: [
+                    { text: "RUSSIA", points: 35, keywords: ["russia", "russian"] },
+                    { text: "UKRAINE", points: 25, keywords: ["ukraine", "ukrainian"] },
+                    { text: "NATO", points: 20, keywords: ["nato", "n.a.t.o.", "us", "u.s.", "united states"] },
+                    { text: "TURKEY", points: 10, keywords: ["turkey", "turkish"] },
+                    { text: "BELARUS", points: 10, keywords: ["belarus"] }
+                ]
+            }
+        ];
+
+        let currentRound = 0;
+        let score = 0;
+        let strikes = 0;
+        let revealedCount = 0;
+        let roundAnswers = [];
+
+        const questionEl = document.getElementById('question-text');
+        const boardEl = document.getElementById('board');
+        const inputEl = document.getElementById('guess-input');
+        const guessBtn = document.getElementById('guess-btn');
+        const nextRoundBtn = document.getElementById('next-round-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const roundDisplay = document.getElementById('round-display');
+        const overlay = document.getElementById('big-x-overlay');
+        const bigX = document.getElementById('big-x');
+
+        // Allow pressing "Enter" to guess
+        inputEl.addEventListener("keypress", function(event) {
+            if (event.key === "Enter" && !guessBtn.disabled) {
+                event.preventDefault();
+                handleGuess();
+            }
+        });
+
+        function startRound(roundIndex) {
+            if (roundIndex >= gameData.length) {
+                endGame();
+                return;
+            }
+
+            strikes = 0;
+            revealedCount = 0;
+            roundAnswers = JSON.parse(JSON.stringify(gameData[roundIndex].answers)); // Deep copy to track status
+            roundAnswers.forEach(ans => ans.isRevealed = false);
+            
+            roundDisplay.innerText = roundIndex + 1;
+            questionEl.innerText = gameData[roundIndex].question;
+            
+            // Reset UI
+            document.getElementById('strike-1').classList.remove('active');
+            document.getElementById('strike-2').classList.remove('active');
+            document.getElementById('strike-3').classList.remove('active');
+            inputEl.value = '';
+            inputEl.disabled = false;
+            guessBtn.disabled = false;
+            nextRoundBtn.style.display = 'none';
+            inputEl.focus();
+
+            renderBoard();
+        }
+
+        function renderBoard() {
+            boardEl.innerHTML = '';
+            roundAnswers.forEach((ans, index) => {
+                const panel = document.createElement('div');
+                panel.className = 'panel';
+                panel.id = `panel-${index}`;
+                
+                if (ans.isRevealed) {
+                    panel.classList.add('revealed');
+                    panel.innerHTML = `
+                        <div class="answer-text">${ans.text}</div>
+                        <div class="points">${ans.points}</div>
+                    `;
+                } else {
+                    panel.innerHTML = `<div class="number">${index + 1}</div>
+                                       <div class="answer-text">${ans.text}</div>
+                                       <div class="points">${ans.points}</div>`;
+                }
+                boardEl.appendChild(panel);
+            });
+        }
+
+        function handleGuess() {
+            let guess = inputEl.value.trim().toLowerCase();
+            if (!guess) return;
+
+            let foundIndex = -1;
+
+            // Check if guess matches any unrevealed answer
+            for (let i = 0; i < roundAnswers.length; i++) {
+                if (!roundAnswers[i].isRevealed) {
+                    if (roundAnswers[i].keywords.includes(guess)) {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (foundIndex !== -1) {
+                // Correct guess
+                revealAnswer(foundIndex);
+            } else {
+                // Incorrect guess
+                triggerStrike();
+            }
+
+            inputEl.value = '';
+            inputEl.focus();
+        }
+
+        function revealAnswer(index) {
+            roundAnswers[index].isRevealed = true;
+            revealedCount++;
+            score += roundAnswers[index].points;
+            scoreDisplay.innerText = `Total Score: ${score}`;
+
+            const panel = document.getElementById(`panel-${index}`);
+            panel.classList.add('revealed');
+
+            checkRoundOver();
+        }
+
+        function triggerStrike() {
+            strikes++;
+            
+            // Show small strike
+            if (strikes <= 3) {
+                document.getElementById(`strike-${strikes}`).classList.add('active');
+            }
+
+            // Flash Big X
+            overlay.style.display = 'flex';
+            bigX.style.animation = 'none';
+            bigX.offsetHeight; /* trigger reflow */
+            bigX.style.animation = null; 
+
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                checkRoundOver();
+            }, 1000);
+        }
+
+        function checkRoundOver() {
+            if (revealedCount === roundAnswers.length || strikes >= 3) {
+                endRound();
+            }
+        }
+
+        function endRound() {
+            inputEl.disabled = true;
+            guessBtn.disabled = true;
+
+            // Reveal missing answers (but don't give points)
+            roundAnswers.forEach((ans, index) => {
+                if (!ans.isRevealed) {
+                    const panel = document.getElementById(`panel-${index}`);
+                    setTimeout(() => {
+                        panel.classList.add('revealed');
+                        // Make missed ones slightly red to distinguish
+                        panel.style.backgroundColor = '#4a1525'; 
+                        panel.style.borderColor = '#d90429';
+                    }, index * 300); // Stagger reveal
+                }
+            });
+
+            setTimeout(() => {
+                nextRoundBtn.style.display = 'inline-block';
+            }, roundAnswers.length * 300);
+        }
+
+        function startNextRound() {
+            currentRound++;
+            startRound(currentRound);
+        }
+
+        function endGame() {
+            document.getElementById('game-board-area').style.display = 'none';
+            document.getElementById('game-over').style.display = 'flex';
+            document.getElementById('final-score').innerText = score;
+        }
+
+        // Initialize game
+        startRound(currentRound);
+
+    </script>
+</body>
+</html>
