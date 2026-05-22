@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ludus Latinus - Classical Latin Jeopardy</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React and ReactDOM CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel for JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Google Fonts for Authentic Jeopardy Typography -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    
+    /* Tall, heavy compressed sans-serif mimicking Swiss 937 / Jeopardy Style */
+    .font-jeopardy {
+      font-family: 'Oswald', 'Impact', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #020212;
+    }
+    
+    /* Authentic Jeopardy blue-to-black screen gradient */
+    .jeopardy-blue-bg {
+      background: radial-gradient(circle, #0a11c0 0%, #030540 100%);
+    }
+
+    /* Outer glowing TV game board structure */
+    .jeopardy-grid-container {
+      border: 6px solid #f9d849;
+      box-shadow: 0 0 35px rgba(249, 216, 73, 0.25), inset 0 0 20px rgba(6, 12, 233, 0.4);
+      background-color: #f9d849; /* Solid grid lines */
+    }
+
+    .jeopardy-card-shadow {
+      box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .jeopardy-text-shadow {
+      text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.9);
+    }
+
+    .jeopardy-gold-text {
+      color: #f9d849;
+      text-shadow: 2.5px 2.5px 0px rgba(0, 0, 0, 0.95);
+    }
+
+    /* CRT monitor scanline effect */
+    .scanline::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 2;
+      background-size: 100% 3px, 3px 100%;
+      pointer-events: none;
+    }
+
+    /* Smooth transitions and animations */
+    .animate-fadeIn {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="text-stone-100 min-h-screen">
+
+  <div id="root"></div>
+
+  <!-- React Code with Babel processing -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Web Audio API Sound Generator for retro/Jeopardy sounds
+    const playSound = (type, enabled) => {
+      if (!enabled) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'correct') {
+          // Arpeggio up
+          const now = ctx.currentTime;
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+          osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        } else if (type === 'wrong') {
+          // Downward buzz
+          const now = ctx.currentTime;
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.linearRampToValueAtTime(80, now + 0.4);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else if (type === 'click') {
+          const now = ctx.currentTime;
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === 'daily_double') {
+          const now = ctx.currentTime;
+          osc.type = 'sine';
+          // Retro fanfare
+          [330, 392, 523, 659, 784].forEach((freq, idx) => {
+            const oscNode = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            oscNode.type = 'square';
+            oscNode.frequency.setValueAtTime(freq, now + idx * 0.12);
+            oscNode.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            gainNode.gain.setValueAtTime(0.08, now + idx * 0.12);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.3);
+            oscNode.start(now + idx * 0.12);
+            oscNode.stop(now + idx * 0.12 + 0.35);
+          });
+        }
+      } catch (e) {
+        console.warn('Audio could not be initialized:', e);
+      }
+    };
+
+    const INITIAL_CATEGORIES = [
+      {
+        id: 'cat-nouns',
+        name: 'Nouns & Cases',
+        description: 'Learn how Latin uses word endings to show sentence functions.',
+        questions: [
+          {
+            id: 'n-100',
+            points: 100,
+            question: 'This case is used for the subject of a sentence—the person or thing performing the main action.',
+            answer: 'Nominative Case',
+            tip: 'Think "Name" (from Latin "nomen"). It names the subject! For example, in "Puella currit" (The girl runs), "puella" is nominative.',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'n-200',
+            points: 200,
+            question: 'This case expresses possession or source, and is commonly translated into English using the word "of".',
+            answer: 'Genitive Case',
+            tip: 'Think "Genealogy" or "origin". E.g., "villa puellae" means "the villa of the girl" or "the girl\'s villa".',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'n-300',
+            points: 300,
+            question: 'If a noun is receiving the action as the direct object of a transitive verb, it must take this case.',
+            answer: 'Accusative Case',
+            tip: 'Think "Accuse" (pointing directly at the target). In "puella canem amat" (The girl loves the dog), "canem" is the accusative direct object.',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'n-400',
+            points: 400,
+            question: 'What is the nominative plural ending for standard first declension feminine nouns (like "puella")?',
+            answer: '-ae (e.g., puellae)',
+            tip: 'First declension nouns transition from singular "-a" to plural "-ae". Example: "femina" (woman) becomes "feminae" (women).',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'n-500',
+            points: 500,
+            question: 'This special case is used strictly for direct address, such as calling someone out by their name.',
+            answer: 'Vocative Case',
+            tip: 'Derived from "vocare" (to call). It looks identical to the nominative for almost all nouns, except second declension masculine singulars ending in "-us" which change to "-e" (e.g., Marcus becomes Marce; "Et tu, Brute?").',
+            difficulty: 'Advanced'
+          }
+        ]
+      },
+      {
+        id: 'cat-verbs',
+        name: 'Verbs & Action',
+        description: 'Conjugations, tenses, and person endings.',
+        questions: [
+          {
+            id: 'v-100',
+            points: 100,
+            question: 'In standard present tense verbs, this personal ending is used to represent the first-person singular ("I").',
+            answer: '-o (or -m)',
+            tip: 'Memorize the standard active personal endings in order: -o/-m (I), -s (you), -t (he/she/it), -mus (we), -tis (you all), -nt (they).',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'v-200',
+            points: 200,
+            question: 'What does the verb ending "-mus" indicate about the subject of a Latin verb?',
+            answer: 'First-Person Plural ("We")',
+            tip: 'Whenever a verb ends in "-mus", "we" are the ones doing it! Example: "amamus" = "we love"; "currimus" = "we run".',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'v-300',
+            points: 300,
+            question: 'Translate the present-tense verb form "videt" into English.',
+            answer: 'He, she, or it sees',
+            tip: 'From "videre" (to see - source of English "video"). The "-t" ending marks third-person singular (he/she/it).',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'v-400',
+            points: 400,
+            question: 'Characterized by the letters "-ba-" inserted before the ending, this past tense describes ongoing, incomplete, or repeated actions.',
+            answer: 'Imperfect Tense',
+            tip: 'Typically translated as "was/were verbing". E.g., "portabat" = "he was carrying". A fun trick: think of the sheep bleating "baaa" in the past!',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'v-500',
+            points: 500,
+            question: 'What is the infinitive form (meaning "to be") of the highly irregular verb "sum"?',
+            answer: 'esse',
+            tip: '"Sum" (I am) has the infinitive "esse" (to be). Its present forms are highly irregular: sum, es, est, sumus, estis, sunt.',
+            difficulty: 'Advanced'
+          }
+        ]
+      },
+      {
+        id: 'cat-vocab',
+        name: 'Vocabulary Essentials',
+        description: 'Boost your word power with foundational Latin roots.',
+        questions: [
+          {
+            id: 'vc-100',
+            points: 100,
+            question: 'This core noun, meaning "forest" or "woods," is the ancestor of English words like "sylvan" and the state "Pennsylvania."',
+            answer: 'silva (silvae, f.)',
+            tip: 'Pennsylvania literally translates to "Penn\'s Woods"! It is a classic first-declension feminine noun.',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'vc-200',
+            points: 200,
+            question: 'This essential Latin verb means "to love" or "to like" and is the source of French "aimer" and Spanish "amar."',
+            answer: 'amare',
+            tip: 'This is the model verb for the 1st conjugation (verbs with infinitive ending in "-are"). Present forms: amo, amas, amat...',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'vc-300',
+            points: 300,
+            question: 'From the Latin word "canis", meaning "dog", we get this common English adjective describing dog-like traits.',
+            answer: 'Canine',
+            tip: 'Romans kept guard dogs and placed mosaics at their entrances saying "Cave canem" (Beware of the dog).',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'vc-400',
+            points: 400,
+            question: 'What is the English meaning of the incredibly common Latin conjunction "sed"?',
+            answer: 'but',
+            tip: 'Crucial for compound sentences. E.g., "Non solum... sed etiam" means "Not only... but also."',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'vc-500',
+            points: 500,
+            question: 'The Latin adjective meaning "great," "large," or "grand" is "magnus." What is its feminine nominative singular form?',
+            answer: 'magna',
+            tip: 'Adjectives must match their noun in gender, number, and case. "Magnus" (masculine), "magna" (feminine), "magnum" (neuter).',
+            difficulty: 'Advanced'
+          }
+        ]
+      },
+      {
+        id: 'cat-phrases',
+        name: 'Famous Sayings',
+        description: 'Mottos, legal terms, and historical quotes.',
+        questions: [
+          {
+            id: 'p-100',
+            points: 100,
+            question: 'Meaning "Seize the day!", this famous advice from Horace encourages us to live fully in the present.',
+            answer: 'Carpe diem',
+            tip: 'From Horace\'s Odes. "Carpe" literally means "pluck" or "harvest" (like a ripe fruit), rather than "seize".',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'p-200',
+            points: 200,
+            question: 'Attributed to Julius Caesar after a swift campaign, the words "Veni, vidi, vici" translate to what?',
+            answer: 'I came, I saw, I conquered',
+            tip: 'Written as a message to the Roman Senate in 47 BC after defeating Pharnaces II at the Battle of Zela.',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'p-300',
+            points: 300,
+            question: 'Found on many state crests and plaques, the motto "Ad astra per aspera" translates to "To the stars through..." what?',
+            answer: 'Difficulties / Hardships / Adversities',
+            tip: '"Aspera" is the neuter plural of "asper", meaning rough, harsh, or difficult.',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'p-400',
+            points: 400,
+            question: 'This four-letter abbreviation was the official stamp of Roman sovereignty, translating to "The Senate and People of Rome."',
+            answer: 'SPQR (Senatus Populusque Romanus)',
+            tip: 'The "-que" at the end of "Populusque" is a suffix that means "and", attaching to the second word of a pair.',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'p-500',
+            points: 500,
+            question: 'This popular three-word Latin legal phrase translates to "something for something," implying a mutual exchange.',
+            answer: 'Quid pro quo',
+            tip: 'Literally "what for what". In historical contexts, it was also used to describe substituting one medicine for another.',
+            difficulty: 'Advanced'
+          }
+        ]
+      },
+      {
+        id: 'cat-culture',
+        name: 'Roman Life & Myth',
+        description: 'The world behind the language.',
+        questions: [
+          {
+            id: 'c-100',
+            points: 100,
+            question: 'The third month of our calendar is named after this Roman god of war and agriculture.',
+            answer: 'Mars (March)',
+            tip: 'Mars was considered highly important to Romans, being the mythological father of Rome\'s founders, Romulus and Remus.',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'c-200',
+            points: 200,
+            question: 'Ancient Rome was famously built upon this many geographical hills.',
+            answer: 'Seven (7)',
+            tip: 'The famous hills include the Palatine (where emperors lived) and the Capitoline (where the main temples stood).',
+            difficulty: 'Beginner'
+          },
+          {
+            id: 'c-300',
+            points: 300,
+            question: 'This Roman plaza served as the main marketplace, judicial center, and public meeting arena at the city center.',
+            answer: 'The Forum (Forum Romanum)',
+            tip: 'The term "forum" is still used today to denote an open place of discussion or debate.',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'c-400',
+            points: 400,
+            question: 'This massive active volcano in Southern Italy erupted in 79 AD, burying Pompeii and Herculaneum in ash.',
+            answer: 'Mount Vesuvius',
+            tip: 'Pliny the Younger wrote a vivid description of the eruption, which is why volcanologists still call similar eruptions "Plinian".',
+            difficulty: 'Intermediate'
+          },
+          {
+            id: 'c-500',
+            points: 500,
+            question: 'Worn draped over a tunic, this heavy woolen semi-circular wrap was a symbol of proud Roman citizenship.',
+            answer: 'A toga',
+            tip: 'Only free adult male Roman citizens were legally permitted to wear the toga. Colored stripes indicated different social/political ranks.',
+            difficulty: 'Advanced'
+          }
+        ]
+      }
+    ];
+
+    function App() {
+      const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+      const [teams, setTeams] = useState([
+        { id: 1, name: 'Legion I (Romulus)', score: 0 },
+        { id: 2, name: 'Legion II (Remus)', score: 0 }
+      ]);
+      const [activeQuestion, setActiveQuestion] = useState(null);
+      const [revealed, setRevealed] = useState(false);
+      const [completed, setCompleted] = useState([]); // Array of question IDs
+      const [starred, setStarred] = useState([]); // Bookmarked for studying
+      const [soundEnabled, setSoundEnabled] = useState(true);
+      const [activeTab, setActiveTab] = useState('game'); // 'game' | 'guide' | 'review'
+      
+      // Daily Double configuration
+      const [dailyDoubleId, setDailyDoubleId] = useState('');
+      const [dailyDoubleWager, setDailyDoubleWager] = useState(200);
+      const [showWagerScreen, setShowWagerScreen] = useState(false);
+      const [tempWager, setTempWager] = useState(200);
+
+      // Flashcard active index for review deck
+      const [reviewIdx, setReviewIdx] = useState(0);
+      const [reviewFlipped, setReviewFlipped] = useState(false);
+
+      // Set up Daily Double randomly on first load
+      useEffect(() => {
+        const allQuestions = INITIAL_CATEGORIES.flatMap(c => c.questions);
+        if (allQuestions.length > 0) {
+          const randomIndex = Math.floor(Math.random() * allQuestions.length);
+          setDailyDoubleId(allQuestions[randomIndex].id);
+        }
+      }, []);
+
+      // Handle clicking a card in play mode
+      const handleCardClick = (question, points) => {
+        if (completed.includes(question.id)) return;
+        
+        playSound('click', soundEnabled);
+        setActiveQuestion({ ...question, points });
+        setRevealed(false);
+
+        if (question.id === dailyDoubleId) {
+          playSound('daily_double', soundEnabled);
+          setShowWagerScreen(true);
+          const maxScore = Math.max(...teams.map(t => t.score), 200);
+          setTempWager(200);
+          setDailyDoubleWager(200);
+        }
+      };
+
+      // Submit Daily Double Wager
+      const submitWager = () => {
+        playSound('click', soundEnabled);
+        setDailyDoubleWager(tempWager);
+        setShowWagerScreen(false);
+      };
+
+      // Adjust scores for teams
+      const adjustScore = (teamId, amount) => {
+        setTeams(prev => prev.map(t => {
+          if (t.id === teamId) {
+            const newScore = t.score + amount;
+            playSound(amount > 0 ? 'correct' : 'wrong', soundEnabled);
+            return { ...t, score: newScore };
+          }
+          return t;
+        }));
+      };
+
+      const markQuestionComplete = (qId) => {
+        if (!completed.includes(qId)) {
+          setCompleted(prev => [...prev, qId]);
+        }
+        setActiveQuestion(null);
+        setShowWagerScreen(false);
+      };
+
+      const toggleStar = (qId, e) => {
+        if (e) e.stopPropagation();
+        playSound('click', soundEnabled);
+        setStarred(prev => 
+          prev.includes(qId) ? prev.filter(id => id !== qId) : [...prev, qId]
+        );
+      };
+
+      const resetGame = () => {
+        if (window.confirm("Are you sure you want to reset the scoreboard and board status?")) {
+          setCompleted([]);
+          setTeams(prev => prev.map(t => ({ ...t, score: 0 })));
+          // Re-roll daily double
+          const allQuestions = INITIAL_CATEGORIES.flatMap(c => c.questions);
+          const randomIndex = Math.floor(Math.random() * allQuestions.length);
+          setDailyDoubleId(allQuestions[randomIndex].id);
+          setActiveQuestion(null);
+          setRevealed(false);
+        }
+      };
+
+      const addTeam = () => {
+        if (teams.length >= 4) return;
+        const names = ['Legion III (Caesar)', 'Legion IV (Cicero)', 'Legion V (Augustus)'];
+        const nextName = names[teams.length - 2] || `Legion ${teams.length + 1}`;
+        setTeams(prev => [...prev, { id: Date.now(), name: nextName, score: 0 }]);
+      };
+
+      const removeTeam = (id) => {
+        if (teams.length <= 1) return;
+        setTeams(prev => prev.filter(t => t.id !== id));
+      };
+
+      const updateTeamName = (id, newName) => {
+        setTeams(prev => prev.map(t => t.id === id ? { ...t, name: newName } : t));
+      };
+
+      // Total points remaining on board
+      const totalRemainingPoints = INITIAL_CATEGORIES.reduce((acc, cat) => {
+        return acc + cat.questions.reduce((qAcc, q) => {
+          return qAcc + (completed.includes(q.id) ? 0 : q.points);
+        }, 0);
+      }, 0);
+
+      const starredQuestions = INITIAL_CATEGORIES.flatMap(c => c.questions).filter(q => starred.includes(q.id));
+
+      const handlePrevCard = () => {
+        playSound('click', soundEnabled);
+        setReviewFlipped(false);
+        setReviewIdx(prev => (prev === 0 ? starredQuestions.length - 1 : prev - 1));
+      };
+
+      const handleNextCard = () => {
+        playSound('click', soundEnabled);
+        setReviewFlipped(false);
+        setReviewIdx(prev => (prev === starredQuestions.length - 1 ? 0 : prev + 1));
+      };
+
+      return (
+        <div className="min-h-screen bg-[#020212] text-stone-100 font-sans flex flex-col selection:bg-amber-500 selection:text-stone-950">
+          
+          {/* HEADER BAR */}
+          <header className="border-b-4 border-[#12127a] bg-[#030340] px-4 py-4 shadow-lg">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              
+              {/* Logo & Subtitle */}
+              <div className="flex items-center gap-3">
+                <div className="bg-[#060ce9] p-2.5 rounded border-2 border-[#f9d849] shadow-md">
+                  <span className="font-jeopardy text-xl font-bold tracking-wider text-[#f9d849]">SPQR</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-2xl md:text-3xl font-jeopardy font-black tracking-widest text-[#f9d849] jeopardy-text-shadow">
+                      LUDUS LATINUS
+                    </h1>
+                  </div>
+                  <p className="text-xs text-[#b8baf8] font-semibold tracking-wide uppercase">CLASSICAL JEOPARDY! BOARD</p>
+                </div>
+              </div>
+
+              {/* Navigation Tabs */}
+              <nav className="flex items-center bg-[#01012b] p-1.5 rounded border-2 border-[#12127a]">
+                <button
+                  onClick={() => { playSound('click', soundEnabled); setActiveTab('game'); }}
+                  className={`px-5 py-2 rounded text-xs md:text-sm font-jeopardy transition-all ${
+                    activeTab === 'game' 
+                      ? 'bg-[#f9d849] text-stone-950 font-black shadow-md' 
+                      : 'text-stone-300 hover:text-white hover:bg-[#060ce9]/40'
+                  }`}
+                >
+                  🎮 BOARD
+                </button>
+                <button
+                  onClick={() => { playSound('click', soundEnabled); setActiveTab('guide'); }}
+                  className={`px-5 py-2 rounded text-xs md:text-sm font-jeopardy transition-all ${
+                    activeTab === 'guide' 
+                      ? 'bg-[#f9d849] text-stone-950 font-black shadow-md' 
+                      : 'text-stone-300 hover:text-white hover:bg-[#060ce9]/40'
+                  }`}
+                >
+                  📖 STUDY GUIDE
+                </button>
+                <button
+                  onClick={() => { playSound('click', soundEnabled); setActiveTab('review'); }}
+                  className={`px-5 py-2 rounded text-xs md:text-sm font-jeopardy transition-all relative ${
+                    activeTab === 'review' 
+                      ? 'bg-[#f9d849] text-stone-950 font-black shadow-md' 
+                      : 'text-stone-300 hover:text-white hover:bg-[#060ce9]/40'
+                  }`}
+                >
+                  ⭐ STUDY DECK
+                  {starred.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 px-1 rounded-full flex items-center justify-center font-bold font-sans">
+                      {starred.length}
+                    </span>
+                  )}
+                </button>
+              </nav>
+
+              {/* Audio & Settings Controllers */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className="p-2.5 rounded bg-[#01012b] hover:bg-[#060ce9] border border-[#12127a] text-stone-300 transition-colors"
+                  title={soundEnabled ? "Mute Sound" : "Unmute Sound"}
+                >
+                  {soundEnabled ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-stone-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zm12.364-3.364l-4.243 4.243m0-4.243l4.243 4.243" />
+                    </svg>
+                  )}
+                </button>
+                <button
+                  onClick={resetGame}
+                  className="px-4 py-2 rounded bg-red-950/40 hover:bg-red-900/60 border border-red-800 text-xs font-jeopardy tracking-wider text-red-200 transition-colors"
+                >
+                  🔄 RESET
+                </button>
+              </div>
+
+            </div>
+          </header>
+
+          {/* MAIN LAYOUT */}
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 flex flex-col gap-6">
+
+            {/* --- TAB 1: INTERACTIVE GAMEPLAY BOARD --- */}
+            {activeTab === 'game' && (
+              <div className="flex flex-col gap-6 animate-fadeIn">
+                
+                {/* Board Info Bar */}
+                <div className="bg-[#030340] p-4 rounded border-2 border-[#12127a] flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl text-[#f9d849]">🔔</span>
+                    <div>
+                      <h3 className="font-jeopardy text-base font-bold text-[#f9d849]">Select a clue from the screen matrix</h3>
+                      <p className="text-xs text-[#b8baf8]">Correct answers build your score; incorrect answers deduct points.</p>
+                    </div>
+                  </div>
+                  <div className="bg-[#01012b] px-4 py-2 rounded border border-[#12127a] text-right">
+                    <div className="text-[10px] text-stone-400 font-mono uppercase tracking-wider">Board Total Remaining</div>
+                    <div className="text-lg font-jeopardy font-bold text-[#f9d849]">${totalRemainingPoints}</div>
+                  </div>
+                </div>
+
+                {/* CONTINUOUS GOLD GRID MATRIX ASSEMBLY */}
+                {/* Wrapper to maintain proper grid ratios on small screens without breaking layout */}
+                <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-indigo-900 scrollbar-track-stone-900">
+                  <div className="min-w-[900px] jeopardy-grid-container rounded-lg grid grid-cols-5 gap-[4px]">
+                    {categories.map((cat) => (
+                      <div key={cat.id} className="flex flex-col bg-[#f9d849] gap-[4px]">
+                        
+                        {/* Authentic Blue Category Header */}
+                        <div className="text-center bg-[#060ce9] scanline relative p-3 h-24 flex flex-col items-center justify-center jeopardy-card-shadow">
+                          <h3 className="font-jeopardy font-bold text-sm tracking-wide text-white jeopardy-text-shadow leading-tight line-clamp-2 z-10">
+                            {cat.name}
+                          </h3>
+                        </div>
+
+                        {/* Clue Value Cards */}
+                        <div className="flex flex-col gap-[4px] h-full">
+                          {cat.questions.map((q) => {
+                            const isCompleted = completed.includes(q.id);
+                            const isStarred = starred.includes(q.id);
+                            return (
+                              <button
+                                key={q.id}
+                                disabled={isCompleted}
+                                onClick={() => handleCardClick(q, q.points)}
+                                className={`relative group scanline h-28 w-full font-jeopardy font-bold text-2xl transition-all flex flex-col items-center justify-center jeopardy-card-shadow ${
+                                  isCompleted 
+                                    ? 'bg-[#030340]/40 text-[#070b92] cursor-not-allowed' 
+                                    : 'bg-[#060ce9] hover:bg-[#0d16f5] text-[#f9d849] hover:scale-[1.015]'
+                                }`}
+                              >
+                                {/* Clue Point Value */}
+                                {!isCompleted ? (
+                                  <span className="text-3xl jeopardy-gold-text z-10">${q.points}</span>
+                                ) : (
+                                  <span className="text-xs font-sans text-[#151788] tracking-widest font-black uppercase z-10">USED</span>
+                                )}
+
+                                {/* Star Icon bookmark overlay */}
+                                {!isCompleted && (
+                                  <button
+                                    onClick={(e) => toggleStar(q.id, e)}
+                                    className="absolute bottom-2 right-2 focus:outline-none z-30 p-1"
+                                    title="Add to study deck"
+                                  >
+                                    <span className={`text-sm ${isStarred ? 'text-[#f9d849]' : 'text-blue-900/60 hover:text-white'}`}>
+                                      ★
+                                    </span>
+                                  </button>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* BLUE SCOREBOARD BAR */}
+                <div className="mt-4 bg-[#030340] p-5 rounded border-2 border-[#12127a] jeopardy-card-shadow">
+                  <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-[#12127a]">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">📢</span>
+                      <h3 className="font-jeopardy font-bold text-[#f9d849] text-lg">CONTESTANT SCORES</h3>
+                    </div>
+                    {teams.length < 4 && (
+                      <button
+                        onClick={addTeam}
+                        className="text-xs bg-[#01012b] hover:bg-[#060ce9] text-stone-200 px-3 py-1.5 rounded border border-[#12127a] font-jeopardy transition-all"
+                      >
+                        + ADD PLAYER
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    {teams.map((team) => (
+                      <div key={team.id} className="bg-[#01012b] p-4 rounded border-2 border-[#12127a] flex flex-col justify-between relative group shadow-md">
+                        {/* Remove Contestant Button */}
+                        {teams.length > 1 && (
+                          <button
+                            onClick={() => removeTeam(team.id)}
+                            className="absolute top-2 right-2 text-stone-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                            title="Remove Player"
+                          >
+                            ✕
+                          </button>
+                        )}
+
+                        <div className="mb-2">
+                          <input
+                            type="text"
+                            value={team.name}
+                            onChange={(e) => updateTeamName(team.id, e.target.value)}
+                            className="bg-transparent border-b-2 border-transparent hover:border-[#12127a] focus:border-[#f9d849] font-jeopardy font-bold text-white focus:outline-none w-full text-base"
+                            placeholder="Player Name"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 mt-2">
+                          {/* Retro Score Box */}
+                          <div className="bg-[#02021c] px-3 py-1.5 rounded border border-[#12127a] flex-1">
+                            <span className={`font-mono text-2xl font-black block tracking-wider ${team.score >= 0 ? 'text-[#f9d849]' : 'text-red-500'}`}>
+                              {team.score >= 0 ? `$${team.score}` : `-$${Math.abs(team.score)}`}
+                            </span>
+                          </div>
+
+                          {/* Quick Add/Sub Buttons */}
+                          <div className="flex gap-1.5">
+                            <button
+                              onClick={() => adjustScore(team.id, -100)}
+                              className="bg-red-950/40 hover:bg-red-900/60 text-red-400 w-8 h-8 rounded border border-red-900/40 text-xs font-bold transition-colors"
+                              title="Subtract 100"
+                            >
+                              -
+                            </button>
+                            <button
+                              onClick={() => adjustScore(team.id, 100)}
+                              className="bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-400 w-8 h-8 rounded border border-emerald-900/40 text-xs font-bold transition-colors"
+                              title="Add 100"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* --- TAB 2: STUDY GUIDE BROWSER --- */}
+            {activeTab === 'guide' && (
+              <div className="flex flex-col gap-6 animate-fadeIn">
+                <div className="bg-[#030340] p-5 rounded border-2 border-[#12127a]">
+                  <h2 className="text-xl font-jeopardy font-bold text-[#f9d849] mb-2">📚 Latin Study Guide Matrix</h2>
+                  <p className="text-sm text-[#b8baf8] max-w-3xl">
+                    Skip the gameplay loop and browse all classical category cards below. Each item contains complete target answers and linguistic tip sheets.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  {categories.map(cat => (
+                    <div key={cat.id} className="bg-[#010122] p-5 rounded-lg border-2 border-[#12127a]">
+                      <div className="mb-4 pb-2 border-b border-[#12127a]">
+                        <h3 className="text-xl font-jeopardy font-bold text-[#f9d849]">{cat.name}</h3>
+                        <p className="text-xs text-stone-400">{cat.description}</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {cat.questions.map(q => {
+                          const isStarred = starred.includes(q.id);
+                          return (
+                            <div 
+                              key={q.id} 
+                              className="bg-[#060ce9] p-5 rounded border border-[#12127a] jeopardy-card-shadow flex flex-col justify-between gap-4"
+                            >
+                              <div>
+                                <div className="flex items-center justify-between mb-3">
+                                  <span className="text-[10px] uppercase font-mono tracking-wider bg-[#01012b] text-indigo-300 px-2.5 py-1 rounded border border-[#12127a]">
+                                    {q.difficulty}
+                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-[#f9d849] font-jeopardy">${q.points} Value</span>
+                                    <button
+                                      onClick={(e) => toggleStar(q.id, e)}
+                                      className="focus:outline-none"
+                                      title="Add to Study Deck"
+                                    >
+                                      <span className={`text-lg ${isStarred ? 'text-[#f9d849]' : 'text-indigo-900 hover:text-white'}`}>
+                                        ★
+                                      </span>
+                                    </button>
+                                  </div>
+                                </div>
+                                <h4 className="font-jeopardy text-white font-semibold mb-3 text-lg tracking-wide leading-tight">{q.question}</h4>
+                                <div className="bg-[#01012b] p-4 rounded border border-[#12127a] mb-3">
+                                  <div className="text-[9px] text-stone-500 uppercase tracking-widest font-mono mb-1">Target Answer</div>
+                                  <p className="text-[#f9d849] font-jeopardy font-bold text-xl">{q.answer}</p>
+                                </div>
+                                <div className="text-xs text-[#b8baf8] bg-[#02021c] p-3 rounded border border-[#12127a]">
+                                  <span className="font-bold text-[#f9d849]">Linguistic Tip:</span> {q.tip}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* --- TAB 3: STUDY DECK REVIEW --- */}
+            {activeTab === 'review' && (
+              <div className="flex flex-col gap-6 animate-fadeIn items-center">
+                <div className="bg-[#030340] p-5 rounded border-2 border-[#12127a] w-full">
+                  <h2 className="text-xl font-jeopardy font-bold text-[#f9d849] mb-2">⭐ FLASHCARD REVIEW DECK</h2>
+                  <p className="text-sm text-[#b8baf8] max-w-3xl">
+                    These are your bookmarked study cards. Tap to flip between the Jeopardy! clue and the Latin answer.
+                  </p>
+                </div>
+
+                {starredQuestions.length === 0 ? (
+                  <div className="text-center py-16 bg-[#010122] rounded-lg border-2 border-[#12127a] w-full max-w-md my-8">
+                    <span className="text-5xl block mb-4">🔔</span>
+                    <h3 className="font-jeopardy text-xl font-bold text-[#f9d849] mb-2">No Starred Clues</h3>
+                    <p className="text-xs text-stone-400 px-8 leading-relaxed">Tap the star (★) on any card in the Board or the Study Guide to compile your personal deck.</p>
+                  </div>
+                ) : (
+                  <div className="w-full max-w-xl flex flex-col items-center gap-6 my-4">
+                    
+                    {/* Progress Indicator */}
+                    <div className="text-xs text-stone-400 font-mono font-bold tracking-widest uppercase">
+                      Card {reviewIdx + 1} of {starredQuestions.length}
+                    </div>
+
+                    {/* Interactive Flashcard formatted like a Jeopardy Monitor */}
+                    <div 
+                      onClick={() => { playSound('click', soundEnabled); setReviewFlipped(!reviewFlipped); }}
+                      className={`w-full min-h-[340px] bg-[#060ce9] border-4 border-[#12127a] rounded-xl p-8 flex flex-col justify-between items-center text-center jeopardy-card-shadow cursor-pointer transition-all duration-300 relative select-none ${
+                        reviewFlipped ? 'shadow-lg shadow-blue-500/20 ring-2 ring-[#f9d849]/20' : ''
+                      }`}
+                    >
+                      <div className="absolute top-4 right-4 flex items-center gap-3">
+                        <span className="text-[10px] uppercase font-mono tracking-wider bg-[#01012b] text-[#f9d849] px-2.5 py-1 rounded">
+                          {starredQuestions[reviewIdx].difficulty}
+                        </span>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStar(starredQuestions[reviewIdx].id, e);
+                            if (reviewIdx >= starredQuestions.length - 1 && reviewIdx > 0) {
+                              setReviewIdx(reviewIdx - 1);
+                            }
+                          }}
+                          className="text-[#f9d849] text-xl hover:scale-110 transition-transform"
+                          title="Unstar card"
+                        >
+                          ★
+                        </button>
+                      </div>
+
+                      <div className="my-auto flex flex-col items-center justify-center gap-4 py-6">
+                        {!reviewFlipped ? (
+                          <>
+                            <div className="text-xs text-indigo-300 uppercase tracking-widest font-mono font-bold">Jeopardy Clue / Question</div>
+                            <h3 className="font-jeopardy text-2xl md:text-3xl font-bold text-white jeopardy-text-shadow px-4 leading-relaxed tracking-wider">
+                              "{starredQuestions[reviewIdx].question}"
+                            </h3>
+                            <p className="text-xs text-[#f9d849] italic mt-4 font-bold tracking-wide uppercase">Click Monitor to reveal response</p>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-xs text-[#f9d849] uppercase tracking-widest font-mono font-bold">What is...</div>
+                            <h3 className="font-jeopardy text-3xl font-black text-[#f9d849] jeopardy-text-shadow px-4 tracking-widest">
+                              "{starredQuestions[reviewIdx].answer}"
+                            </h3>
+                            <div className="mt-5 bg-[#01012b] p-4 rounded border border-[#12127a] text-xs text-stone-300 max-w-md text-left leading-relaxed shadow-inner">
+                              <span className="font-bold text-[#f9d849] uppercase">Explanation:</span> {starredQuestions[reviewIdx].tip}
+                            </div>
+                            <p className="text-xs text-indigo-300/80 italic mt-3 font-bold tracking-wide uppercase">Click to flip back</p>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="text-[10px] text-indigo-400 font-bold tracking-widest uppercase">
+                        TAP TO FLIP
+                      </div>
+                    </div>
+
+                    {/* Controller Keys */}
+                    <div className="flex gap-4 items-center justify-between w-full px-6">
+                      <button 
+                        onClick={handlePrevCard}
+                        className="bg-[#030340] hover:bg-[#060ce9] text-stone-200 px-4 py-2 rounded-lg border-2 border-[#12127a] text-xs font-jeopardy tracking-wider transition-colors"
+                      >
+                        ← PREVIOUS
+                      </button>
+
+                      <button
+                        onClick={() => { playSound('click', soundEnabled); setReviewFlipped(!reviewFlipped); }}
+                        className="bg-[#f9d849] hover:bg-yellow-400 text-stone-950 px-6 py-2 rounded-lg text-xs font-jeopardy tracking-widest font-bold"
+                      >
+                        🔄 FLIP MONITOR
+                      </button>
+
+                      <button 
+                        onClick={handleNextCard}
+                        className="bg-[#030340] hover:bg-[#060ce9] text-stone-200 px-4 py-2 rounded-lg border-2 border-[#12127a] text-xs font-jeopardy tracking-wider transition-colors"
+                      >
+                        NEXT →
+                      </button>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            )}
+
+          </main>
+
+          {/* QUESTION PLAY MODAL - FULLY FORMATTED LIKE A BROADCAST TV CLUE */}
+          {activeQuestion && (
+            <div className="fixed inset-0 z-50 bg-[#01011c] jeopardy-blue-bg flex flex-col justify-between p-6 md:p-12 animate-fadeIn">
+              
+              {/* Television Border Overlay */}
+              <div className="absolute inset-4 pointer-events-none border-4 border-double border-[#12127a]/60 rounded-lg"></div>
+              
+              {/* Modal Top Info Bar */}
+              <div className="z-10 flex justify-between items-center border-b-2 border-[#12127a] pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs uppercase font-mono font-bold tracking-widest bg-[#01012b] text-[#f9d849] px-3 py-1 rounded border border-[#12127a]">
+                    {activeQuestion.difficulty}
+                  </span>
+                  {activeQuestion.id === dailyDoubleId && (
+                    <span className="text-xs uppercase font-mono tracking-widest bg-red-600 text-white px-3 py-1 rounded font-black shadow-md animate-pulse">
+                      🔥 DAILY DOUBLE
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={(e) => toggleStar(activeQuestion.id, e)}
+                    className="text-xs font-jeopardy tracking-widest focus:outline-none bg-[#01012b] px-3 py-1.5 rounded border border-[#12127a]"
+                  >
+                    {starred.includes(activeQuestion.id) ? (
+                      <span className="text-[#f9d849]">★ STARRED</span>
+                    ) : (
+                      <span className="text-stone-400 hover:text-stone-200">☆ STAR CLUE</span>
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => markQuestionComplete(activeQuestion.id)}
+                    className="text-stone-400 hover:text-white bg-[#01012b] w-8 h-8 rounded border border-[#12127a] flex items-center justify-center font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* DAILY DOUBLE WAGER SCREEN */}
+              {showWagerScreen ? (
+                <div className="z-10 my-auto text-center flex flex-col items-center gap-6 max-w-xl mx-auto">
+                  <div className="text-5xl">🔥</div>
+                  <h2 className="font-jeopardy text-3xl md:text-4xl font-black text-[#f9d849] jeopardy-text-shadow tracking-widest">
+                    DAILY DOUBLE
+                  </h2>
+                  <p className="text-sm text-[#b8baf8] uppercase tracking-wider">
+                    Place your point wager before viewing the classical clue.
+                  </p>
+                  
+                  <div className="flex flex-col gap-2 w-full max-w-xs mt-6">
+                    <label className="text-xs text-stone-400 uppercase font-mono tracking-wider font-bold">WAGER (XP Points)</label>
+                    <input 
+                      type="number" 
+                      min="50"
+                      max="2000"
+                      value={tempWager}
+                      onChange={(e) => setTempWager(Math.max(1, parseInt(e.target.value) || 0))}
+                      className="bg-[#01012b] border-2 border-[#12127a] focus:border-[#f9d849] text-center font-mono text-3xl font-black text-[#f9d849] py-4 rounded-xl focus:outline-none shadow-inner"
+                    />
+                    <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider mt-1">Min: 50 | Suggestion: 200 XP</span>
+                  </div>
+
+                  <button
+                    onClick={submitWager}
+                    className="mt-6 bg-[#f9d849] hover:bg-yellow-400 text-stone-950 font-jeopardy font-black text-xl px-10 py-3 rounded-lg transition-all shadow-lg"
+                  >
+                    PROCEED TO CLUE
+                  </button>
+                </div>
+              ) : (
+                /* BROADCAST-ACCURATE CLUE SCREEN */
+                <div className="z-10 my-auto flex flex-col items-center justify-center max-w-4xl mx-auto py-8">
+                  
+                  {/* Point Value Header */}
+                  <div className="text-center mb-6">
+                    <div className="text-base text-[#f9d849] font-jeopardy tracking-widest font-bold">
+                      CLUE VALUE: ${activeQuestion.id === dailyDoubleId ? dailyDoubleWager : activeQuestion.points}
+                    </div>
+                  </div>
+
+                  {/* Big Blue Screen Question Text */}
+                  <h2 className="font-jeopardy text-3xl md:text-5xl font-bold text-white jeopardy-text-shadow leading-relaxed text-center tracking-wider px-4 md:px-12 mb-12">
+                    "{activeQuestion.question}"
+                  </h2>
+
+                  {/* Reveal Answer Area */}
+                  {!revealed ? (
+                    <button
+                      onClick={() => { playSound('click', soundEnabled); setRevealed(true); }}
+                      className="bg-[#f9d849] hover:bg-yellow-400 text-stone-950 border-2 border-[#12127a] py-4 px-10 rounded font-jeopardy font-black text-xl transition-all shadow-md tracking-wider"
+                    >
+                      🏛️ REVEAL ANSWER
+                    </button>
+                  ) : (
+                    <div className="w-full flex flex-col gap-6 animate-fadeIn">
+                      
+                      {/* Signature Gold Response Box */}
+                      <div className="bg-[#01012b] p-6 rounded-lg border-2 border-[#12127a] text-center jeopardy-card-shadow">
+                        <span className="text-[10px] text-indigo-400 uppercase font-mono tracking-widest font-bold block mb-1">Response</span>
+                        <h3 className="font-jeopardy text-3xl md:text-4xl font-black text-[#f9d849] jeopardy-text-shadow tracking-widest">
+                          "WHAT IS {activeQuestion.answer}"
+                        </h3>
+                      </div>
+
+                      {/* Linguistic Helper Sheet */}
+                      <div className="bg-[#02021c]/90 p-5 rounded border border-[#12127a] text-xs text-stone-300 max-w-xl mx-auto text-left shadow-lg">
+                        <span className="font-bold text-[#f9d849] block mb-1 uppercase tracking-wide">Classical Study Hint:</span>
+                        {activeQuestion.tip}
+                      </div>
+
+                      {/* SCOREBOARD ACTION PANEL */}
+                      <div className="border-t-2 border-[#12127a] pt-6 max-w-2xl mx-auto w-full">
+                        <h4 className="text-center text-xs text-stone-400 uppercase font-mono tracking-widest font-bold mb-4">AWARD / DEDUCT POINTS</h4>
+                        
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {teams.map((t) => {
+                            const pointsToModify = activeQuestion.id === dailyDoubleId ? dailyDoubleWager : activeQuestion.points;
+                            return (
+                              <div key={t.id} className="bg-[#01012b] p-3 rounded border border-[#12127a] flex flex-col justify-between items-center gap-3">
+                                <span className="text-xs font-bold text-stone-300 truncate w-full text-center font-jeopardy tracking-wide">{t.name}</span>
+                                <div className="flex gap-1.5 w-full justify-center">
+                                  <button
+                                    onClick={() => adjustScore(t.id, -pointsToModify)}
+                                    className="bg-red-950/40 hover:bg-red-600 text-red-400 hover:text-white border border-red-900/40 text-[10px] font-bold py-1 px-2.5 rounded transition-all flex-1"
+                                    title={`Deduct ${pointsToModify}`}
+                                  >
+                                    -{pointsToModify}
+                                  </button>
+                                  <button
+                                    onClick={() => adjustScore(t.id, pointsToModify)}
+                                    className="bg-emerald-950/40 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-900/40 text-[10px] font-bold py-1 px-2.5 rounded transition-all flex-1"
+                                    title={`Award ${pointsToModify}`}
+                                  >
+                                    +{pointsToModify}
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+              {/* Close Button / Bottom Nav Area */}
+              <div className="z-10 flex justify-between items-center border-t-2 border-[#12127a] pt-4">
+                <p className="text-[10px] text-stone-500 font-mono tracking-widest">LUDUS LATINUS TV CONTROL</p>
+                <button
+                  onClick={() => markQuestionComplete(activeQuestion.id)}
+                  className="bg-[#030340] hover:bg-[#060ce9] text-stone-200 border border-[#12127a] text-xs font-jeopardy tracking-widest px-6 py-3 rounded"
+                >
+                  DISMISS BOARD CLUE
+                </button>
+              </div>
+
+            </div>
+          )}
+
+          {/* FOOTER */}
+          <footer className="border-t border-[#12127a] py-6 px-4 bg-[#030340] text-center">
+            <p className="text-[11px] text-[#b8baf8] font-mono tracking-widest font-bold">
+              LUDUS LATINUS — MAGISTER ET CONDISCIPULI ROMANI — ANNO RECENTI MCMLXXXIV
+            </p>
+          </footer>
+
+        </div>
+      );
+    }
+
+    // Render App
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
