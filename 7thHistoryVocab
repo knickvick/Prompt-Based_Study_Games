@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echoes of History: US History, Civil Rights & WWII</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        history: {
+                            50: '#fbf7f4',
+                            100: '#f4eae1',
+                            200: '#e8d2c2',
+                            300: '#d7b29a',
+                            400: '#c38d6f',
+                            500: '#b26e4d',
+                            600: '#a35c3e',
+                            700: '#884931',
+                            800: '#6e3c2b',
+                            900: '#593225',
+                            950: '#301912',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Card Flip Animations */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .preserve-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        /* Grid transitions */
+        .card-transition {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-full flex flex-col font-sans selection:bg-history-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-history-700 rounded-xl text-white shadow-lg shadow-history-900/30">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Echoes of History <span class="text-xs px-2.5 py-0.5 bg-history-500/20 text-history-300 rounded-full font-mono border border-history-500/30">Study Engine</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">US Expansion, Civil Rights, and World War II Era</p>
+                </div>
+            </div>
+            <nav class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button onclick="switchTab('concentration')" id="btn-tab-concentration" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-history-700 text-white shadow">
+                    🎴 Memory Match
+                </button>
+                <button onclick="switchTab('matchup')" id="btn-tab-matchup" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white">
+                    ⚡ Match-Up Rush
+                </button>
+                <button onclick="switchTab('study')" id="btn-tab-study" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white">
+                    📖 Study Desk
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Custom Notification/Toast Area -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+        
+        <!-- SECTION: CONCENTRATION GAME -->
+        <section id="sec-concentration" class="space-y-6">
+            <!-- Set Controls / Deck Selectors -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1 bg-slate-950/40 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="text-xs font-semibold tracking-wider text-history-400 uppercase">Configuration</span>
+                        <h2 class="text-2xl font-bold mt-1 mb-2">Configure Game</h2>
+                        <p class="text-sm text-slate-400 mb-4">Select a curated study deck, difficulty, and visual presentation style. Focus on specific periods or challenge yourself with the complete set.</p>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Select Thematic Deck</label>
+                                <select id="deck-select" onchange="loadSelectedDeck()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-history-500">
+                                    <option value="all-random-8">Quick Mix (8 Random Pairs - 16 Cards)</option>
+                                    <option value="all-random-12" selected>Standard Mix (12 Random Pairs - 24 Cards)</option>
+                                    <option value="sovereignty">Indigenous Sovereignty & Expansion (5 Pairs)</option>
+                                    <option value="civil-rights">Reconstruction & Civil Rights (9 Pairs)</option>
+                                    <option value="wwii-home">WWII Homefront & Pacific (5 Pairs)</option>
+                                    <option value="wwii-europe">WWII Europe & Diplomacy (5 Pairs)</option>
+                                    <option value="mega-mix">Ultimate Full Deck (All 24 Pairs - 48 Cards)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Card Visibility Mode</label>
+                                <select id="visibility-mode" onchange="initializeMemoryGame()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-history-500">
+                                    <option value="face-up" selected>Face-Up (Classic Matching)</option>
+                                    <option value="face-down">Face-Down (Concentration Memory)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Card Content Mode</label>
+                                <select id="content-mode" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-history-500">
+                                    <option value="term-to-def">Match: Term ➔ Definition (Best Learning)</option>
+                                    <option value="term-to-term">Match: Direct Terms (Classic Memory)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-800">
+                        <button onclick="initializeMemoryGame()" class="w-full py-3 px-4 bg-history-600 hover:bg-history-500 active:bg-history-700 text-white rounded-xl font-bold tracking-wide transition-colors flex items-center justify-center gap-2 shadow-lg shadow-history-950/50">
+                            <svg class="w-5 h-5 animate-spin-hover" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.253 8H18"></path>
+                            </svg>
+                            Deal New Game Board
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Scoreboard & Statistics -->
+                <div class="lg:col-span-2 bg-slate-950/40 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                            <span id="game-status-label" class="text-sm font-semibold text-slate-300">Active Game Console</span>
+                        </div>
+                        <span id="deck-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-history-900/40 border border-history-700/50 text-history-300"></span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 my-auto py-2">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
+                            <span class="text-xs text-slate-400 font-semibold block uppercase tracking-wide">Matches</span>
+                            <span id="stat-matches" class="text-2xl font-extrabold text-white block mt-1">0 / 0</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
+                            <span class="text-xs text-slate-400 font-semibold block uppercase tracking-wide">Time</span>
+                            <span id="stat-time" class="text-2xl font-extrabold text-history-400 block mt-1 font-mono">00:00</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
+                            <span class="text-xs text-slate-400 font-semibold block uppercase tracking-wide">Tries Made</span>
+                            <span id="stat-flips" class="text-2xl font-extrabold text-white block mt-1">0</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
+                            <span class="text-xs text-slate-400 font-semibold block uppercase tracking-wide">Accuracy</span>
+                            <span id="stat-accuracy" class="text-2xl font-extrabold text-yellow-400 block mt-1">100%</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                        <p id="help-hint">💡 <span class="font-semibold text-slate-300">How to Play:</span> Click a <span class="text-amber-400 font-bold">Concept Term</span> then match it to its <span class="text-sky-400 font-bold">Definition/Description</span> context!</p>
+                        <button onclick="toggleAudio()" id="btn-audio" class="p-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-slate-300 transition-colors flex items-center gap-1.5 border border-slate-800">
+                            🔊 Sound On
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memory Game Board Grid Container -->
+            <div id="memory-board-wrapper" class="bg-slate-950/60 rounded-3xl p-6 border border-slate-800/80 shadow-2xl relative min-h-[400px] flex items-center justify-center">
+                <div id="memory-board" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full">
+                    <!-- Cards are injected programmatically here -->
+                </div>
+                
+                <!-- Win Overlay State -->
+                <div id="win-overlay" class="hidden absolute inset-0 bg-slate-950/90 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center text-center p-8 z-20">
+                    <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center border border-emerald-500/30 mb-4 animate-bounce">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-white tracking-tight">Historical Knowledge Mastered!</h3>
+                    <p class="text-slate-400 max-w-md mt-2 mb-6">You've successfully matched all historical terms and constitutional concepts to their proper definitions.</p>
+                    
+                    <div class="grid grid-cols-3 gap-6 max-w-sm w-full bg-slate-900 p-4 rounded-2xl border border-slate-800 mb-6">
+                        <div>
+                            <span class="text-xs text-slate-400">Total Attempts</span>
+                            <p id="win-flips" class="text-xl font-bold text-white"></p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400">Final Time</span>
+                            <p id="win-time" class="text-xl font-bold text-history-400 font-mono"></p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400">Accuracy</span>
+                            <p id="win-accuracy" class="text-xl font-bold text-yellow-400"></p>
+                        </div>
+                    </div>
+
+                    <button onclick="initializeMemoryGame()" class="py-3 px-8 bg-history-600 hover:bg-history-500 text-white font-bold tracking-wide rounded-xl transition-all shadow-lg shadow-history-950/80">
+                        Deal Next Board
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: MATCH-UP RUSH -->
+        <section id="sec-matchup" class="hidden space-y-6">
+            <div class="bg-slate-950/40 p-5 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">⚡ Match-Up Rush</h2>
+                    <p class="text-sm text-slate-400">Match the term on the left with its definition on the right. High speed, high retention drill.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="initializeMatchupGame()" class="py-2.5 px-5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-sm font-bold transition-all">
+                        Reset Board & Shuffle
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+                <!-- Left Side: Terms -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-amber-400 px-1">Concepts & Terms</h3>
+                    <div id="matchup-terms" class="space-y-3">
+                        <!-- Instantiated through Javascript -->
+                    </div>
+                </div>
+
+                <!-- Right Side: Definitions -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-sky-400 px-1">Definitions / Historical Events</h3>
+                    <div id="matchup-defs" class="space-y-3">
+                        <!-- Instantiated through Javascript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Complete/Success State for Match-Up -->
+            <div id="matchup-complete-banner" class="hidden bg-emerald-950/30 border border-emerald-500/30 p-6 rounded-2xl text-center">
+                <h3 class="text-xl font-bold text-emerald-400 mb-2">⚡ Perfect Connection!</h3>
+                <p class="text-sm text-slate-300 max-w-lg mx-auto mb-4">You successfully linked all 6 random vocabulary pairings correctly. Let's practice with another batch.</p>
+                <button onclick="initializeMatchupGame()" class="py-2 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl transition-all">
+                    Load Next Match-Up Batch
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION: STUDY DESK -->
+        <section id="sec-study" class="hidden space-y-6">
+            <div class="bg-slate-950/40 p-6 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-bold text-white">📖 Interactive Study Desk</h2>
+                    <p class="text-sm text-slate-400">Browse through the entire glossary of 24 terms, categorized by historically related eras and themes.</p>
+                </div>
+                <div class="w-full sm:w-auto flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="search-bar" onkeyup="filterStudyList()" placeholder="Search terms & histories..." class="bg-transparent border-none text-sm text-white focus:outline-none w-full sm:w-64">
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex flex-wrap gap-2 pb-2">
+                <button onclick="setStudyFilter('all')" class="study-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-history-700 text-white border border-history-600">
+                    All Terms (24)
+                </button>
+                <button onclick="setStudyFilter('sovereignty')" class="study-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                    Sovereignty & Expansion (5)
+                </button>
+                <button onclick="setStudyFilter('civil-rights')" class="study-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                    Civil Rights & Constitution (9)
+                </button>
+                <button onclick="setStudyFilter('wwii-home')" class="study-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                    WWII Homefront & Pacific (5)
+                </button>
+                <button onclick="setStudyFilter('wwii-europe')" class="study-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+                    WWII Europe & Settlements (5)
+                </button>
+            </div>
+
+            <!-- Glossary Grid -->
+            <div id="study-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards filled by Javascript -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-800 bg-slate-950 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p>© 2026 Echoes of History. Interactive Educational Module.</p>
+            <div class="flex gap-4">
+                <a href="#" onclick="switchTab('study')" class="hover:underline">Study Dictionary</a>
+                <span class="text-slate-750">•</span>
+                <a href="#" onclick="switchTab('concentration')" class="hover:underline">Concentration Board</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AUDIO DRIVER (Synthesized Web Audio API Sound Effects) -->
+    <script>
+        let isAudioEnabled = true;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btn-audio');
+            if (isAudioEnabled) {
+                btn.innerHTML = '🔊 Sound On';
+                btn.className = "p-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-slate-300 transition-colors flex items-center gap-1.5 border border-slate-800";
+                playNote(523.25, 'sine', 0.1); // C5 quick chirp
+            } else {
+                btn.innerHTML = '🔇 Sound Off';
+                btn.className = "p-2 bg-slate-950 hover:bg-slate-900 rounded-lg text-slate-500 transition-colors flex items-center gap-1.5 border border-slate-900";
+            }
+        }
+
+        function playNote(frequency, type, duration, delay = 0) {
+            if (!isAudioEnabled) return;
+            setTimeout(() => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type || 'sine';
+                    osc.frequency.value = frequency;
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                } catch (e) {
+                    console.error("Audio playback error:", e);
+                }
+            }, delay * 1000);
+        }
+
+        function soundFlip() {
+            playNote(329.63, 'sine', 0.15); // E4
+        }
+
+        function soundMatch() {
+            playNote(523.25, 'triangle', 0.2); // C5
+            playNote(659.25, 'triangle', 0.35, 0.1); // E5
+        }
+
+        function soundMismatch() {
+            playNote(220.00, 'sawtooth', 0.25); // A3
+            playNote(196.00, 'sawtooth', 0.3, 0.05); // G3
+        }
+
+        function soundVictory() {
+            const notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
+            notes.forEach((note, i) => {
+                playNote(note, 'sine', 0.3, i * 0.08);
+            });
+        }
+    </script>
+
+    <!-- CORE VOCABULARY ENGINE & GAME CONTROLLER -->
+    <script>
+        // Updated Database of all 24 US History terms
+        const VOCABULARY_DB = [
+            {
+                term: "Missouri Compromise",
+                definition: "An 1820 federal statute regulating slavery in western territories, establishing the 36°30′ parallel line as a boundary.",
+                category: "sovereignty"
+            },
+            {
+                term: "Worcester v. Georgia",
+                definition: "An 1832 Supreme Court case ruling Cherokee lands sovereign, which was famously ignored by President Andrew Jackson.",
+                category: "sovereignty"
+            },
+            {
+                term: "Treaty of New Echota",
+                definition: "An unauthorized 1835 treaty signed by a minor Cherokee faction, which the US used to force the Cherokee Trail of Tears.",
+                category: "sovereignty"
+            },
+            {
+                term: "Dawes Act",
+                definition: "An 1887 law dividing tribal reservations into individual family allotments to forcibly assimilate Native Americans.",
+                category: "sovereignty"
+            },
+            {
+                term: "Indigenous Boarding Schools",
+                definition: "Late 19th & 20th-century government-funded institutions systematically stripping Native children of their cultural identities.",
+                category: "sovereignty"
+            },
+            {
+                term: "13th Amendment",
+                definition: "The 1865 constitutional amendment officially abolishing slavery, except as a punishment for a crime.",
+                category: "civil-rights"
+            },
+            {
+                term: "14th Amendment",
+                definition: "The 1868 amendment granting citizenship and equal protection under the law, vital to modern civil rights litigation.",
+                category: "civil-rights"
+            },
+            {
+                term: "15th Amendment",
+                definition: "The 1870 amendment prohibiting voting restrictions based on race, color, or previous condition of servitude.",
+                category: "civil-rights"
+            },
+            {
+                term: "Plessy v. Ferguson",
+                definition: "An 1896 landmark Supreme Court decision validating segregation under the legal doctrine of 'separate but equal'.",
+                category: "civil-rights"
+            },
+            {
+                term: "Great Migration",
+                definition: "The widespread relocation of millions of African Americans from the rural South to urban Northern and Western cities (1916–1970).",
+                category: "civil-rights"
+            },
+            {
+                term: "Harlem Renaissance",
+                definition: "A vibrant 1920s artistic and literary movement celebrating black cultural identity, expression, and history.",
+                category: "civil-rights"
+            },
+            {
+                term: "Brown v. Board of Education",
+                definition: "The 1954 Supreme Court case declaring that segregated public schools are inherently unequal and unconstitutional.",
+                category: "civil-rights"
+            },
+            {
+                term: "Civil Rights Act of 1964",
+                definition: "A landmark federal law outlawing discrimination in public accommodations, employment, and education based on race or sex.",
+                category: "civil-rights"
+            },
+            {
+                term: "Voting Rights Act of 1965",
+                definition: "A historic statute outlawing discriminatory voting practices (such as literacy tests) to secure the black franchise.",
+                category: "civil-rights"
+            },
+            {
+                term: "Propaganda",
+                definition: "Biased or misleading information disseminated by governments to shape public opinion and mobilize war efforts.",
+                category: "wwii-home"
+            },
+            {
+                term: "Pearl Harbor",
+                definition: "The surprise military strike by the Imperial Japanese Navy on Hawaii on December 7, 1941, drawing the US into WWII.",
+                category: "wwii-home"
+            },
+            {
+                term: "Day of Infamy Speech",
+                definition: "President Franklin D. Roosevelt's address to Congress requesting a declaration of war following the attack on Pearl Harbor.",
+                category: "wwii-home"
+            },
+            {
+                term: "Tuskegee Airmen",
+                definition: "The pioneering group of African American military pilots and support personnel who fought with distinction in World War II.",
+                category: "wwii-home"
+            },
+            {
+                term: "D-Day",
+                definition: "The June 6, 1944 allied amphibious invasion of Normandy, establishing a major Western Front against Axis forces.",
+                category: "wwii-europe"
+            },
+            {
+                term: "Yalta Conference",
+                definition: "The February 1945 summit of FDR, Churchill, and Stalin to plan Europe's post-war partition, occupation, and restoration.",
+                category: "wwii-europe"
+            },
+            {
+                term: "Victory in Europe Day",
+                definition: "Celebrated on May 8, 1945, marking the formal acceptance of Nazi Germany's unconditional surrender.",
+                category: "wwii-europe"
+            },
+            {
+                term: "Trinity Test",
+                definition: "The first-ever detonation of a nuclear weapon, conducted by the US military in New Mexico on July 16, 1945.",
+                category: "wwii-home"
+            },
+            {
+                term: "Potsdam Declaration",
+                definition: "A July 1945 Allied statement warning Japan of 'prompt and utter destruction' if it did not immediately surrender.",
+                category: "wwii-europe"
+            },
+            {
+                term: "Instrument of Surrender",
+                definition: "The formal written agreement signed aboard the USS Missouri on September 2, 1945, officially ending World War II.",
+                category: "wwii-europe"
+            }
+        ];
+
+        // Global State Keepers
+        let activeTab = 'concentration';
+        let memoryDeck = [];
+        let flippedCards = [];
+        let matchedPairsCount = 0;
+        let totalPairs = 0;
+        let isBoardLocked = false;
+        let moveCount = 0;
+        let secondsElapsed = 0;
+        let timerInterval = null;
+        let activeStudyFilter = 'all';
+
+        // 1. Tab Switching Functionality
+        function switchTab(tabId) {
+            activeTab = tabId;
+            
+            // Toggle Section Visibilities
+            document.getElementById('sec-concentration').classList.add('hidden');
+            document.getElementById('sec-matchup').classList.add('hidden');
+            document.getElementById('sec-study').classList.add('hidden');
+            
+            document.getElementById('btn-tab-concentration').className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white";
+            document.getElementById('btn-tab-matchup').className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white";
+            document.getElementById('btn-tab-study').className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white";
+
+            if (tabId === 'concentration') {
+                document.getElementById('sec-concentration').classList.remove('hidden');
+                document.getElementById('btn-tab-concentration').className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-history-700 text-white shadow";
+            } else if (tabId === 'matchup') {
+                document.getElementById('sec-matchup').classList.remove('hidden');
+                document.getElementById('btn-tab-matchup').className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-amber-600 text-white shadow";
+                initializeMatchupGame();
+            } else if (tabId === 'study') {
+                document.getElementById('sec-study').classList.remove('hidden');
+                document.getElementById('btn-tab-study').className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-indigo-700 text-white shadow";
+                initializeStudyDesk();
+            }
+        }
+
+        // Helper: Toast System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgClass = {
+                success: 'bg-emerald-900/90 border-emerald-500 text-emerald-200',
+                error: 'bg-rose-950/90 border-rose-500 text-rose-200',
+                info: 'bg-slate-900/90 border-slate-700 text-slate-200'
+            }[type];
+
+            toast.className = `p-4 rounded-xl border-l-4 shadow-xl flex items-center gap-3 text-xs md:text-sm font-medium backdrop-blur-sm pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${bgClass}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <div>${message}</div>
+            `;
+
+            container.appendChild(toast);
+            
+            // Animate In
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Animate Out & Destroy
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // 2. CONCENTRATION / CLASSIC MATCH GAME FUNCTIONS
+        function loadSelectedDeck() {
+            const val = document.getElementById('deck-select').value;
+            const badge = document.getElementById('deck-badge');
+            
+            const labelMap = {
+                'all-random-8': "8 Random Matchups",
+                'all-random-12': "12 Random Matchups",
+                'sovereignty': "Sovereignty & Expansion",
+                'civil-rights': "Civil Rights & Constitution",
+                'wwii-home': "WWII Home & Pacific",
+                'wwii-europe': "WWII Europe & Diplomacy",
+                'mega-mix': "Full Deck Challenge"
+            };
+            
+            badge.innerText = labelMap[val] || "Custom Deck";
+        }
+
+        function getDeckItems() {
+            const val = document.getElementById('deck-select').value;
+            let pool = [];
+
+            if (val.startsWith('all-random-') || val === 'mega-mix') {
+                const count = val === 'all-random-8' ? 8 : val === 'all-random-12' ? 12 : 24;
+                const shuffled = [...VOCABULARY_DB].sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count);
+            }
+
+            // Categorical decks
+            switch (val) {
+                case 'sovereignty':
+                    return VOCABULARY_DB.filter(x => x.category === 'sovereignty');
+                case 'civil-rights':
+                    return VOCABULARY_DB.filter(x => x.category === 'civil-rights');
+                case 'wwii-home':
+                    return VOCABULARY_DB.filter(x => x.category === 'wwii-home');
+                case 'wwii-europe':
+                    return VOCABULARY_DB.filter(x => x.category === 'wwii-europe');
+                default:
+                    return VOCABULARY_DB.slice(0, 8);
+            }
+        }
+
+        function initializeMemoryGame() {
+            clearInterval(timerInterval);
+            document.getElementById('win-overlay').classList.add('hidden');
+            
+            const rawDeck = getDeckItems();
+            totalPairs = rawDeck.length;
+            matchedPairsCount = 0;
+            moveCount = 0;
+            secondsElapsed = 0;
+            flippedCards = [];
+            isBoardLocked = false;
+
+            // Stats Update
+            document.getElementById('stat-matches').innerText = `0 / ${totalPairs}`;
+            document.getElementById('stat-time').innerText = "00:00";
+            document.getElementById('stat-flips').innerText = "0";
+            document.getElementById('stat-accuracy').innerText = "100%";
+
+            loadSelectedDeck();
+
+            const isFaceUp = document.getElementById('visibility-mode').value === 'face-up';
+            const isTermToDef = document.getElementById('content-mode').value === 'term-to-def';
+
+            // Set contextual header status labels
+            document.getElementById('game-status-label').innerText = isFaceUp ? "Active Match Console (Classic Mode)" : "Active Memory Console (Concentration Mode)";
+            document.getElementById('help-hint').innerHTML = isFaceUp 
+                ? `💡 <span class="font-semibold text-slate-350">Classic Face-Up Mode:</span> Tap any Term, then tap its match! Correct pairings will seal green.` 
+                : `💡 <span class="font-semibold text-slate-350">Concentration Mode:</span> Click a card to reveal, and seek out its paired card!`;
+
+            let cardsData = [];
+
+            rawDeck.forEach((item, index) => {
+                // Card A: Term Card
+                cardsData.push({
+                    id: `term-${index}`,
+                    pairId: index,
+                    type: 'term',
+                    displayText: item.term,
+                    fulltext: item.term
+                });
+
+                // Card B: Definition or Duplicate Term Card
+                cardsData.push({
+                    id: `def-${index}`,
+                    pairId: index,
+                    type: 'def',
+                    displayText: isTermToDef ? item.definition : item.term,
+                    fulltext: isTermToDef ? item.definition : item.term
+                });
+            });
+
+            // Randomize Card Order
+            cardsData.sort(() => 0.5 - Math.random());
+
+            // Render Cards into HTML
+            const board = document.getElementById('memory-board');
+            board.innerHTML = '';
+
+            // Handle responsive columns dynamically depending on deck size
+            if (cardsData.length <= 16) {
+                board.className = "grid grid-cols-2 md:grid-cols-4 gap-4 w-full";
+            } else if (cardsData.length <= 24) {
+                board.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full";
+            } else {
+                board.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 w-full";
+            }
+
+            cardsData.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.id = `card-wrapper-${card.id}`;
+                
+                const isTerm = card.type === 'term';
+                
+                // Color assignments for card borders
+                const cardThemeFront = isTerm 
+                    ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-amber-600/30 text-amber-100 shadow-md shadow-amber-950/20' 
+                    : 'bg-gradient-to-br from-slate-900 to-slate-850 border-sky-600/30 text-sky-100 shadow-md shadow-sky-950/20';
+
+                const cardHeading = isTerm 
+                    ? '<span class="text-[10px] md:text-xs uppercase tracking-wider text-amber-500 font-semibold mb-1">Concept</span>'
+                    : '<span class="text-[10px] md:text-xs uppercase tracking-wider text-sky-400 font-semibold mb-1">Definition Context</span>';
+
+                if (isFaceUp) {
+                    // FLAT FACE-UP CARD DESIGN
+                    cardEl.className = "w-full cursor-pointer h-36 md:h-40 relative rounded-2xl border border-slate-850 transition-all duration-200 hover:border-slate-700 hover:scale-[1.01] flex items-center justify-center p-0.5 active:scale-95";
+                    cardEl.setAttribute('onclick', `selectCardFaceUp(this, '${card.id}', ${card.pairId}, '${card.type}')`);
+                    
+                    cardEl.innerHTML = `
+                        <div class="card-inner-frame w-full h-full rounded-2xl flex flex-col p-3 border-2 ${cardThemeFront} transition-all duration-300">
+                            <div class="flex items-start justify-between">
+                                ${cardHeading}
+                                <span class="text-[9px] font-mono opacity-40 px-1 bg-slate-850 rounded border border-slate-700/10">ID:${card.pairId}</span>
+                            </div>
+                            <div class="flex-grow flex items-center justify-center overflow-y-auto mt-1 pr-1 custom-scrollbar">
+                                <p class="text-center font-medium leading-snug tracking-tight text-xs md:text-[13px] break-words max-h-full">
+                                    ${card.displayText}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // 3D FACE-DOWN CARD DESIGN
+                    cardEl.className = "aspect-square w-full perspective-1000 cursor-pointer h-36 md:h-40";
+                    cardEl.setAttribute('onclick', `flipCard(this, '${card.id}', ${card.pairId}, '${card.type}')`);
+
+                    cardEl.innerHTML = `
+                        <div class="preserve-3d card-transition w-full h-full relative rounded-2xl border border-slate-700/80 bg-slate-900 shadow shadow-slate-950 flex items-center justify-center">
+                            
+                            <!-- Back Face (Covered) -->
+                            <div class="backface-hidden absolute inset-0 w-full h-full bg-gradient-to-tr from-slate-950 to-slate-900 hover:from-slate-900 hover:to-slate-850 rounded-2xl flex flex-col items-center justify-center border border-slate-800 p-4 text-center transition-all duration-200">
+                                <div class="w-10 h-10 rounded-full bg-history-950/40 border border-history-800/60 flex items-center justify-center text-history-500/80 text-lg font-bold mb-1 shadow-inner">
+                                    ?
+                                </div>
+                                <span class="text-[10px] tracking-wider font-semibold text-slate-500 uppercase">Reveal Context</span>
+                            </div>
+
+                            <!-- Front Face -->
+                            <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full rounded-2xl flex flex-col p-3 border-2 ${cardThemeFront}">
+                                <div class="flex items-start justify-between">
+                                    ${cardHeading}
+                                    <span class="text-[9px] font-mono opacity-45 px-1 bg-slate-800/30 rounded border border-slate-700/10">ID:${card.pairId}</span>
+                                </div>
+                                <div class="flex-grow flex items-center justify-center overflow-y-auto mt-1 pr-1 custom-scrollbar">
+                                    <p class="text-center font-medium leading-snug tracking-tight text-xs md:text-[13px] break-words max-h-full">
+                                        ${card.displayText}
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    `;
+                }
+
+                board.appendChild(cardEl);
+            });
+
+            // Start Clock Timer
+            startTimer();
+            showToast(`Dealt game of ${totalPairs} pairs successfully! Match cards.`, 'info');
+        }
+
+        // Timer controller
+        function startTimer() {
+            secondsElapsed = 0;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
+                document.getElementById('stat-time').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        // --- FACE-UP MATCHING GAME LOGIC ---
+        function selectCardFaceUp(el, cardId, pairId, type) {
+            if (isBoardLocked) return;
+            if (el.classList.contains('matched')) return;
+
+            // If card is already selected, unselect it
+            if (flippedCards.some(c => c.id === cardId)) {
+                soundFlip();
+                const innerFrame = el.querySelector('.card-inner-frame');
+                innerFrame.classList.remove('ring-4', 'ring-amber-500', 'ring-sky-400');
+                flippedCards = flippedCards.filter(c => c.id !== cardId);
+                return;
+            }
+
+            soundFlip();
+
+            // Highlight selected card visually
+            const innerFrame = el.querySelector('.card-inner-frame');
+            if (type === 'term') {
+                innerFrame.classList.add('ring-4', 'ring-amber-500');
+            } else {
+                innerFrame.classList.add('ring-4', 'ring-sky-400');
+            }
+
+            // Record choice
+            flippedCards.push({ id: cardId, pairId, type, element: el });
+
+            if (flippedCards.length === 2) {
+                isBoardLocked = true;
+                moveCount++;
+                document.getElementById('stat-flips').innerText = moveCount;
+                
+                checkMatchFaceUp();
+            }
+        }
+
+        function checkMatchFaceUp() {
+            const [first, second] = flippedCards;
+
+            if (first.pairId === second.pairId) {
+                // SUCCESS MATCH
+                matchedPairsCount++;
+                soundMatch();
+                document.getElementById('stat-matches').innerText = `${matchedPairsCount} / ${totalPairs}`;
+
+                setTimeout(() => {
+                    const cardsToHighlight = [first.element, second.element];
+                    cardsToHighlight.forEach(card => {
+                        card.classList.add('matched');
+                        card.style.pointerEvents = 'none'; // Lock card interaction
+                        
+                        const inner = card.querySelector('.card-inner-frame');
+                        inner.classList.remove('ring-4', 'ring-amber-500', 'ring-sky-400');
+                        inner.classList.remove('border-amber-600/30', 'border-sky-600/30');
+                        // Set matching green success theme and dim slightly
+                        inner.classList.add('border-emerald-500', 'bg-emerald-950/25', 'text-emerald-100', 'opacity-60');
+                    });
+
+                    flippedCards = [];
+                    isBoardLocked = false;
+
+                    if (matchedPairsCount === totalPairs) {
+                        triggerWin();
+                    }
+                }, 450);
+
+            } else {
+                // MISMATCH
+                soundMismatch();
+
+                setTimeout(() => {
+                    const cardsToReset = [first.element, second.element];
+                    cardsToReset.forEach(card => {
+                        const inner = card.querySelector('.card-inner-frame');
+                        inner.classList.remove('ring-4', 'ring-amber-500', 'ring-sky-400');
+                        // Flash error feedback
+                        inner.classList.add('border-rose-500', 'bg-rose-950/20');
+                    });
+
+                    setTimeout(() => {
+                        cardsToReset.forEach(card => {
+                            const inner = card.querySelector('.card-inner-frame');
+                            inner.classList.remove('border-rose-500', 'bg-rose-950/20');
+                        });
+                        flippedCards = [];
+                        isBoardLocked = false;
+                    }, 800);
+
+                }, 400);
+            }
+
+            // Recalculate accuracy percentage
+            const accuracy = Math.round((matchedPairsCount / moveCount) * 100);
+            document.getElementById('stat-accuracy').innerText = `${accuracy}%`;
+        }
+
+        // --- FACE-DOWN CONCENTRATION LOGIC ---
+        function flipCard(el, cardId, pairId, type) {
+            // Check board lock conditions
+            if (isBoardLocked) return;
+            if (flippedCards.some(c => c.id === cardId)) return; // Already clicked this turn
+            if (el.classList.contains('matched')) return;
+
+            soundFlip();
+
+            // Perform flip visual action (Rotate 180deg)
+            const innerElement = el.querySelector('.preserve-3d');
+            innerElement.classList.add('rotate-y-180');
+
+            // Track flipped items
+            flippedCards.push({ id: cardId, pairId, type, element: el });
+
+            if (flippedCards.length === 2) {
+                isBoardLocked = true;
+                moveCount++;
+                document.getElementById('stat-flips').innerText = moveCount;
+                
+                checkMatchFaceDown();
+            }
+        }
+
+        function checkMatchFaceDown() {
+            const [first, second] = flippedCards;
+
+            if (first.pairId === second.pairId) {
+                // MATCH ACCRUAL
+                matchedPairsCount++;
+                soundMatch();
+
+                document.getElementById('stat-matches').innerText = `${matchedPairsCount} / ${totalPairs}`;
+
+                // Set green successful state styling
+                setTimeout(() => {
+                    const cardsToHighlight = [first.element, second.element];
+                    cardsToHighlight.forEach(card => {
+                        card.classList.add('matched');
+                        const cardFrame = card.querySelector('.preserve-3d > div:nth-child(2)');
+                        cardFrame.classList.remove('border-amber-600/30', 'border-sky-600/30');
+                        cardFrame.classList.add('border-emerald-500', 'bg-emerald-950/25', 'text-emerald-100');
+                    });
+
+                    // Clear active tracking
+                    flippedCards = [];
+                    isBoardLocked = false;
+
+                    // Trigger Win state
+                    if (matchedPairsCount === totalPairs) {
+                        triggerWin();
+                    }
+                }, 400);
+
+            } else {
+                // MISMATCH STATE
+                soundMismatch();
+                
+                setTimeout(() => {
+                    // Turn them back face down
+                    first.element.querySelector('.preserve-3d').classList.remove('rotate-y-180');
+                    second.element.querySelector('.preserve-3d').classList.remove('rotate-y-180');
+                    
+                    flippedCards = [];
+                    isBoardLocked = false;
+                }, 1300);
+            }
+
+            // Recalculate accuracy percentage
+            const accuracy = Math.round((matchedPairsCount / moveCount) * 100);
+            document.getElementById('stat-accuracy').innerText = `${accuracy}%`;
+        }
+
+        function triggerWin() {
+            clearInterval(timerInterval);
+            soundVictory();
+
+            const finalMins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const finalSecs = String(secondsElapsed % 60).padStart(2, '0');
+            const accuracy = Math.round((matchedPairsCount / moveCount) * 100);
+
+            document.getElementById('win-flips').innerText = moveCount;
+            document.getElementById('win-time').innerText = `${finalMins}:${finalSecs}`;
+            document.getElementById('win-accuracy').innerText = `${accuracy}%`;
+
+            setTimeout(() => {
+                document.getElementById('win-overlay').classList.remove('hidden');
+            }, 800);
+        }
+
+
+        // 3. MATCH-UP RUSH CONTROLLER
+        let matchupActiveSelection = null;
+        let matchupRemainingPairs = 0;
+
+        function initializeMatchupGame() {
+            document.getElementById('matchup-complete-banner').classList.add('hidden');
+            
+            // Pull a random pool of 6 items to match
+            const shuffled = [...VOCABULARY_DB].sort(() => 0.5 - Math.random());
+            const activePool = shuffled.slice(0, 6);
+            matchupRemainingPairs = 6;
+            matchupActiveSelection = null;
+
+            // Prep terms array & definitions array
+            const termsList = activePool.map((item, idx) => ({ id: idx, term: item.term }));
+            const defsList = activePool.map((item, idx) => ({ id: idx, definition: item.definition }));
+
+            // Double Shuffle separately so alignment doesn't match directly index-wise
+            termsList.sort(() => 0.5 - Math.random());
+            defsList.sort(() => 0.5 - Math.random());
+
+            // Render Term Cards
+            const termContainer = document.getElementById('matchup-terms');
+            termContainer.innerHTML = '';
+            termsList.forEach(t => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-100 transition-all font-bold text-sm select-none relative focus:outline-none flex justify-between items-center group";
+                btn.id = `matchup-term-${t.id}`;
+                btn.setAttribute('onclick', `handleMatchupClick('term', ${t.id})`);
+                btn.innerHTML = `
+                    <span>${t.term}</span>
+                    <span class="w-2.5 h-2.5 rounded-full border border-slate-700 bg-slate-950 group-hover:border-amber-500"></span>
+                `;
+                termContainer.appendChild(btn);
+            });
+
+            // Render Definition Cards
+            const defContainer = document.getElementById('matchup-defs');
+            defContainer.innerHTML = '';
+            defsList.forEach(d => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500/50 text-slate-300 transition-all text-xs md:text-sm select-none relative focus:outline-none flex justify-between items-center gap-3 group";
+                btn.id = `matchup-def-${d.id}`;
+                btn.setAttribute('onclick', `handleMatchupClick('def', ${d.id})`);
+                btn.innerHTML = `
+                    <span class="w-2.5 h-2.5 shrink-0 rounded-full border border-slate-700 bg-slate-950 group-hover:border-sky-500"></span>
+                    <span class="flex-grow">${d.definition}</span>
+                `;
+                defContainer.appendChild(btn);
+            });
+
+            showToast("Created a new fast-paced matching pool!", 'info');
+        }
+
+        function handleMatchupClick(type, id) {
+            const elementId = `matchup-${type}-${id}`;
+            const targetBtn = document.getElementById(elementId);
+
+            // If selected item is already matched successfully, ignore clicks
+            if (targetBtn.classList.contains('matched')) return;
+
+            soundFlip();
+
+            // Clear previous highlighting
+            if (matchupActiveSelection) {
+                const prevEl = document.getElementById(`matchup-${matchupActiveSelection.type}-${matchupActiveSelection.id}`);
+                if (prevEl) {
+                    prevEl.classList.remove('border-amber-500', 'border-sky-500', 'bg-slate-850/60');
+                }
+            }
+
+            // If clicking the same category type again, simply re-assign selection
+            if (matchupActiveSelection && matchupActiveSelection.type === type) {
+                matchupActiveSelection = { type, id };
+                targetBtn.classList.add(type === 'term' ? 'border-amber-500' : 'border-sky-500', 'bg-slate-850/60');
+                return;
+            }
+
+            // If no active selection, set current selection
+            if (!matchupActiveSelection) {
+                matchupActiveSelection = { type, id };
+                targetBtn.classList.add(type === 'term' ? 'border-amber-500' : 'border-sky-500', 'bg-slate-850/60');
+                return;
+            }
+
+            // Evaluate Match-Up
+            if (matchupActiveSelection.id === id) {
+                // Success! Match confirmed.
+                soundMatch();
+                
+                const matchedTermEl = document.getElementById(`matchup-term-${id}`);
+                const matchedDefEl = document.getElementById(`matchup-def-${id}`);
+
+                // Update styling to state permanent success
+                [matchedTermEl, matchedDefEl].forEach(el => {
+                    el.className = "w-full text-left p-4 rounded-xl bg-emerald-950/20 border-emerald-500/70 text-emerald-100 transition-all text-xs md:text-sm select-none pointer-events-none flex items-center gap-3 matched";
+                });
+                matchedTermEl.innerHTML += ` <span class="text-emerald-400 font-bold ml-auto text-xs">✓ Checked</span>`;
+                matchedDefEl.innerHTML = `✓ <span class="flex-grow text-slate-300">${matchedDefEl.innerText}</span>`;
+
+                matchupRemainingPairs--;
+                matchupActiveSelection = null;
+
+                if (matchupRemainingPairs === 0) {
+                    soundVictory();
+                    document.getElementById('matchup-complete-banner').classList.remove('hidden');
+                }
+            } else {
+                // Fail Match-Up
+                soundMismatch();
+                
+                // Highlight red temporarily
+                const activeEl = document.getElementById(`matchup-${matchupActiveSelection.type}-${matchupActiveSelection.id}`);
+                const wrongBorderClass = type === 'term' ? 'border-amber-500' : 'border-sky-500';
+                
+                [targetBtn, activeEl].forEach(el => {
+                    if (el) {
+                        el.classList.add('border-rose-600', 'bg-rose-950/20');
+                    }
+                });
+
+                showToast("Incorrect pairing. Double-check your history context!", "error");
+
+                setTimeout(() => {
+                    [targetBtn, activeEl].forEach(el => {
+                        if (el) {
+                            el.classList.remove('border-rose-600', 'bg-rose-950/20', 'border-amber-500', 'border-sky-500', 'bg-slate-850/60');
+                        }
+                    });
+                }, 1000);
+
+                matchupActiveSelection = null;
+            }
+        }
+
+
+        // 4. STUDY DESK CONTROLLER
+        function initializeStudyDesk() {
+            const grid = document.getElementById('study-grid');
+            grid.innerHTML = '';
+
+            VOCABULARY_DB.forEach(item => {
+                const card = document.createElement('div');
+                
+                // Set appropriate category tags for UI visual aid
+                const catLabel = {
+                    'sovereignty': "Sovereignty & Expansion",
+                    'civil-rights': "Civil Rights & Constitution",
+                    'wwii-home': "WWII Homefront & Pacific",
+                    'wwii-europe': "WWII Europe & Settlements"
+                }[item.category];
+
+                const badgeBg = {
+                    'sovereignty': "bg-amber-900/30 text-amber-300 border-amber-800/40",
+                    'civil-rights': "bg-emerald-900/30 text-emerald-300 border-emerald-800/40",
+                    'wwii-home': "bg-indigo-900/30 text-indigo-300 border-indigo-800/40",
+                    'wwii-europe': "bg-pink-900/30 text-pink-300 border-pink-800/40"
+                }[item.category];
+
+                card.className = "bg-slate-900/60 hover:bg-slate-900 rounded-2xl p-5 border border-slate-800/80 hover:border-slate-700/80 transition-all duration-200 shadow-md flex flex-col justify-between space-y-4 study-card";
+                card.setAttribute('data-category', item.category);
+                card.setAttribute('data-term', item.term.toLowerCase());
+                card.setAttribute('data-definition', item.definition.toLowerCase());
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase border ${badgeBg}">
+                                ${catLabel}
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white tracking-tight">${item.term}</h3>
+                        <p class="text-sm text-slate-350 leading-relaxed mt-2 font-serif">
+                            "${item.definition}"
+                        </p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function setStudyFilter(category) {
+            activeStudyFilter = category;
+            
+            // Highlight current active filter button
+            const buttons = document.querySelectorAll('.study-filter-btn');
+            buttons.forEach(btn => {
+                btn.className = "study-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors";
+            });
+
+            // Target correct event sender
+            event.target.className = "study-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-history-700 text-white border border-history-600 transition-colors";
+
+            filterStudyList();
+        }
+
+        function filterStudyList() {
+            const searchVal = document.getElementById('search-bar').value.toLowerCase();
+            const cards = document.querySelectorAll('.study-card');
+
+            cards.forEach(card => {
+                const term = card.getAttribute('data-term');
+                const def = card.getAttribute('data-definition');
+                const cat = card.getAttribute('data-category');
+
+                const matchesSearch = term.includes(searchVal) || def.includes(searchVal);
+                const matchesCategory = activeStudyFilter === 'all' || cat === activeStudyFilter;
+
+                if (matchesSearch && matchesCategory) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+
+        // Initialization trigger
+        window.onload = function() {
+            // Setup default memory game when screen opens
+            initializeMemoryGame();
+        };
+    </script>
+</body>
+</html>
